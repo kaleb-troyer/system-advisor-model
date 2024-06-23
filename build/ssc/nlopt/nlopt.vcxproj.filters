@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\auglag.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\bobyqa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\ccsa_quadratic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\cdirect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\cobyla.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\crs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\deprecated.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\DIRect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\direct_wrap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\DIRserial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\DIRsubrout.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\esch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\general.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\hybrid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\isres.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\mlsl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\mma.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\mssubs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\mt19937ar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\newuoa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\nldrmd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\optimize.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\plip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\plis.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\pnet.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\praxis.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\pssubs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\qsort_r.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\redblack.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\rescale.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\sbplx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\slsqp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\sobolseq.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\stop.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\sys\time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\nlopt\timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\ssc\nlopt\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F359FC73-6DA5-37D1-9EB5-9C19495A6F8F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

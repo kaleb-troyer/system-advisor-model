@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\colamd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\commonlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\fortify.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\ini.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_crash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_Hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_lib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_LUSOL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_matrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_MDO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_mipbb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_MPS.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_params.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_presolve.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_price.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_pricePSE.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_report.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_rlp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_scale.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_simplex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_solve.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_SOS.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lp_wlp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\lusol.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\mmio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\myblas.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\lpsolve\yacc_read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\ssc\lpsolve\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F359FC73-6DA5-37D1-9EB5-9C19495A6F8F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

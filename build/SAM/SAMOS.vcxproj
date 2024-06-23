@@ -1,0 +1,503 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B330B8D1-DB53-343F-8CE5-716BCB1A7D50}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>SAMOS</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\.repositories\sam_dev\SAM\deploy\x64\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SAMOS.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SAMOSd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\.repositories\sam_dev\SAM\deploy\x64\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SAMOS.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SAMOS</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/source/wxWidgets-3.2.4/lib/vc_x64_lib/mswu" /external:I "C:/source/wxWidgets-3.2.4/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;_MBCS;__WXMSW__;__64BIT__;LK_USE_WXWIDGETS;UNICODE;_UNICODE;_LIB;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;__WXMSW__;__64BIT__;LK_USE_WXWIDGETS;UNICODE;_UNICODE;_LIB;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>								</Message>
+      <Command>setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/dbghelp.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libcurl.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libeay32.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libssh2.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/msvcp140.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/openssl.exe C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/ssleay32.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/vcruntime140.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:/source/.repositories/sam_dev/build/ssc/ssc/Debug/sscd.dll C:/source/.repositories/sam_dev/build/ssc/ssc/Debug/sscd.lib C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\lk\Debug\lkd.lib;..\Debug\wexd.lib;..\ssc\ssc\Debug\sscd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_xrc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_webview.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_stc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_richtext.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_ribbon.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_propgrid.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_aui.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_gl.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_html.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_qa.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_adv.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_core.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32ud_xml.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32ud_net.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32ud.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxscintillad.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxpngd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxtiffd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxjpegd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxzlibd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxregexud.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxexpatd.lib;opengl32.lib;glu32.lib;imm32.lib;winmm.lib;comctl32.lib;uuid.lib;oleacc.lib;uxtheme.lib;rpcrt4.lib;shlwapi.lib;version.lib;wsock32.lib;C:\source\.repositories\sam_dev\wex\build_resources\libcurl_ssl_x64\lib\libcurl.lib;Winhttp.lib;..\ssc\solarpilot\Debug\solarpilot_cored.lib;..\ssc\tcs\Debug\tcsd.lib;..\ssc\nlopt\Debug\nloptd.lib;..\ssc\shared\Debug\sharedd.lib;..\ssc\lpsolve\Debug\lpsolved.lib;..\ssc\splinter\Debug\splinterd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/source/.repositories/sam_dev/build/SAM/Debug/SAMOSd.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/source/.repositories/sam_dev/SAM/deploy/x64/SAMOSd.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/source/wxWidgets-3.2.4/lib/vc_x64_lib/mswu" /external:I "C:/source/wxWidgets-3.2.4/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_MBCS;__WXMSW__;__64BIT__;LK_USE_WXWIDGETS;UNICODE;_UNICODE;_LIB;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_MBCS;__WXMSW__;__64BIT__;LK_USE_WXWIDGETS;UNICODE;_UNICODE;_LIB;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\SAM\src;C:\source\.repositories\sam_dev\wex\include;C:\source\.repositories\sam_dev\lk\include;C:\source\.repositories\sam_dev\ssc;C:\source\.repositories\sam_dev\SAM\..\tcs;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>								</Message>
+      <Command>setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/dbghelp.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libcurl.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libeay32.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/libssh2.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/msvcp140.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/openssl.exe C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/ssleay32.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:\source\.repositories\sam_dev\wex/build_resources/libcurl_ssl_x64/bin/vcruntime140.dll C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\source\CMake\bin\cmake.exe -E copy C:/source/.repositories/sam_dev/build/ssc/ssc/Release/ssc.dll C:/source/.repositories/sam_dev/build/ssc/ssc/Release/ssc.lib C:/source/.repositories/sam_dev/SAM/deploy/x64
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>..\lk\Release\lk.lib;..\Release\wex.lib;..\ssc\ssc\Release\ssc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_xrc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_webview.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_stc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_richtext.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_ribbon.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_propgrid.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_aui.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_gl.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_html.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_qa.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_adv.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_core.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32u_xml.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32u_net.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32u.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxscintilla.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxpng.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxtiff.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxjpeg.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxzlib.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxregexu.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxexpat.lib;opengl32.lib;glu32.lib;imm32.lib;winmm.lib;comctl32.lib;uuid.lib;oleacc.lib;uxtheme.lib;rpcrt4.lib;shlwapi.lib;version.lib;wsock32.lib;C:\source\.repositories\sam_dev\wex\build_resources\libcurl_ssl_x64\lib\libcurl.lib;Winhttp.lib;..\ssc\solarpilot\Release\solarpilot_core.lib;..\ssc\tcs\Release\tcs.lib;..\ssc\nlopt\Release\nlopt.lib;..\ssc\shared\Release\shared.lib;..\ssc\lpsolve\Release\lpsolve.lib;..\ssc\splinter\Release\splinter.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/source/.repositories/sam_dev/build/SAM/Release/SAMOS.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/source/.repositories/sam_dev/SAM/deploy/x64/SAMOS.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\SAM\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/source/.repositories/sam_dev/SAM/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\source\CMake\bin\cmake.exe -SC:/source/.repositories/sam_dev -BC:/source/.repositories/sam_dev/build --check-stamp-file C:/source/.repositories/sam_dev/build/SAM/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\CMake\share\cmake-3.30\Modules\FindPackageHandleStandardArgs.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindPackageMessage.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindwxWidgets.cmake;C:\source\CMake\share\cmake-3.30\Modules\UsewxWidgets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\.repositories\sam_dev\build\SAM\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/source/.repositories/sam_dev/SAM/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\source\CMake\bin\cmake.exe -SC:/source/.repositories/sam_dev -BC:/source/.repositories/sam_dev/build --check-stamp-file C:/source/.repositories/sam_dev/build/SAM/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\CMake\share\cmake-3.30\Modules\FindPackageHandleStandardArgs.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindPackageMessage.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindwxWidgets.cmake;C:\source\CMake\share\cmake-3.30\Modules\UsewxWidgets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\.repositories\sam_dev\build\SAM\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\private.h" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\main_add.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\ide.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\ide.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\lossdiag.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\lossdiag.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\defmgr.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\defmgr.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\urdb.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\urdb.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\macro.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\macro.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\s3engine.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\s3engine.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\s3objects.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\s3objects.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\s3tool.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\s3tool.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\s3view.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\s3view.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\stochastic.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\stochastic.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\nsrdb.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\nsrdb.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\windtoolkit.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\windtoolkit.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\wavetoolkit.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\wavetoolkit.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\gridsupport.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\gridsupport.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\p50p90.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\p50p90.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\pvuncertainty.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\pvuncertainty.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\reports.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\reports.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\script.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\script.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\graph.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\graph.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\uncertainties.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\uncertainties.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\excelexch.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\excelexch.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\simulation.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\simulation.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\library.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\library.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\results.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\results.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\ipagelist.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\ipagelist.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\casewin.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\casewin.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\invoke.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\invoke.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\case.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\case.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\main.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\main.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\equations.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\equations.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\inputpage.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\inputpage.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\uiobjects.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\uiobjects.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\lossadj.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\lossadj.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\widgets.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\widgets.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\variables.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\variables.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\project.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\project.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\object.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\object.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\variablegrid.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\variablegrid.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\parametric.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\parametric.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\welcome.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\welcome.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\ptlayoutctrl.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\ptlayoutctrl.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\troughloop.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\troughloop.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\shadingfactors.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\shadingfactors.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\materials.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\materials.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\codegenerator.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\codegenerator.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\pythonhandler.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\pythonhandler.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\combinecases.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\combinecases.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\ptesdesignptdialog.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\ptesdesignptdialog.h" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\SAM\src\geotools.cpp" />
+    <ClInclude Include="C:\source\.repositories\sam_dev\SAM\src\geotools.h" />
+    <ResourceCompile Include="C:\source\.repositories\sam_dev\SAM\build_resources\SAM.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ZERO_CHECK.vcxproj">
+      <Project>{A2A45B3F-0DE5-3C2E-A5BB-8CB9F6E9985B}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\lk\lk.vcxproj">
+      <Project>{3A703314-FAD2-3763-BB48-EA45C5ED0B45}</Project>
+      <Name>lk</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\lpsolve\lpsolve.vcxproj">
+      <Project>{AEF0C9CB-F311-3DD5-96B0-692DEE504B9B}</Project>
+      <Name>lpsolve</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\nlopt\nlopt.vcxproj">
+      <Project>{E17185D0-6F6A-3D07-B194-AE3BF50C31F0}</Project>
+      <Name>nlopt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\shared\shared.vcxproj">
+      <Project>{E61B884B-C44E-34BE-9FEE-A4A92E000C67}</Project>
+      <Name>shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\solarpilot\solarpilot_core.vcxproj">
+      <Project>{CBADC0FD-F861-3940-8704-4504952AF646}</Project>
+      <Name>solarpilot_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\splinter\splinter.vcxproj">
+      <Project>{5261D39F-F349-376B-BEA0-04ED5B143FEA}</Project>
+      <Name>splinter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\ssc\ssc.vcxproj">
+      <Project>{DF5D2D44-0180-3DD6-9F50-72D8EA365E09}</Project>
+      <Name>ssc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ssc\tcs\tcs.vcxproj">
+      <Project>{82AE1EFB-189D-313B-A26E-0228EC89B4E3}</Project>
+      <Name>tcs</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\wex\src\wex.vcxproj">
+      <Project>{C0F36628-6F74-37B2-B5AF-08E8C4CB7ACD}</Project>
+      <Name>wex</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

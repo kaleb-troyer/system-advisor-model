@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\build\CMakeFiles\cc8ce1a758b0672de224ad586d401e66\build-time-make-directory.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\ssc\ssc\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\source\.repositories\sam_dev\build\ssc\ssc\CMakeFiles\build-time-make-directory" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A8DA3378-9B1C-35EB-AF6A-D9E08A3FCC56}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

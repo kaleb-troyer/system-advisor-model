@@ -1,0 +1,25 @@
+# CMake generation dependency list for this directory.
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeCInformation.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeCXXInformation.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeGenericSystem.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeInitializeConfigs.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeLanguageInformation.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeRCInformation.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeSystemSpecificInformation.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/CMakeSystemSpecificInitialize.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Compiler/MSVC-C.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Compiler/MSVC-CXX.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Compiler/MSVC.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/Windows-Initialize.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/Windows-MSVC-C.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/Windows-MSVC-CXX.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/Windows-MSVC.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/Windows.cmake
+C:/repositories/.dependencies/CMake/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake
+C:/repositories/sam_dev/CMakeLists.txt
+C:/repositories/sam_dev/build/CMakeFiles/3.29.0/CMakeCCompiler.cmake
+C:/repositories/sam_dev/build/CMakeFiles/3.29.0/CMakeCXXCompiler.cmake
+C:/repositories/sam_dev/build/CMakeFiles/3.29.0/CMakeRCCompiler.cmake
+C:/repositories/sam_dev/build/CMakeFiles/3.29.0/CMakeSystem.cmake

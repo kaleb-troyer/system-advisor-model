@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\bspline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\bsplinebasis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\bsplinebasis1d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\bsplinebuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\datapoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\datatable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\function.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\knots.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\mykroneckerproduct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\source\.repositories\sam_dev\ssc\splinter\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\ssc\splinter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{F359FC73-6DA5-37D1-9EB5-9C19495A6F8F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

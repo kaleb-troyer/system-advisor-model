@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B947F828-8644-3929-9363-AE7EAA8B26EF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>lk_sandbox</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\.repositories\sam_dev\build\lk\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lk_sandbox.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lk_sandboxd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\.repositories\sam_dev\build\lk\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lk_sandbox.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lk_sandbox</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/source/wxWidgets-3.2.4/lib/vc_x64_lib/mswu" /external:I "C:/source/wxWidgets-3.2.4/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;NOPCH;LK_USE_WXWIDGETS;UNICODE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;NOPCH;LK_USE_WXWIDGETS;UNICODE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>Debug\lkd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_qa.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_webview.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_aui.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_richtext.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_html.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_propgrid.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_adv.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32ud_net.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_stc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32ud_core.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32ud.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxscintillad.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxpngd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxtiffd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxjpegd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxzlibd.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxregexud.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxexpatd.lib;imm32.lib;winmm.lib;comctl32.lib;uuid.lib;oleacc.lib;uxtheme.lib;rpcrt4.lib;shlwapi.lib;version.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/source/.repositories/sam_dev/build/lk/Debug/lk_sandboxd.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/source/.repositories/sam_dev/build/lk/Debug/lk_sandboxd.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/source/wxWidgets-3.2.4/lib/vc_x64_lib/mswu" /external:I "C:/source/wxWidgets-3.2.4/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MinimalRebuild></MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;NOPCH;LK_USE_WXWIDGETS;UNICODE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;NOPCH;LK_USE_WXWIDGETS;UNICODE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\source\.repositories\sam_dev\lk\include;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\mswu;C:\source\wxWidgets-3.2.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>Release\lk.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_qa.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_webview.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_aui.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_richtext.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_html.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_propgrid.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_adv.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32u_net.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_stc.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxmsw32u_core.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxbase32u.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxscintilla.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxpng.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxtiff.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxjpeg.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxzlib.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxregexu.lib;C:\source\wxWidgets-3.2.4\lib\vc_x64_lib\wxexpat.lib;imm32.lib;winmm.lib;comctl32.lib;uuid.lib;oleacc.lib;uxtheme.lib;rpcrt4.lib;shlwapi.lib;version.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/source/.repositories/sam_dev/build/lk/Release/lk_sandbox.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/source/.repositories/sam_dev/build/lk/Release/lk_sandbox.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\source\.repositories\sam_dev\lk\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/source/.repositories/sam_dev/lk/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\source\CMake\bin\cmake.exe -SC:/source/.repositories/sam_dev -BC:/source/.repositories/sam_dev/build --check-stamp-file C:/source/.repositories/sam_dev/build/lk/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\CMake\share\cmake-3.30\Modules\FindPackageHandleStandardArgs.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindPackageMessage.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindwxWidgets.cmake;C:\source\CMake\share\cmake-3.30\Modules\UsewxWidgets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\source\.repositories\sam_dev\build\lk\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/source/.repositories/sam_dev/lk/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\source\CMake\bin\cmake.exe -SC:/source/.repositories/sam_dev -BC:/source/.repositories/sam_dev/build --check-stamp-file C:/source/.repositories/sam_dev/build/lk/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\CMake\share\cmake-3.30\Modules\FindPackageHandleStandardArgs.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindPackageMessage.cmake;C:\source\CMake\share\cmake-3.30\Modules\FindwxWidgets.cmake;C:\source\CMake\share\cmake-3.30\Modules\UsewxWidgets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\source\.repositories\sam_dev\build\lk\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\absyn.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\eval.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\parse.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\vm.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\codegen.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\invoke.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\env.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\lex.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\sqlite3.c" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\src\stdlib.cpp" />
+    <ClCompile Include="C:\source\.repositories\sam_dev\lk\sandbox\sandbox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\ZERO_CHECK.vcxproj">
+      <Project>{A2A45B3F-0DE5-3C2E-A5BB-8CB9F6E9985B}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\source\.repositories\sam_dev\build\lk\lk.vcxproj">
+      <Project>{3A703314-FAD2-3763-BB48-EA45C5ED0B45}</Project>
+      <Name>lk</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
