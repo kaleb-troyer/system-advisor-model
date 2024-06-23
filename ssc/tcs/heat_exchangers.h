@@ -514,10 +514,12 @@ public:
         double m_P_h_in;			//[kPa] Hot fluid inlet pressure
         double m_P_h_out;			//[kPa] Hot fluid outlet pressure
         double m_m_dot_hot_des;		//[kg/s] hot fluid design mass flow rate
+        double m_V_dot_hot_des;		//[kg/s] hot fluid design volumetric flow rate
         double m_T_c_in;			//[K] Design-point cold inlet temperature
         double m_P_c_in;			//[kPa] Cold fluid inlet temperature
         double m_P_c_out;			//[kPa] Cold fluid outlet temperature
         double m_m_dot_cold_des;	//[kg/s] cold fluid design mass flow rate
+        double m_V_dot_cold_des;	//[kg/s] cold fluid design mass flow rate
 
         double m_eff_max;			//[-] Max allowable effectiveness
 
@@ -525,7 +527,7 @@ public:
         {
             m_T_h_in = m_P_h_in = m_P_h_out = m_m_dot_hot_des =
                 m_T_c_in = m_P_c_in = m_P_c_out = m_m_dot_cold_des =
-
+                m_V_dot_hot_des = m_V_dot_cold_des = 
                 m_eff_max = std::numeric_limits<double>::quiet_NaN();
         }
     };

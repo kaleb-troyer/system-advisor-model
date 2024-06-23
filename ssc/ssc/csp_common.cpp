@@ -741,7 +741,7 @@ bool are_values_sig_different(double v1, double v2, double tol)
 
 var_info vtab_sco2_design[] = {
 
-	/*   VARTYPE   DATATYPE         NAME               LABEL                                                    UNITS     META  GROUP REQUIRED_IF CONSTRAINTS     UI_HINTS*/
+	/*   VARTYPE   DATATYPE         NAME               LABEL                                                  UNITS          META        GROUP     REQUIRED_IF   CONSTRAINTS   UI_HINTS*/
 	// ** Design Parameters **
 		// System Design
 	{ SSC_INPUT,  SSC_NUMBER,  "htf",                  "Integer code for HTF used in PHX",                       "",           "",    "System Design",      "*",     "",       "" },
@@ -802,8 +802,8 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "dT_PHX_cold_approach", "Temp diff btw cold HTF and cold CO2",                    "C",          "",    "PHX Design",      "*",     "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "PHX_n_sub_hx",         "Number of subsections in PHX model",                     "-",          "",    "PHX Design",      "?=10",  "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "PHX_od_model",         "0: mass flow scale, 1: conductance ratio model",         "-",          "",    "PHX Design",      "?=1",   "",       "" },
-    { SSC_INPUT,  SSC_NUMBER,  "PHX_cost_model",       "Cost model for primary heat exchanger",                  "-",          "",    "PHX Design",      "*",     "",       "" },
-
+    { SSC_INPUT,  SSC_NUMBER,  "PHX_cost_model",       "Cost model for primary heat exchanger",                  "-",          "",    "PHX Design",      "",      "",       "" },
+    
         // Air Cooler Design
 	{ SSC_INPUT,  SSC_NUMBER,  "is_design_air_cooler", "Defaults to True. False will skip air cooler calcs",     "",           "",    "Air Cooler Design",      "?=1.0", "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "fan_power_frac",       "Fraction of net cycle power consumed by air cooler fan", "",           "",    "Air Cooler Design",      "*",     "",       "" },
@@ -815,6 +815,7 @@ var_info vtab_sco2_design[] = {
 		// System Design Solution
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_htf_cold_des",       "HTF design cold temperature (PHX outlet)",               "C",          "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "m_dot_htf_des",        "HTF mass flow rate",                                     "kg/s",       "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "V_dot_htf_des",        "HTF volumetric flow rate",                               "m3/s",       "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_calc",     "Calculated cycle thermal efficiency",                    "-",          "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "m_dot_co2_full",       "CO2 mass flow rate through HTR, PHX, turbine",           "kg/s",       "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "recomp_frac",          "Recompression fraction",                                 "-",          "System Design Solution",    "",      "*",     "",       "" },
@@ -823,7 +824,7 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "cycle_spec_cost_thermal", "Cycle specific (thermal) cost bare erected",          "$/kWt",      "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
-    // Compressor
+        // Compressor
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_comp_in",            "Compressor inlet temperature",                           "C",          "Compressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "P_comp_in",            "Compressor inlet pressure",                              "MPa",        "Compressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "P_comp_out",           "Compressor outlet pressure",                             "MPa",        "Compressor",    "",      "*",     "",       "" },
@@ -1422,9 +1423,11 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     double comp_cost_bare_erected_sum = 0.0;    //[M$]
 	double comp_power_sum = 0.0; //[MWe]
 	double m_dot_htf_design = c_sco2_cycle.get_phx_des_par()->m_m_dot_hot_des;	//[kg/s]
+    double V_dot_htf_design = c_sco2_cycle.get_phx_des_par()->m_V_dot_hot_des;	//[m3/s]
 	double T_htf_cold_calc = c_sco2_cycle.get_design_solved()->ms_phx_des_solved.m_T_h_out;		//[K]
 	cm->assign("T_htf_cold_des", (ssc_number_t)(T_htf_cold_calc - 273.15));		//[C] convert from K
 	cm->assign("m_dot_htf_des", (ssc_number_t)m_dot_htf_design);				//[kg/s]
+    cm->assign("V_dot_htf_des", (ssc_number_t)V_dot_htf_design);				//[m3/s]
 	cm->assign("eta_thermal_calc", (ssc_number_t)c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal);	//[-]
 	cm->assign("m_dot_co2_full", (ssc_number_t)c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_m_dot_t);		//[kg/s]
 	cm->assign("recomp_frac", (ssc_number_t)c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_recomp_frac);		//[-]
