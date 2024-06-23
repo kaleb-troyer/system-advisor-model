@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BDC6D26F-C024-3AA3-A4B3-DBBBE4C96546}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\repositories\sam_dev\ssc\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\repositories\sam_dev\build\ssc\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\repositories\sam_dev\build\ssc\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ZERO_CHECK.vcxproj">
+      <Project>{86A4BBF8-B8D1-3E8D-8FF1-208E61787A21}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\sdktool\SDKtool.vcxproj">
+      <Project>{71D7B2FD-99C6-3920-89F2-3034D3992584}</Project>
+      <Name>SDKtool</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\test\Test.vcxproj">
+      <Project>{E7C505AD-3266-3314-ADEE-6EAA8EC554E7}</Project>
+      <Name>Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\ssc\build-time-make-directory.vcxproj">
+      <Project>{9551D212-A419-312D-B02A-7D7C3E069A4D}</Project>
+      <Name>build-time-make-directory</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\lpsolve\lpsolve.vcxproj">
+      <Project>{4387913B-BA56-3703-B425-6F626C34F5CE}</Project>
+      <Name>lpsolve</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\nlopt\nlopt.vcxproj">
+      <Project>{966FC219-C7A9-3B1B-ADD0-C85975A6C542}</Project>
+      <Name>nlopt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\shared\shared.vcxproj">
+      <Project>{8AD481B5-5E8C-3FC0-93EB-BB7D7A9426EB}</Project>
+      <Name>shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\solarpilot\solarpilot_core.vcxproj">
+      <Project>{0196E3EC-F087-3A25-9A18-BE42AAC0E5DE}</Project>
+      <Name>solarpilot_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\splinter\splinter.vcxproj">
+      <Project>{5ED31C54-D9F3-3242-8427-3E6B59B2E024}</Project>
+      <Name>splinter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\ssc\ssc.vcxproj">
+      <Project>{C6A1EDF9-0421-32F7-97DC-57FB8B173053}</Project>
+      <Name>ssc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\tcs\tcs.vcxproj">
+      <Project>{B3477691-2509-32E8-AA65-C2121A3CBA9F}</Project>
+      <Name>tcs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

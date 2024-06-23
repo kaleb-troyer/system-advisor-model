@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{966FC219-C7A9-3B1B-ADD0-C85975A6C542}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>nlopt</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\repositories\sam_dev\build\ssc\nlopt\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nlopt.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nloptd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\repositories\sam_dev\build\ssc\nlopt\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nlopt.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nlopt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_DEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;__WXMSW__;_MBCS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;__WXMSW__;_MBCS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;__WXMSW__;_MBCS;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;__WXMSW__;_MBCS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\repositories\sam_dev\ssc\nlopt\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\repositories\sam_dev\ssc\nlopt\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/nlopt/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/nlopt/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\repositories\sam_dev\build\ssc\nlopt\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/nlopt/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/nlopt/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\repositories\sam_dev\build\ssc\nlopt\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\auglag.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\bobyqa.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\ccsa_quadratic.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\cdirect.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\cobyla.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\crs.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\deprecated.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\DIRect.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\direct_wrap.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\DIRserial.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\DIRsubrout.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\esch.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\general.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\hybrid.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\isres.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\mlsl.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\mma.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\mssubs.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\mt19937ar.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\newuoa.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\nldrmd.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\optimize.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\options.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\plip.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\plis.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\pnet.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\praxis.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\pssubs.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\qsort_r.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\redblack.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\rescale.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\sbplx.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\slsqp.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\sobolseq.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\stop.c" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\sys\time.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\nlopt\timer.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ZERO_CHECK.vcxproj">
+      <Project>{86A4BBF8-B8D1-3E8D-8FF1-208E61787A21}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

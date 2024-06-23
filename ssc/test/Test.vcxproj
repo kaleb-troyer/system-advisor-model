@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E7C505AD-3266-3314-ADEE-6EAA8EC554E7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Test</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\repositories\sam_dev\build\ssc\test\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Test.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Testd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\repositories\sam_dev\build\ssc\test\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Test.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Test</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_DEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;_MBCS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;_MBCS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\repositories\.dependencies\googletest\build\lib\Debug\gtest.lib;..\ssc\Debug\sscd.lib;..\splinter\Debug\splinterd.lib;..\solarpilot\Debug\solarpilot_cored.lib;..\tcs\Debug\tcsd.lib;..\nlopt\Debug\nloptd.lib;..\shared\Debug\sharedd.lib;..\lpsolve\Debug\lpsolved.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/repositories/sam_dev/build/ssc/test/Debug/Testd.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/repositories/sam_dev/build/ssc/test/Debug/Testd.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DisableSpecificWarnings>4244</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner></SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;_MBCS;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;__64BIT__;__WINDOWS__;_CRT_SECURE_NO_WARNINGS;LPWINAPP;_MBCS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\repositories\.dependencies\googletest\include;C:\repositories\.dependencies\googletest\googletest\include;C:\repositories\.dependencies\googletest\googletest\include\gtest;C:\repositories\sam_dev\ssc\test\.;C:\repositories\sam_dev\ssc\test\input_cases;C:\repositories\sam_dev\ssc\test\shared_test;C:\repositories\sam_dev\ssc\test\ssc_test;C:\repositories\sam_dev\ssc\test\tcs_test;C:\repositories\sam_dev\ssc\test\..\ssc;C:\repositories\sam_dev\ssc\test\..\tcs;C:\repositories\sam_dev\ssc\test\..\solarpilot;C:\repositories\sam_dev\ssc\test\..\shared;C:\repositories\sam_dev\ssc\test\..\splinter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\repositories\.dependencies\googletest\build\lib\Release\gtest.lib;..\ssc\Release\ssc.lib;..\splinter\Release\splinter.lib;..\solarpilot\Release\solarpilot_core.lib;..\tcs\Release\tcs.lib;..\nlopt\Release\nlopt.lib;..\shared\Release\shared.lib;..\lpsolve\Release\lpsolve.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/repositories/sam_dev/build/ssc/test/Release/Test.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/repositories/sam_dev/build/ssc/test/Release/Test.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\repositories\sam_dev\ssc\test\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/test/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\repositories\sam_dev\build\ssc\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/repositories/sam_dev/ssc/test/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\repositories\.dependencies\CMake\bin\cmake.exe -SC:/repositories/sam_dev -BC:/repositories/sam_dev/build --check-stamp-file C:/repositories/sam_dev/build/ssc/test/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\repositories\sam_dev\build\ssc\test\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_eqns_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_pvsamv1_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_stateful_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battwatts_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_biomass_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_cashloan_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_communitysolar_test .cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_equpartflip_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_etes_etes_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_etes_ptes_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_fuelcell_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_generic_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_geothermal_costs_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_geothermal_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_grid_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_host_developer_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_hybrid_steps_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_hybrid_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_lcoefcr_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_levpartflip_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_merchantplant_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_mhk_tidal_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_mhk_wave_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvsamv1_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv5_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv7_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv8_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvyield_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_saleleaseback_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_sco2_csp_system_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_singleowner_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_swh_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_tcsdirect_steam_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_tcsfresnel_molten_salt_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_tcsmolten_salt_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_tcstrough_empirical_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_thirdpartyownership_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_trough_physical_iph_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_trough_physical_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_utilityrate5_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_wfreader_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_windpower_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\save_as_JSON_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\sscapi_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\ssc_test\vartab_test.cpp" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_eqns_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_pvsamv1_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_stateful_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battery_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_battwatts_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_biomass_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_cashloan_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_communitysolar_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_equpartflip_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_fuelcell_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_generic_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_geothermal_costs_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_geothermal_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_grid_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_host_developer_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_hybrid_steps_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_hybrid_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_json_comparison_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_lcoefcr_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_levpartflip_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_merchantplant_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_mhk_tidal_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_mhk_wave_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvsamv1_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv5_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv7_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvwattsv8_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_pvyield_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_saleleaseback_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_singleowner_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_swh_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_thirdpartyownership_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\cmod_windpower_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\csp_common_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\ssc_test\vartab_test.h" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\6par_solve_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\csp_solver_core_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_capacity_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_automatic_btm_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_automatic_fom_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_manual_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_pvsmoothing_fom_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_lifetime_lmolto_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_lifetime_nmc_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_lifetime_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_powerflow_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_voltage_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_tes_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_tower_shared_with_ui_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_trough_shared_with_ui_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_trough_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_fuel_cell_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_geothermal_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_irradproc_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_resilience_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_shared_inverter_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_solar_thermal_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_time_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_util_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_utility_rate_equations_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_utility_rate_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_weatherfile_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_windfile_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_windwakemodel_test.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_windwatts_test.cpp" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_capacity_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_automatic_btm_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_automatic_fom_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_manual_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_pvsmoothing_fom_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_dispatch_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_lifetime_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_powerflow_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_properties.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_battery_voltage_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_tes_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_csp_trough_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_fuel_cell_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_geothermal_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_irradproc_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_resilience_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_solar_thermal_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_time_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\lib_windwakemodel_test.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\shared_test\vs_google_test_explorer_namespace.h" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\input_cases\csp_financial_defaults.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\input_cases\pvsamv1_common_data.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\input_cases\shared_rate_data.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\input_cases\weather_inputs.cpp" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\battery_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\battwatts_cases.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\biomass_common.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\code_generator_utilities.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\etes_etes_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\etes_ptes_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\fuelcell_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\generic_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\geothermal_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\geothermal_costs_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\grid_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvsamv1_battery_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvsamv1_cases.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvsamv1_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvwatts_cases.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvyield_cases.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\pvyield_common_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\shared_rate_data.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\singleowner_common.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\sscapi.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\swh_common.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\tcsdirect_steam_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\tcsfresnel_molten_salt_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\tcsmolten_salt_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\tcstrough_empirical_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\trough_physical_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\trough_physical_iph_defaults.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\weather_inputs.h" />
+    <ClInclude Include="C:\repositories\sam_dev\ssc\test\input_cases\windpower_cases.h" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\core.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\common.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\vartab.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\cmod_windpower.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\cmod_utilityrate5.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\cmod_battery.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\cmod_battwatts.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\ssc\cmod_fuelcell.cpp" />
+    <ClCompile Include="C:\repositories\sam_dev\ssc\test\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ZERO_CHECK.vcxproj">
+      <Project>{86A4BBF8-B8D1-3E8D-8FF1-208E61787A21}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\lpsolve\lpsolve.vcxproj">
+      <Project>{4387913B-BA56-3703-B425-6F626C34F5CE}</Project>
+      <Name>lpsolve</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\nlopt\nlopt.vcxproj">
+      <Project>{966FC219-C7A9-3B1B-ADD0-C85975A6C542}</Project>
+      <Name>nlopt</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\shared\shared.vcxproj">
+      <Project>{8AD481B5-5E8C-3FC0-93EB-BB7D7A9426EB}</Project>
+      <Name>shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\solarpilot\solarpilot_core.vcxproj">
+      <Project>{0196E3EC-F087-3A25-9A18-BE42AAC0E5DE}</Project>
+      <Name>solarpilot_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\splinter\splinter.vcxproj">
+      <Project>{5ED31C54-D9F3-3242-8427-3E6B59B2E024}</Project>
+      <Name>splinter</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\ssc\ssc.vcxproj">
+      <Project>{C6A1EDF9-0421-32F7-97DC-57FB8B173053}</Project>
+      <Name>ssc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\repositories\sam_dev\build\ssc\tcs\tcs.vcxproj">
+      <Project>{B3477691-2509-32E8-AA65-C2121A3CBA9F}</Project>
+      <Name>tcs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

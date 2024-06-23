@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Ambient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\API_structures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\AutoPilot_API.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\definitions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Financial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Flux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\fluxsim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\heliodata.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Heliostat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\interop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\IOUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Land.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\LayoutSimulateThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\mod_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\OpticalMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\optimize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Receiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\SolarField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\solpos.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\STObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\string_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\STSimulateThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\repositories\sam_dev\ssc\solarpilot\Toolbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\repositories\sam_dev\ssc\solarpilot\exceptions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\repositories\sam_dev\ssc\solarpilot\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{EE9FE9C9-2070-38D2-9F72-B9D2945D2487}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1D61EF08-9EDE-3A06-BD69-039F6B4AE180}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
