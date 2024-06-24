@@ -279,7 +279,9 @@ void C_sco2_phx_air_cooler::design_core()
 
 	if (error_msg.empty())
 	{
-		mc_messages.add_notice("The " + s_cycle_config + " cycle design optimization was successful");
+        if (ms_des_par.m_quiet == 0) {
+            mc_messages.add_notice("The " + s_cycle_config + " cycle design optimization was successful");
+        }
 	}
 	else
 	{

@@ -741,8 +741,9 @@ bool are_values_sig_different(double v1, double v2, double tol)
 
 var_info vtab_sco2_design[] = {
 
-	/*   VARTYPE   DATATYPE         NAME               LABEL                                                  UNITS          META        GROUP     REQUIRED_IF   CONSTRAINTS   UI_HINTS*/
-	// ** Design Parameters **
+	/*  VARTYPE   DATATYPE     NAME                    LABEL                                                  UNITS          META        GROUP     REQUIRED_IF   CONSTRAINTS   UI_HINTS*/
+    { SSC_INPUT,  SSC_NUMBER,  "quiet",                "Silence status=successful log notices.",                 "",           "",    "Meta",               "?=0",   "",       "" },
+    // ** Design Parameters **
 		// System Design
 	{ SSC_INPUT,  SSC_NUMBER,  "htf",                  "Integer code for HTF used in PHX",                       "",           "",    "System Design",      "*",     "",       "" },
     { SSC_INPUT,  SSC_MATRIX,  "htf_props",            "User defined HTF property data",                         "", "7 columns (T,Cp,dens,visc,kvisc,cond,h), at least 3 rows", "System Design", "?=[[0]]", "", "" },
@@ -755,10 +756,10 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "design_method",        "1 = Specify efficiency, 2 = Specify total recup UA, 3 = Specify each recup design","","","System Design","*","",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "eta_thermal_des",      "Power cycle thermal efficiency",                         "",           "",    "System Design",      "design_method=1","",  "" },
 	    
-        // Heat exchanger design
-            // Combined recuperator design parameter (design_method == 2)
+    // Heat exchanger design
+        // Combined recuperator design parameter (design_method == 2)
     { SSC_INPUT,  SSC_NUMBER,  "UA_recup_tot_des",     "Total recuperator conductance",                          "kW/K",       "Combined recuperator design",    "Heat Exchanger Design",      "design_method=2","",  "" },
-	        // Low temperature recuperator parameters
+	    // Low temperature recuperator parameters
     { SSC_INPUT,  SSC_NUMBER,  "LTR_design_code",      "1 = UA, 2 = min dT, 3 = effectiveness",                  "-",          "Low temperature recuperator",    "Heat Exchanger Design",      "design_method=3", "", "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "LTR_UA_des_in",        "Design LTR conductance",                                 "kW/K",       "Low temperature recuperator",    "Heat Exchanger Design",      "design_method=3", "", "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "LTR_min_dT_des_in",    "Design minimum allowable temperature difference in LTR", "C",          "Low temperature recuperator",    "Heat Exchanger Design",      "design_method=3", "", "" },
@@ -1000,7 +1001,9 @@ var_info_invalid };
 int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_cycle)
 {
 	C_sco2_phx_air_cooler::S_des_par s_sco2_des_par;
-	// System design parameters
+    // Meta
+    s_sco2_des_par.m_quiet = cm->as_integer("quiet"); 
+    // System design parameters
 	s_sco2_des_par.m_hot_fl_code = cm->as_integer("htf");							//[-] Integer code for HTF
 	s_sco2_des_par.mc_hot_fl_props = cm->as_matrix("htf_props");					//[-] Custom HTF properties
 	s_sco2_des_par.m_T_htf_hot_in = cm->as_double("T_htf_hot_des") + 273.15;		//[K] Convert from C

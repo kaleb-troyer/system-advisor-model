@@ -439,7 +439,9 @@ public:
         }
 		if (!is_od_cases_assigned && !is_P_mc_in_od_sweep_assigned && !is_od_set_control && !is_od_generate_udpc_assigned && !is_od_T_mc_in_sweep_assigned && !is_od_max_htf_m_dot_assigned)
 		{
-			log("No off-design cases or main compressor inlet sweep specified");
+            if (c_sco2_cycle.get_design_par()->m_quiet == 0) {
+                log("No off-design cases or main compressor inlet sweep specified");
+            }
 			return;
 		}
 		

@@ -53,7 +53,9 @@ public:
 
 	struct S_des_par
 	{
-		// System Design
+        // Meta
+        int m_quiet;                    //[-] Silence status=successful log notices.
+        // System Design
 		int m_hot_fl_code;				//[-] Integer coding the HTF type
 		util::matrix_t<double> mc_hot_fl_props;	//[-] Custom HTF properties (if applicable)
 		double m_T_htf_hot_in;			//[K] Design-point hot inlet temperature
