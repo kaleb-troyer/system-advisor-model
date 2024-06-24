@@ -343,6 +343,18 @@ double HTFProperties::Cp( double T_K )
             0.0022*std::pow(T_C, 2) + 0.6218*T_C + 434.06;  // BPVC_CC_BPV_2017 Case 2702 - 3
     case Salt_45MgCl2_39KCl_16NaCl:
         return 1.284E-6*T_C*T_C - 1.843E-3*T_C + 1.661;  // Zhao 2020 Molten Chloride Thermophysical Properties, Chemical Optimization, and Purification Purification
+
+    // Particulates as a heat transfer fluid
+    case Silica: // Reference: NIST Chemistry WebBook: https://webbook.nist.gov/cgi/cbook.cgi?ID=C14808607&Type=JANAFS&Table=on
+        if (298 <= T_K && T_K <= 847) {
+            return (-6.076591 + 251.6755 * (T_K / 1000) - 324.7964 * pow(T_K / 1000, 2) +
+                168.5604 * pow(T_K / 1000, 3) + 0.002548 / pow(T_K / 1000, 2)) / 60.0843;
+        }
+        else if (847 < T_K && T_K <= 1996) {
+            return (58.75340 + 10.27925 * (T_K / 1000) - 0.131384 * pow(T_K / 1000, 2) +
+                0.025210 * pow(T_K / 1000, 3) + 0.025601 / pow(T_K / 1000, 2)) / 60.0843;
+        }
+
     case User_defined:
 		{
 			if ( m_userTable.nrows() < 3 ) return std::numeric_limits<double>::quiet_NaN();
@@ -435,6 +447,22 @@ double HTFProperties::dens(double T_K, double P)
             return 8072.0;  // BPVC_CC_BPV_2017 Case 2702 - 3
         case Salt_45MgCl2_39KCl_16NaCl:
             return -5.878E-1*T_C + 1974.0;  // Zhao 2020 Molten Chloride Thermophysical Properties, Chemical Optimization, and Purification Purification
+
+        // Particulates as a heat transfer fluid
+        case Silica: // Reference: L. Merill, J. Phys. Chem. Ref. Data 11, 1043 (1982).
+            if (T_C <= 573) {
+                return 2648 * 0.613;
+            }
+            else if (T_C <= 870) {
+                return 2530 * 0.613;
+            }
+            else if (T_C <= 1470) {
+                return 2250 * 0.613;
+            }
+            else if (T_C <= 1705) {
+                return 2200 * 0.613;
+            }
+
         case User_defined:
 			if ( m_userTable.nrows() < 3 )
 						return std::numeric_limits<double>::quiet_NaN();
@@ -659,7 +687,18 @@ double HTFProperties::temp(double H)
 	case Therminol_59:	//Reference: Therminol Reference Disk by Solutia: http://www.therminol.com/pages/tools/toolscd.asp
 		H_kJ = H / 1000.0;
 		return -0.000204*H_kJ*H_kJ + 0.539*H_kJ - 0.094;
-	case User_defined:
+
+    // Particulates as a heat transfer fluid
+    case Silica: // Curve-fitted for temperature using NIST material data.  
+        H_kJ = H / 1000.0; 
+        if (H_kJ <= 719.24) {
+            return 199.175 + (1.061 * H_kJ) - (0.0002 * H_kJ * H_kJ) - (8445.735 / H_kJ); 
+        }
+        else {
+            return -42.096 + (0.895 * H_kJ) - (0.000036 * H_kJ * H_kJ) + (38.343 * log(H_kJ)); 
+        }
+
+    case User_defined:
 		if ( m_userTable.nrows() < 3 )
 					return std::numeric_limits<double>::quiet_NaN();
 
@@ -714,6 +753,12 @@ double HTFProperties::min_temp()
     case Salt_45MgCl2_39KCl_16NaCl:
         T_C = 450.0;
         break;
+
+    // Particulates as a heat transfer fluid
+    case Silica: // Reference: NIST Chemistry WebBook: https://webbook.nist.gov/cgi/cbook.cgi?ID=C14808607&Type=JANAFS&Table=on
+        T_C = 26.0;
+        break; 
+
     case User_defined:
         if (m_userTable.nrows() < 2) {
             T_C = std::numeric_limits<double>::quiet_NaN();
@@ -773,6 +818,12 @@ double HTFProperties::max_temp()
     case Salt_45MgCl2_39KCl_16NaCl:
         T_C = 720.0;
         break;
+
+    // Particulates as a heat transfer fluid
+    case Silica: // Reference: NIST Chemistry WebBook: https://webbook.nist.gov/cgi/cbook.cgi?ID=C14808607&Type=JANAFS&Table=on
+        T_C = 1722.85;
+        break;
+
     case User_defined:
         if (m_userTable.nrows() < 2) {
             T_C = std::numeric_limits<double>::quiet_NaN();
@@ -819,6 +870,18 @@ double HTFProperties::enth(double T_K)
 		return 1000.*(0.0034*T_C*T_C + 1.5977*T_C - 0.0926);
 	case Pressurized_Water:
 		return 4.2711*T_C - 4.3272;
+
+    // Particulates as a heat transfer fluid
+    case Silica: // Reference: NIST Chemistry WebBook: https://webbook.nist.gov/cgi/cbook.cgi?ID=C14808607&Type=JANAFS&Table=on
+        if (298 <= T_K && T_K <= 847) {
+            return ((-6.076591 * (T_K / 1000) + 251.6755 * pow(T_K / 1000, 2) / 2 - 324.7964 * pow(T_K / 1000, 3) / 3 +
+                168.5604 * pow(T_K / 1000, 4) / 4 + 0.002548 / (T_K / 1000) - 917.6893 + 910.8568) / 0.0600843) + 150;
+        }
+        else if (847 < T_K && T_K <= 1996) {
+            return ((58.75340 * (T_K / 1000) + 10.27925 * pow(T_K / 1000, 2) / 2 - 0.131384 * pow(T_K / 1000, 3) / 3 +
+                0.025210 * pow(T_K / 1000, 4) / 4 + 0.025601 / (T_K / 1000) - 929.3292 + 910.8568) / 0.0600843) + 137.624;
+        }
+
 	case User_defined:
 		if ( m_userTable.nrows() < 3 )
 		return std::numeric_limits<double>::quiet_NaN();

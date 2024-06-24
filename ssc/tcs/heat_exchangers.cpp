@@ -2626,7 +2626,7 @@ void C_HX_co2_to_htf::design_and_calc_m_dot_htf(C_HX_counterflow_CRM::S_des_calc
     double h_c_in = mc_hot_fl.enth_lookup(T_htf_cold);			//[kJ/kg]
 
     des_par.m_m_dot_hot_des = q_dot_design / (h_h_in - h_c_in);
-    des_par.m_V_dot_hot_des = des_par.m_m_dot_hot_des / mc_hot_fl.dens(des_par.m_T_h_in, des_par.m_P_h_in); 
+    des_par.m_V_dot_hot_des = des_par.m_m_dot_hot_des / mc_hot_fl.dens(des_par.m_T_h_in + 273.15, des_par.m_P_h_in); 
 
     design_calc_UA(des_par, q_dot_design, des_solved);
 }
