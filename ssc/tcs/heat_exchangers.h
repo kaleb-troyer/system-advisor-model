@@ -482,14 +482,15 @@ public:
     bool m_is_single_node_des_set;
     NS_HX_counterflow_eqs::S_hx_node_info ms_node_info_des;
 
-    enum
+    enum E_COST_MODEL
     {
         // Techno-Economic Comparison of Solar-Driven SCO2 Brayton Cycles Using 
         // Component Cost Models Baselined with Vendor Data and Estimates
         // ASME ES 2017		
-        E_CARLSON_17_RECUP,		// CO2 - CO2 PCHE
+        E_CARLSON_17_RECUP = 1, // CO2 - CO2 PCHE
         E_WEILAND_19_RECUP,     // CO2 - CO2
-        E_CARLSON_17_PHX		// Salt - CO2 PCHE high temperature
+        E_CARLSON_17_PHX,		// Salt - CO2 PCHE high temperature
+        E_SIC_PHX,              // Sand - CO2 Silicon Carbide additively manufactured 
     };
 
     struct S_init_par
@@ -743,7 +744,6 @@ public:
         
         m_od_solution_type = C_HX_counterflow_CRM::C_od_thermal_solution_type::E_DEFAULT;
         
-        
 	}
 
 	//// This method calculates the HTF mass flow rate (m_m_dot_hot_des) that results in CR = 1
@@ -754,8 +754,7 @@ public:
 		double q_dot_design /*kWt*/, double dt_cold_approach /*C/K*/, C_HX_counterflow_CRM::S_des_solved &des_solved);
 
 	virtual void initialize(int hot_fl, util::matrix_t<double> hot_fl_props, int N_sub_hx, NS_HX_counterflow_eqs::E_UA_target_type od_UA_target_type);
-
-	virtual void initialize(int hot_fl, int N_sub_hx, NS_HX_counterflow_eqs::E_UA_target_type od_UA_target_type);
+    virtual void initialize(int hot_fl, int N_sub_hx, NS_HX_counterflow_eqs::E_UA_target_type od_UA_target_type);
 	
 };
 

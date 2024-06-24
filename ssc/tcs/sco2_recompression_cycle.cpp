@@ -2352,20 +2352,11 @@ int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, doub
 void C_RecompCycle::design_core(int & error_code)
 {
 	// 2.16.15 twn: choose which design point model to use
-
-	
-
-	
 	//design_core_bypass150C(error_code);
 
-
-
-
-	
 	design_core_standard(error_code);
 
 	//design_core_bypass(error_code);
-
 	//design_core_HTR_hs(error_code);
 }
 

@@ -115,6 +115,7 @@ public:
 		// This is a PHX rather than system parameter because we don't know T_CO2_in until cycle model is solved
 		double m_phx_dt_cold_approach;	//[K/C] Temperature difference between cold HTF and PHX CO2 inlet
         int m_phx_N_sub_hx;             //[-]
+        int m_phx_cost_model;           //[-]
         NS_HX_counterflow_eqs::E_UA_target_type m_phx_od_UA_target_type;
 
 		// Air cooler parameters
@@ -141,7 +142,10 @@ public:
 			// Default to standard optimization to maximize cycle efficiency
 			m_des_objective_type = 1;
 			m_min_phx_deltaT = 0.0;		//[C]
-	
+
+            // Default to cost estimate using UA
+            m_phx_cost_model = 3;       //[-]
+
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance
             m_LTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
@@ -159,7 +163,9 @@ public:
                 m_is_recomp_ok = 
 	
 				m_PR_HP_to_LP_guess = m_f_PR_HP_to_IP_guess =
-	
+
+                m_HTR_N_sub_hxrs = m_UA_recup_tot_des = 
+
 				m_phx_dt_cold_approach = m_frac_fan_power = m_deltaP_cooler_frac = m_eta_fan =
 				std::numeric_limits<double>::quiet_NaN();
 	

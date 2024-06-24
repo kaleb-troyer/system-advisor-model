@@ -295,7 +295,8 @@ public:
 
 			m_N_sub_hxrs = -1;
 
-			m_fixed_P_mc_in = m_fixed_recomp_frac = m_fixed_N_mc = m_fixed_N_t = false;
+			m_fixed_P_mc_in = m_fixed_recomp_frac = m_fixed_N_mc =
+                m_fixed_N_t = m_is_max_W_dot = false;
 		}
 	};
 

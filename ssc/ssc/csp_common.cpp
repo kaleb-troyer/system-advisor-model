@@ -802,7 +802,7 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "dT_PHX_cold_approach", "Temp diff btw cold HTF and cold CO2",                    "C",          "",    "PHX Design",      "*",     "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "PHX_n_sub_hx",         "Number of subsections in PHX model",                     "-",          "",    "PHX Design",      "?=10",  "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "PHX_od_model",         "0: mass flow scale, 1: conductance ratio model",         "-",          "",    "PHX Design",      "?=1",   "",       "" },
-    { SSC_INPUT,  SSC_NUMBER,  "PHX_cost_model",       "Cost model for primary heat exchanger",                  "-",          "",    "PHX Design",      "",      "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "PHX_cost_model",       "Cost model for primary heat exchanger",                  "-",          "",    "PHX Design",      "?=3",   "",       "" },
     
         // Air Cooler Design
 	{ SSC_INPUT,  SSC_NUMBER,  "is_design_air_cooler", "Defaults to True. False will skip air cooler calcs",     "",           "",    "Air Cooler Design",      "?=1.0", "",       "" },
@@ -1215,6 +1215,7 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	s_sco2_des_par.m_phx_dt_cold_approach = cm->as_double("dT_PHX_cold_approach");  //[C]
     s_sco2_des_par.m_phx_N_sub_hx = cm->as_integer("PHX_n_sub_hx");              //[-]
     s_sco2_des_par.m_phx_od_UA_target_type = static_cast<NS_HX_counterflow_eqs::E_UA_target_type>(cm->as_integer("PHX_od_model"));   // E_calc_UA;
+    s_sco2_des_par.m_phx_cost_model = cm->as_integer("PHX_cost_model");          //[-]
 
 	// Air cooler parameters
 	s_sco2_des_par.m_is_des_air_cooler = cm->as_boolean("is_design_air_cooler");

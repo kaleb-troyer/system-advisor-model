@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CO2_properties.h"
 #include <cmath>
 #include <string>
+#include <iostream>
 
 #include "nlopt.hpp"
 
@@ -290,6 +291,7 @@ void C_sco2_phx_air_cooler::design_core()
 
 	// Initialize the PHX
     mc_phx.initialize(ms_des_par.m_hot_fl_code, ms_des_par.mc_hot_fl_props, ms_des_par.m_phx_N_sub_hx, ms_des_par.m_phx_od_UA_target_type);
+    mc_phx.m_cost_model = ms_des_par.m_phx_cost_model; 
 
 	// Design the PHX
 	double q_dot_des_phx = ms_des_solved.ms_rc_cycle_solved.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;
