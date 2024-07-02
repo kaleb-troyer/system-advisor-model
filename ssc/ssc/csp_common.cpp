@@ -742,7 +742,7 @@ bool are_values_sig_different(double v1, double v2, double tol)
 var_info vtab_sco2_design[] = {
 
 	/*  VARTYPE   DATATYPE     NAME                    LABEL                                                  UNITS          META        GROUP     REQUIRED_IF   CONSTRAINTS   UI_HINTS*/
-    { SSC_INPUT,  SSC_NUMBER,  "quiet",                "Silence status=successful log notices.",                 "",           "",    "Meta",               "?=0",   "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "quiet",                "if !=0, silence status=successful log notices.",         "",           "",    "Meta",               "?=0",   "",       "" },
     // ** Design Parameters **
 		// System Design
 	{ SSC_INPUT,  SSC_NUMBER,  "htf",                  "Integer code for HTF used in PHX",                       "",           "",    "System Design",      "*",     "",       "" },

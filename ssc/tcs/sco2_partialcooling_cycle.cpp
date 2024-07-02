@@ -950,7 +950,7 @@ int C_PartialCooling_Cycle::opt_design(S_opt_des_params & opt_des_par_in)
 int C_PartialCooling_Cycle::auto_opt_design(S_auto_opt_design_parameters & auto_opt_des_par_in)
 {
 	ms_auto_opt_des_par = auto_opt_des_par_in;
-
+    
 	return auto_opt_design_core();
 }
 

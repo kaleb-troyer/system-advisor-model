@@ -261,7 +261,16 @@ void C_sco2_phx_air_cooler::design_core()
         des_params.m_f_PR_HP_to_IP_guess = ms_des_par.m_f_PR_HP_to_IP_guess;    //[-]
         des_params.m_fixed_f_PR_HP_to_IP = ms_des_par.m_fixed_f_PR_HP_to_IP;    //[-]
 
-		des_params.m_is_recomp_ok = ms_des_par.m_is_recomp_ok;
+		des_params.m_is_recomp_ok   = ms_des_par.m_is_recomp_ok;
+
+        // parameters for PHX
+        des_params.m_hot_fl_code = ms_des_par.m_hot_fl_code;
+        des_params.mc_hot_fl_props = ms_des_par.mc_hot_fl_props;
+        des_params.m_phx_dt_cold_approach = ms_des_par.m_phx_dt_cold_approach;
+        des_params.m_phx_N_sub_hx = ms_des_par.m_phx_N_sub_hx;
+        des_params.m_phx_cost_model = ms_des_par.m_phx_cost_model;
+        des_params.m_phx_od_UA_target_type = ms_des_par.m_phx_od_UA_target_type;
+        des_params.m_T_htf_hot_in = ms_des_par.m_T_htf_hot_in;
 
 		auto_err_code = mpc_sco2_cycle->auto_opt_design(des_params);
 	}

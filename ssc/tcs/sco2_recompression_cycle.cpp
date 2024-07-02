@@ -2125,6 +2125,156 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	m_m_dot_mc = m_dot_mc;
 	m_m_dot_rc = m_dot_rc;
 	m_m_dot_t = m_dot_t;
+
+    //********************************************
+    // TESTING COST FUNCTIONS WITHIN OPTIMIZATION
+    //********************************************
+    int cpp_offset = 1;
+
+    int mc_design_err = m_mc_ms.design_given_outlet_state(m_mc_comp_model_code, m_temp_last[MC_IN],
+        m_pres_last[MC_IN],
+        m_m_dot_mc,
+        m_temp_last[MC_OUT],
+        m_pres_last[MC_OUT],
+        ms_des_par.m_des_tol);
+
+    if (mc_design_err != 0)
+    {
+        error_code = mc_design_err;
+        return;
+    }
+
+    if (ms_des_par.m_recomp_frac > 0.01)
+    {
+        int rc_des_err = m_rc_ms.design_given_outlet_state(m_rc_comp_model_code, m_temp_last[LTR_LP_OUT],
+            m_pres_last[LTR_LP_OUT],
+            m_m_dot_rc,
+            m_temp_last[RC_OUT],
+            m_pres_last[RC_OUT], ms_des_par.m_des_tol);
+
+        if (rc_des_err != 0)
+        {
+            error_code = rc_des_err;
+            return;
+        }
+
+        ms_des_solved.m_is_rc = true;
+    }
+    else
+        ms_des_solved.m_is_rc = false;
+
+    // Size turbine
+    C_turbine::S_design_parameters  t_des_par;
+    // Set turbine shaft speed
+    t_des_par.m_N_design = m_N_turbine;
+    t_des_par.m_N_comp_design_if_linked = m_mc_ms.get_design_solved()->m_N_design;	//[rpm] m_mc.get_design_solved()->m_N_design;
+    // Turbine inlet state
+    t_des_par.m_P_in = m_pres_last[6 - cpp_offset];
+    t_des_par.m_T_in = m_temp_last[6 - cpp_offset];
+    t_des_par.m_D_in = m_dens_last[6 - cpp_offset];
+    t_des_par.m_h_in = m_enth_last[6 - cpp_offset];
+    t_des_par.m_s_in = m_entr_last[6 - cpp_offset];
+    // Turbine outlet state
+    t_des_par.m_P_out = m_pres_last[7 - cpp_offset];
+    t_des_par.m_h_out = m_enth_last[7 - cpp_offset];
+    // Mass flow
+    t_des_par.m_m_dot = m_m_dot_t;
+
+    int turb_size_error_code = 0;
+    m_t.turbine_sizing(t_des_par, turb_size_error_code);
+    if (turb_size_error_code != 0)
+    {
+        error_code = turb_size_error_code;
+        return;
+    }
+
+    // Design air cooler
+        // Structure for design parameters that are dependent on cycle design solution
+    C_CO2_to_air_cooler::S_des_par_cycle_dep s_air_cooler_des_par_dep;
+    // Set air cooler design parameters that are dependent on the cycle design solution
+    s_air_cooler_des_par_dep.m_T_hot_in_des = m_temp_last[C_sco2_cycle_core::LTR_LP_OUT];		//[K]
+    s_air_cooler_des_par_dep.m_P_hot_in_des = m_pres_last[C_sco2_cycle_core::LTR_LP_OUT];		//[kPa]
+    s_air_cooler_des_par_dep.m_m_dot_total = m_m_dot_mc;		//[kg/s]
+
+    // This pressure drop is currently uncoupled from the cycle design
+    double cooler_deltaP = m_pres_last[C_sco2_cycle_core::LTR_LP_OUT] - m_pres_last[C_sco2_cycle_core::MC_IN];	//[kPa]
+    if (cooler_deltaP == 0.0)
+        s_air_cooler_des_par_dep.m_delta_P_des = m_deltaP_cooler_frac * m_pres_last[C_sco2_cycle_core::LTR_LP_OUT];	//[kPa]
+    else
+        s_air_cooler_des_par_dep.m_delta_P_des = cooler_deltaP;	//[kPa]
+
+
+    s_air_cooler_des_par_dep.m_T_hot_out_des = m_temp_last[C_sco2_cycle_core::MC_IN];			//[K]
+    s_air_cooler_des_par_dep.m_W_dot_fan_des = m_frac_fan_power * m_W_dot_net / 1000.0;		//[MWe]
+    // Structure for design parameters that are independent of cycle design solution
+    C_CO2_to_air_cooler::S_des_par_ind s_air_cooler_des_par_ind;
+    s_air_cooler_des_par_ind.m_T_amb_des = m_T_amb_des;		//[K]
+    s_air_cooler_des_par_ind.m_elev = m_elevation;			//[m]
+    s_air_cooler_des_par_ind.m_eta_fan = m_eta_fan;          //[-]
+    s_air_cooler_des_par_ind.m_N_nodes_pass = m_N_nodes_pass;    //[-]
+
+    if (ms_des_par.m_is_des_air_cooler && std::isfinite(m_deltaP_cooler_frac) && std::isfinite(m_frac_fan_power)
+        && std::isfinite(m_T_amb_des) && std::isfinite(m_elevation) && std::isfinite(m_eta_fan) && m_N_nodes_pass > 0)
+    {
+        mc_air_cooler.design_hx(s_air_cooler_des_par_ind, s_air_cooler_des_par_dep, ms_des_par.m_des_tol);
+    }
+
+
+    // Get 'design_solved' structures from component classes
+    //ms_des_solved.ms_mc_des_solved = *m_mc.get_design_solved();
+    ms_des_solved.ms_mc_ms_des_solved = *m_mc_ms.get_design_solved();
+    ms_des_solved.ms_rc_ms_des_solved = *m_rc_ms.get_design_solved();
+    ms_des_solved.ms_t_des_solved = *m_t.get_design_solved();
+    ms_des_solved.ms_LTR_des_solved = mc_LT_recup.ms_des_solved;
+    ms_des_solved.ms_HTR_des_solved = mc_HT_recup.ms_des_solved;
+    ms_des_solved.ms_mc_air_cooler = *mc_air_cooler.get_design_solved();
+
+    // Set solved design point metrics
+    ms_des_solved.m_temp = m_temp_last;
+    ms_des_solved.m_pres = m_pres_last;
+    ms_des_solved.m_enth = m_enth_last;
+    ms_des_solved.m_entr = m_entr_last;
+    ms_des_solved.m_dens = m_dens_last;
+
+    ms_des_solved.m_eta_thermal = m_eta_thermal_calc_last;
+    ms_des_solved.m_W_dot_net = m_W_dot_net_last;
+    ms_des_solved.m_m_dot_mc = m_m_dot_mc;
+    ms_des_solved.m_m_dot_rc = m_m_dot_rc;
+    ms_des_solved.m_m_dot_t = m_m_dot_t;
+    ms_des_solved.m_recomp_frac = m_m_dot_rc / m_m_dot_t;
+
+    ms_des_solved.m_UA_LTR = ms_des_par.m_LTR_UA;
+    ms_des_solved.m_UA_HTR = ms_des_par.m_HTR_UA;
+
+    ms_des_solved.m_W_dot_t = m_W_dot_t;		//[kWe]
+    ms_des_solved.m_W_dot_mc = m_W_dot_mc;		//[kWe]
+    ms_des_solved.m_W_dot_rc = m_W_dot_rc;		//[kWe]
+
+    ms_des_solved.m_W_dot_cooler_tot = mc_air_cooler.get_design_solved()->m_W_dot_fan * 1.E3;	//[kWe] convert from MWe
+
+    // Initialize the PHX
+    mc_phx.initialize(ms_auto_opt_des_par.m_hot_fl_code, ms_auto_opt_des_par.mc_hot_fl_props, ms_auto_opt_des_par.m_phx_N_sub_hx, ms_auto_opt_des_par.m_phx_od_UA_target_type);
+    mc_phx.m_cost_model = ms_auto_opt_des_par.m_phx_cost_model;
+
+    // Design the PHX
+    double q_dot_des_phx = ms_des_solved.m_W_dot_net / ms_des_solved.m_eta_thermal;
+    // ms_phx_des_par.m_Q_dot_design = ms_des_solved.ms_rc_cycle_solved.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;		//[kWt]
+    ms_phx_des_par.m_T_h_in = ms_auto_opt_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature 
+        // Okay, but CO2-HTF HX is assumed here. How does "structure inheritance" work?
+    ms_phx_des_par.m_P_h_in = 1.0;							// Assuming HTF is incompressible...
+    ms_phx_des_par.m_P_h_out = 1.0;						// Assuming HTF is incompressible...
+        // .................................................................................
+    ms_phx_des_par.m_T_c_in = ms_des_solved.m_temp[C_sco2_cycle_core::HTR_HP_OUT];		//[K]
+    ms_phx_des_par.m_P_c_in = ms_des_solved.m_pres[C_sco2_cycle_core::HTR_HP_OUT];		//[K]
+    ms_phx_des_par.m_P_c_out = ms_des_solved.m_pres[C_sco2_cycle_core::TURB_IN];		//[K]
+    ms_phx_des_par.m_m_dot_cold_des = ms_des_solved.m_m_dot_t;	//[kg/s]
+        // Calculating the HTF mass flow rate in 'design_and_calc_m_dot_htf'
+    ms_phx_des_par.m_m_dot_hot_des = std::numeric_limits<double>::quiet_NaN();
+        // Set maximum effectiveness
+    ms_phx_des_par.m_eff_max = 1.0;
+
+    mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_auto_opt_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
+
 }
 
 int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, double *diff_T_LTR_LP_out /*K*/)

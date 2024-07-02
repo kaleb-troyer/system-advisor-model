@@ -459,7 +459,7 @@ public:
 
         enum 
         {
-            E_CRM_UA_PER_NODE,
+            E_CRM_UA_PER_NODE = 1,
             E_DEFAULT
         };
     };

@@ -169,7 +169,7 @@ public:
                 m_HTR_N_sub_hxrs = m_UA_recup_tot_des = 
 
 				m_phx_dt_cold_approach = m_frac_fan_power = m_deltaP_cooler_frac = m_eta_fan =
-				std::numeric_limits<double>::quiet_NaN();
+				m_quiet = std::numeric_limits<double>::quiet_NaN();
 	
             m_fixed_P_mc_out = false;       //[-] If false, then should default to optimizing this parameter
             m_fixed_PR_HP_to_LP = false;    //[-] If false, then should default to optimizing this parameter

@@ -395,7 +395,11 @@ private:
 	C_comp_multi_stage m_mc_ms;
 	C_comp_multi_stage m_rc_ms;
 	C_HeatExchanger m_PHX, m_PC;
-	
+
+    // phx from cycle interface - KAT | 2024/07/02
+    C_HX_co2_to_htf mc_phx;
+    C_HX_counterflow_CRM::S_des_calc_UA_par ms_phx_des_par;
+
     C_HX_co2_to_co2_CRM mc_LT_recup;
     C_HX_co2_to_co2_CRM mc_HT_recup;
 

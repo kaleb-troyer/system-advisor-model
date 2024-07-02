@@ -84,6 +84,7 @@ public:
 		C_turbine::S_design_solved ms_t_des_solved;
 		C_HX_counterflow_CRM::S_des_solved ms_LTR_des_solved;
 		C_HX_counterflow_CRM::S_des_solved ms_HTR_des_solved;
+        C_HX_counterflow_CRM::S_des_solved ms_phx_des_solved;
 
 		C_CO2_to_air_cooler::S_des_solved ms_mc_air_cooler; 
 		C_CO2_to_air_cooler::S_des_solved ms_pc_air_cooler; 
@@ -222,6 +223,15 @@ public:
 		// Callback function only log
 		bool(*mf_callback_log)(std::string &log_msg, std::string &progress_msg, void *data, double progress, int out_type);
 		void *mp_mf_active;
+
+        // parameters for PHX design
+        int m_hot_fl_code;				//[-] Integer coding the HTF type
+        util::matrix_t<double> mc_hot_fl_props;	//[-] Custom HTF properties (if applicable)
+        double m_phx_dt_cold_approach;	//[K/C] Temperature difference between cold HTF and PHX CO2 inlet
+        int m_phx_N_sub_hx;             //[-]
+        int m_phx_cost_model;           //[-]
+        NS_HX_counterflow_eqs::E_UA_target_type m_phx_od_UA_target_type;
+        double m_T_htf_hot_in;			//[K] Design-point hot inlet temperature
 
 
 		S_auto_opt_design_parameters()
