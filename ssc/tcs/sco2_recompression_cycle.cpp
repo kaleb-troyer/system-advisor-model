@@ -2024,7 +2024,6 @@ void C_RecompCycle::design_core_standard(int & error_code)
 		return;
 	}
 
-
 	// ****************************************************
 	// ****************************************************
 	// Solve the recuperators
@@ -2122,7 +2121,6 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	}
     else if (ms_des_par.m_des_objective_type == 3)
     {
-
         //********************************************
         // TESTING COST FUNCTIONS WITHIN OPTIMIZATION
         //********************************************
@@ -2256,7 +2254,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // ms_phx_des_par.m_Q_dot_design = ms_des_solved.ms_rc_cycle_solved.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;		//[kWt]
         ms_phx_des_par.m_T_h_in = ms_auto_opt_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature 
         // Okay, but CO2-HTF HX is assumed here. How does "structure inheritance" work?
-        ms_phx_des_par.m_P_h_in = 1.0;							// Assuming HTF is incompressible...
+        ms_phx_des_par.m_P_h_in = 1.0;						// Assuming HTF is incompressible...
         ms_phx_des_par.m_P_h_out = 1.0;						// Assuming HTF is incompressible...
         // .................................................................................
         ms_phx_des_par.m_T_c_in = ms_des_solved.m_temp[C_sco2_cycle_core::HTR_HP_OUT];		//[K]
@@ -2512,7 +2510,6 @@ int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, doub
 
 	return 0;
 }
-
 
 void C_RecompCycle::design_core(int & error_code)
 {
@@ -2784,6 +2781,12 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
     {
         ms_des_par.m_LTR_UA = ms_opt_des_par.m_LTR_UA;      //[kW/K]
         ms_des_par.m_HTR_UA = ms_opt_des_par.m_HTR_UA;      //[kW/K]
+    }
+
+    // Constraining deltaT between Recompressor and LTR
+    if (abs(m_temp_last[MIXER_OUT] - m_temp_last[RC_OUT]) > 20
+        || abs(m_temp_last[MIXER_OUT] - m_temp_last[LTR_HP_OUT]) > 20) {
+        return 0.0; 
     }
 
 	int error_code = 0;
