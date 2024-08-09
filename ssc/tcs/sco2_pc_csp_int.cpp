@@ -323,6 +323,16 @@ void C_sco2_phx_air_cooler::design_core()
 	
 	mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
+    // Calculating CSP equipment costs
+    ms_des_solved.m_cost_receiver = 125 * (ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal) * 1E-6;
+    ms_des_solved.m_cost_HTF = 0.18 * 907.185 * 17000 * 1E-6;
+    ms_des_solved.m_cost_TES = 15.0 * 12 * (ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal) * 1E-6;
+    ms_des_solved.m_cost_tower = 0;
+    ms_des_solved.m_cost_solar_field = 0;
+    ms_des_solved.m_cost_CSP_equip = ms_des_solved.m_cost_receiver +
+        ms_des_solved.m_cost_HTF + ms_des_solved.m_cost_TES +
+        ms_des_solved.m_cost_tower + ms_des_solved.m_cost_solar_field;
+
 	//*************************************************************************************
 	//*************************************************************************************
 

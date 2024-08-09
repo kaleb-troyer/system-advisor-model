@@ -755,7 +755,8 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "W_dot_net_des",        "Design cycle power output (no cooling parasitics)",      "MWe",        "",    "System Design",      "*",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "design_method",        "1 = Specify efficiency, 2 = Specify total recup UA, 3 = Specify each recup design","","","System Design","*","",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "eta_thermal_des",      "Power cycle thermal efficiency",                         "",           "",    "System Design",      "design_method=1","",  "" },
-	    
+    { SSC_INPUT,  SSC_NUMBER,  "TES_capacity",         "Thermal energy storage capacity",                        "",           "",    "System Design",      "*",     "",       "" },
+
     // Heat exchanger design
         // Combined recuperator design parameter (design_method == 2)
     { SSC_INPUT,  SSC_NUMBER,  "UA_recup_tot_des",     "Total recuperator conductance",                          "kW/K",       "Combined recuperator design",    "Heat Exchanger Design",      "design_method=2","",  "" },
@@ -825,7 +826,16 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "cycle_spec_cost_thermal", "Cycle specific (thermal) cost bare erected",          "$/kWt",      "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
-        // Compressor
+
+    { SSC_OUTPUT, SSC_NUMBER,  "receiver_cost",        "Receiver cost bare erected",                             "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "HTF_cost",             "Heat transfer fluid bulk cost",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "TES_cost",             "Energy storage cost bare erected",                       "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "tower_cost",           "Tower cost bare erected",                                "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",     "Solar field cost bare erected",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "CSP_equip_cost",       "Total CSP equipment cost",                               "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_cost",           "Total cost of CSP and power cycle",                      "M$",         "System Design Solution",    "",      "*",     "",       "" },
+
+    // Compressor
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_comp_in",            "Compressor inlet temperature",                           "C",          "Compressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "P_comp_in",            "Compressor inlet pressure",                              "MPa",        "Compressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "P_comp_out",           "Compressor outlet pressure",                             "MPa",        "Compressor",    "",      "*",     "",       "" },
@@ -1012,6 +1022,7 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	s_sco2_des_par.m_dt_mc_approach = cm->as_double("dT_mc_approach");				//[K/C] Temperature difference between ambient air and main compressor inlet
 	s_sco2_des_par.m_elevation = cm->as_double("site_elevation");					//[m] Site elevation
 	s_sco2_des_par.m_W_dot_net = cm->as_double("W_dot_net_des")*1000.0;			//[kWe] Convert from MWe, cycle power output w/o cooling parasitics
+    s_sco2_des_par.m_TES_capacity = cm->as_double("TES_capacity");              //[h] Energy storage in hours
 
     s_sco2_des_par.m_cycle_config = cm->as_integer("cycle_config");			//[-] 1 = recompression, 2 = partial cooling
 
@@ -1421,11 +1432,12 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 
 	// Set SSC design outputs
 	// System
-	double cost_equip_sum = 0.0;        //[M$]
-    double cost_bare_erected_sum = 0.0; //[M$]
-	double comp_cost_equip_sum = 0.0;	//[M$]
-    double comp_cost_bare_erected_sum = 0.0;    //[M$]
-	double comp_power_sum = 0.0; //[MWe]
+	double cost_equip_sum = 0.0;                    //[M$]
+    double cost_bare_erected_sum = 0.0;             //[M$]
+    double cost_CSP_bare_erected_sum = 0.0;         //[M$]
+	double comp_cost_equip_sum = 0.0;	            //[M$]
+    double comp_cost_bare_erected_sum = 0.0;        //[M$]
+	double comp_power_sum = 0.0;                    //[MWe]
 	double m_dot_htf_design = c_sco2_cycle.get_phx_des_par()->m_m_dot_hot_des;	//[kg/s]
     double V_dot_htf_design = c_sco2_cycle.get_phx_des_par()->m_V_dot_hot_des;	//[m3/s]
 	double T_htf_cold_calc = c_sco2_cycle.get_design_solved()->ms_phx_des_solved.m_T_h_out;		//[K]
@@ -1767,10 +1779,23 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     // Add piping, inventory control, etc cost back to BEC
     cost_bare_erected_sum += piping_inventory_etc_cost;     //[M$]
 
+    // Report total CSP equipment costs
+    cm->assign("receiver_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_receiver)); //[M$]
+    cm->assign("HTF_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_HTF)); //[M$]
+    cm->assign("TES_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_TES)); //[M$]
+    cm->assign("tower_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_tower)); //[M$]
+    cm->assign("solar_field_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_solar_field)); //[M$]
+    cm->assign("CSP_equip_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_CSP_equip)); //[M$]
+    cost_CSP_bare_erected_sum = c_sco2_cycle.get_design_solved()->m_cost_CSP_equip; 
+
     // Report total cycle cost metrics as BEC basis
 	cm->assign("cycle_cost", (ssc_number_t)cost_bare_erected_sum);		    //[M$]
-	cm->assign("cycle_spec_cost", (ssc_number_t)(cost_bare_erected_sum*1.E6 / s_sco2_des_par.m_W_dot_net));	//[$/kWe]
+    cm->assign("cycle_spec_cost", (ssc_number_t)(cost_bare_erected_sum*1.E6 / s_sco2_des_par.m_W_dot_net));	//[$/kWe]
 	cm->assign("cycle_spec_cost_thermal", (ssc_number_t)(cost_bare_erected_sum*1.E6 / (s_sco2_des_par.m_W_dot_net / c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal)));	//[$/kWt]
+
+    // Report total plant cost
+    cm->assign("total_cost", (ssc_number_t)(cost_bare_erected_sum + cost_CSP_bare_erected_sum)); //[M$]
+
     double W_dot_net_less_cooling = (1.0 - s_sco2_des_par.m_frac_fan_power) * s_sco2_des_par.m_W_dot_net * 1.E-3;   //[MWe]
     cm->assign("W_dot_net_less_cooling", (ssc_number_t)W_dot_net_less_cooling);     //[MWe]
     cm->assign("eta_thermal_net_less_cooling_des", (ssc_number_t)(W_dot_net_less_cooling/(c_sco2_cycle.get_design_solved()->ms_phx_des_solved.m_Q_dot_design*1.E-3)));  //[-]

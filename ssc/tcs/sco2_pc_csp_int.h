@@ -68,7 +68,8 @@ public:
 		double m_eta_thermal;			//[-] Cycle thermal efficiency
 		double m_UA_recup_tot_des;		//[kW/K] Total recuperator conductance
 		int m_cycle_config;				//[-] 2 = partial cooling, [else] = recompression
-	
+        double m_TES_capacity;          //[h] Thermal energy storage capacity in hours
+
 		// Cycle design parameters
 		std::vector<double> m_DP_LT;		//(cold, hot) positive values are absolute [kPa], negative values are relative (-)
 		std::vector<double> m_DP_HT;		//(cold, hot) positive values are absolute [kPa], negative values are relative (-)
@@ -130,7 +131,8 @@ public:
 		S_des_par()
 		{
 			m_hot_fl_code = m_design_method = m_LTR_N_sub_hxrs = m_LTR_N_sub_hxrs = m_phx_N_sub_hx = -1;
-	
+            m_TES_capacity = 8; 
+
 			// Default cycle config to recompression
 			m_cycle_config = 1;	      
 
@@ -182,7 +184,15 @@ public:
 	{
 		C_HX_counterflow_CRM::S_des_solved ms_phx_des_solved;
 		C_sco2_cycle_core::S_design_solved ms_rc_cycle_solved;
-	};
+
+        double m_cost_receiver;     //[M$]
+        double m_cost_HTF;          //[M$]
+        double m_cost_TES;          //[M$]
+        double m_cost_tower;        //[M$]
+        double m_cost_solar_field;  //[M$]
+        double m_cost_CSP_equip;    //[M$]
+
+    };
 
 	struct S_od_par
 	{

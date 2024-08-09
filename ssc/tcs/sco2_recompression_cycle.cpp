@@ -2268,9 +2268,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
         mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_auto_opt_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
-        // **************************
-        // Collecting equipment costs
-        // **************************
+        // ********************************
+        // Collecting cycle equipment costs
+        // ********************************
         double cost_MC = ms_des_solved.ms_mc_ms_des_solved.m_cost_bare_erected; // main compressor cost
         double cost_RC = ms_des_solved.ms_rc_ms_des_solved.m_cost_bare_erected; // recompressor cost
         double cost_HT = ms_des_solved.ms_t_des_solved.m_bare_erected_cost;     // turbine cost
@@ -2278,7 +2278,17 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double cost_HR = ms_des_solved.ms_HTR_des_solved.m_cost_bare_erected;   // high-temp recuperator cost
         double cost_AC = ms_des_solved.ms_mc_air_cooler.m_cost_bare_erected;    // air cooler cost
         double cost_HX = ms_des_solved.ms_phx_des_solved.m_cost_bare_erected;   // primary HX cost
-        double total_cost = cost_MC + cost_RC + cost_HT + cost_LR + cost_HR + cost_AC + cost_HX;
+        double cycle_cost = cost_MC + cost_RC + cost_HT + cost_LR + cost_HR + cost_AC + cost_HX;
+        // ********************************
+        // Collecting CSP equipment costs
+        // ********************************
+        double cost_REC = 125 * (m_W_dot_net / m_eta_thermal_calc_last) * 1E-6;         // reciever
+        double cost_TES =  15 * (m_W_dot_net / m_eta_thermal_calc_last) * 1E-6 * 12;    // thermal energy storage
+        double cost_HTF = 0; // heat transfer fluid
+        double cost_TWR = 0; // power tower
+        double cost_FLD = 0; // solar field
+
+        double total_cost = cycle_cost + cost_REC + cost_TES + cost_HTF + cost_TWR + cost_FLD;
 
         m_objective_metric_last = 1/total_cost;
 
@@ -2673,7 +2683,7 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		ms_des_par.m_P_mc_out = ms_opt_des_par.m_P_mc_out_guess;
 		ms_des_par.m_P_mc_in = ms_des_par.m_P_mc_out / ms_opt_des_par.m_PR_HP_to_LP_guess;
 		ms_des_par.m_recomp_frac = ms_opt_des_par.m_recomp_frac_guess;
-		
+
         if (ms_opt_des_par.m_LTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA || ms_opt_des_par.m_HTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA)
         {
             ms_des_par.m_LTR_UA = ms_opt_des_par.m_UA_rec_total*ms_opt_des_par.m_LT_frac_guess;
@@ -2783,11 +2793,11 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
         ms_des_par.m_HTR_UA = ms_opt_des_par.m_HTR_UA;      //[kW/K]
     }
 
-    // Constraining deltaT between Recompressor and LTR
-    if (abs(m_temp_last[MIXER_OUT] - m_temp_last[RC_OUT]) > 20
-        || abs(m_temp_last[MIXER_OUT] - m_temp_last[LTR_HP_OUT]) > 20) {
-        return 0.0; 
-    }
+    // Constraining delta-h between Recompressor and LTR
+    //double deltaEntropy = 0.01; // [kJ/kg-K] 
+    //if ((abs(-m_entr_last[LTR_HP_OUT] + m_entr_last[RC_OUT])) > deltaEntropy) {
+    //    return 0.0; 
+    //}
 
 	int error_code = 0;
 
