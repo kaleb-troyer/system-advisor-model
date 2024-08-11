@@ -67,8 +67,8 @@ public:
 		double m_m_dot_pc;		//[kg/s]
 		double m_m_dot_t;		//[kg/s]
 		double m_recomp_frac;	//[-]
-		double m_UA_LTR;			//[kW/K]
-		double m_UA_HTR;			//[kW/K]
+		double m_UA_LTR;	    //[kW/K]
+		double m_UA_HTR;	    //[kW/K]
 		double m_W_dot_mc;      //[kWe]
 		double m_W_dot_rc;		//[kWe]
 		double m_W_dot_pc;		//[kWe]
@@ -92,7 +92,7 @@ public:
 		S_design_solved()
 		{
 			m_eta_thermal = m_W_dot_net = m_m_dot_mc = m_m_dot_rc = m_m_dot_t = m_recomp_frac =
-				m_UA_LTR = m_UA_HTR =
+				m_UA_LTR = m_UA_HTR = m_m_dot_pc = 
 				m_W_dot_mc = m_W_dot_rc = m_W_dot_pc = m_W_dot_t =
 				m_W_dot_cooler_tot = std::numeric_limits<double>::quiet_NaN();
 
@@ -217,6 +217,9 @@ public:
         double m_f_PR_HP_to_IP_guess;     //[-] Initial guess fraction of HP-to-LP deltaP for HP-to-IP (partial cooling cycle)
         bool m_fixed_f_PR_HP_to_IP;       //[-] if true, fix at guess
 
+        double m_UA_frac_guess;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
+        bool m_fixed_UA_frac;
+
 		int m_des_objective_type;		//[2] = min phx deltat then max eta, [else] max eta
 		double m_min_phx_deltaT;		//[C]
 
@@ -243,6 +246,9 @@ public:
                 m_eta_pc = m_des_tol = m_des_opt_tol = 
                 m_is_recomp_ok =
 				m_PR_HP_to_LP_guess = m_f_PR_HP_to_IP_guess = std::numeric_limits<double>::quiet_NaN();
+
+            m_UA_frac_guess = 1.0;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
+            m_fixed_UA_frac = true;
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance

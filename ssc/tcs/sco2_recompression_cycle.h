@@ -168,7 +168,9 @@ public:
 		double m_recomp_frac_guess;			//[-] Initial guess for design-point recompression fraction
 		bool m_fixed_recomp_frac;			//[-] if true, recomp_frac is fixed at recomp_frac_guess
 
-		double m_LT_frac_guess;				//[-] Initial guess for fraction of UA_rec_total that is in the low-temperature recuperator
+        double m_UA_frac_guess;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
+        bool m_fixed_UA_frac;               //[-] if true, UA_frac is fixed at UA_max_allowed
+        double m_LT_frac_guess;				//[-] Initial guess for fraction of UA_rec_total that is in the low-temperature recuperator
 		bool m_fixed_LT_frac;				//[-] if true, LT_frac is fixed at LT_frac_guess
 
 		S_opt_design_parameters()
@@ -179,6 +181,9 @@ public:
                 m_des_tol = m_des_opt_tol = 
 				m_P_mc_out_guess = m_PR_HP_to_LP_guess = m_recomp_frac_guess = m_LT_frac_guess =
                 std::numeric_limits<double>::quiet_NaN();
+
+            m_fixed_UA_frac = true; 
+            m_UA_frac_guess = 1.0; 
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance

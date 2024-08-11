@@ -1050,8 +1050,11 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
         s_sco2_des_par.m_UA_recup_tot_des = cm->as_double("UA_recup_tot_des");		//[kW/K] Total recuperator conductance
 		if (s_sco2_des_par.m_UA_recup_tot_des < 0.0)
 		{
-			cm->log("For cycle design method = 2, the input total recuperator conductance must be greater than 0", SSC_ERROR, -1.0);
-			return -1;
+            // Negative UA is now permissable. If UA < 0, UA is optimized, not fixed. 
+
+            // error handling if UA is negative
+			//cm->log("For cycle design method = 2, the input total recuperator conductance must be greater than 0", SSC_ERROR, -1.0);
+			//return -1;
 		}
         s_sco2_des_par.m_eta_thermal = std::numeric_limits<double>::quiet_NaN();
 	}

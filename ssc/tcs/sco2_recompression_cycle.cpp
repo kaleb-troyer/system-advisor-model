@@ -2635,6 +2635,16 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		index++;
 	}
 
+    if (!ms_opt_des_par.m_fixed_UA_frac)
+    {
+        x.push_back(ms_opt_des_par.m_UA_frac_guess); 
+        lb.push_back(0.0); 
+        ub.push_back(1.0); 
+        scale.push_back(0.01); 
+
+        index++; 
+    }
+
 	if( !ms_opt_des_par.m_fixed_LT_frac )
 	{
 		x.push_back(ms_opt_des_par.m_LT_frac_guess);
@@ -2686,8 +2696,8 @@ void C_RecompCycle::opt_design_core(int & error_code)
 
         if (ms_opt_des_par.m_LTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA || ms_opt_des_par.m_HTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA)
         {
-            ms_des_par.m_LTR_UA = ms_opt_des_par.m_UA_rec_total*ms_opt_des_par.m_LT_frac_guess;
-            ms_des_par.m_HTR_UA = ms_opt_des_par.m_UA_rec_total*(1.0 - ms_opt_des_par.m_LT_frac_guess);
+            ms_des_par.m_LTR_UA = ms_opt_des_par.m_UA_frac_guess*ms_opt_des_par.m_UA_rec_total*ms_opt_des_par.m_LT_frac_guess;
+            ms_des_par.m_HTR_UA = ms_opt_des_par.m_UA_frac_guess*ms_opt_des_par.m_UA_rec_total*(1.0 - ms_opt_des_par.m_LT_frac_guess);
         }
         else
         {
@@ -2759,16 +2769,28 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
 		return 0.0;
 	ms_des_par.m_P_mc_in = P_mc_in;
 
-	// Recompression fraction
-	if( !ms_opt_des_par.m_fixed_recomp_frac )
-	{
-		ms_des_par.m_recomp_frac = x[index];
-		if( ms_des_par.m_recomp_frac < 0.0 )
-			return 0.0;
-		index++;
-	}
-	else
-		ms_des_par.m_recomp_frac = ms_opt_des_par.m_recomp_frac_guess;
+    // Recompression fraction
+    if (!ms_opt_des_par.m_fixed_recomp_frac)
+    {
+        ms_des_par.m_recomp_frac = x[index];
+        if (ms_des_par.m_recomp_frac < 0.0)
+            return 0.0;
+        index++;
+    }
+    else
+        ms_des_par.m_recomp_frac = ms_opt_des_par.m_recomp_frac_guess;
+
+    // Recuperator conductance
+    double UA_frac_local = -999.9; 
+    if (!ms_opt_des_par.m_fixed_UA_frac)
+    {
+        UA_frac_local = x[index];
+        if (UA_frac_local > 1.0 || UA_frac_local < 0.0)
+            return 0.0;
+        index++;
+    }
+    else
+        UA_frac_local = ms_opt_des_par.m_UA_frac_guess;
 
 	// Recuperator split fraction
 	double LT_frac_local = -999.9;
@@ -2784,8 +2806,8 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
 	
     if (ms_opt_des_par.m_LTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA || ms_opt_des_par.m_HTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA)
     {
-        ms_des_par.m_LTR_UA = ms_opt_des_par.m_UA_rec_total*LT_frac_local;
-        ms_des_par.m_HTR_UA = ms_opt_des_par.m_UA_rec_total*(1.0 - LT_frac_local);
+        ms_des_par.m_LTR_UA = UA_frac_local*ms_opt_des_par.m_UA_rec_total*LT_frac_local;
+        ms_des_par.m_HTR_UA = UA_frac_local*ms_opt_des_par.m_UA_rec_total*(1.0 - LT_frac_local);
     }
     else
     {
@@ -2856,7 +2878,8 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 	ms_opt_des_par.m_HTR_eff_max = ms_auto_opt_des_par.m_HTR_eff_max;
     ms_opt_des_par.m_HTR_od_UA_target_type = ms_auto_opt_des_par.m_HTR_od_UA_target_type;
         //
-	ms_opt_des_par.m_UA_rec_total = ms_auto_opt_des_par.m_UA_rec_total;
+    ms_opt_des_par.m_UA_rec_total = ms_auto_opt_des_par.m_UA_rec_total;
+
 	ms_opt_des_par.m_des_tol = ms_auto_opt_des_par.m_des_tol;
 	ms_opt_des_par.m_des_opt_tol = ms_auto_opt_des_par.m_des_opt_tol;
 
@@ -2919,6 +2942,20 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
         {   // optimized
             ms_opt_des_par.m_recomp_frac_guess = 0.3;
             ms_opt_des_par.m_fixed_recomp_frac = false;
+        }
+
+        // Is recuperator conductance fixed or optimized?
+        // ... decided in sco2_pc_csp_int.cpp. Decision passed into ms_auto_opt_des_par.
+        // 
+        if (ms_auto_opt_des_par.m_fixed_UA_frac)
+        {   // fixed
+            ms_opt_des_par.m_fixed_UA_frac = true;
+            ms_opt_des_par.m_UA_frac_guess = 1.0;
+        }
+        else
+        {   // optimized
+            ms_opt_des_par.m_fixed_UA_frac = false;
+            ms_opt_des_par.m_UA_frac_guess = 0.2;
         }
 
         ms_opt_des_par.m_LT_frac_guess = 0.5;
@@ -3336,7 +3373,18 @@ double C_RecompCycle::opt_eta_fixed_P_high(double P_high_opt /*kPa*/)
             ms_opt_des_par.m_recomp_frac_guess = 0.3;
             ms_opt_des_par.m_fixed_recomp_frac = false;
         }
-		
+
+        if (ms_auto_opt_des_par.m_fixed_UA_frac)
+        {   // fixed
+            ms_opt_des_par.m_fixed_UA_frac = true;
+            ms_opt_des_par.m_UA_frac_guess = 1.0;
+        }
+        else
+        {   // optimized
+            ms_opt_des_par.m_fixed_UA_frac = false;
+            ms_opt_des_par.m_UA_frac_guess = 0.2;
+        }
+
 		ms_opt_des_par.m_LT_frac_guess = 0.5;
 		ms_opt_des_par.m_fixed_LT_frac = false;
 

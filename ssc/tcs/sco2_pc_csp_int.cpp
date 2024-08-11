@@ -208,16 +208,22 @@ void C_sco2_phx_air_cooler::design_core()
 	}
 	else if (ms_des_par.m_design_method == 2 || ms_des_par.m_design_method == 3)
 	{
+
+        C_sco2_cycle_core::S_auto_opt_design_parameters des_params;
+
 		if (ms_des_par.m_design_method == 2)
 		{
 			if (ms_des_par.m_UA_recup_tot_des < 0.0)
 			{
-				std::string ex_msg = "The " + s_cycle_config + " cycle and CSP integration design, design method 2, conductance must be > 0";
-				throw(C_csp_exception(ex_msg.c_str()));
+                // Negative UA is now permissable. If UA < 0, UA is optimized, not fixed. 
+                des_params.m_fixed_UA_frac = false;
+                ms_des_par.m_UA_recup_tot_des = abs(ms_des_par.m_UA_recup_tot_des);
+
+                // error handling if UA is negative
+                //std::string ex_msg = "The " + s_cycle_config + " cycle and CSP integration design, design method 2, conductance must be > 0";
+				//throw(C_csp_exception(ex_msg.c_str()));
 			}
 		}
-		
-		C_sco2_cycle_core::S_auto_opt_design_parameters des_params;
 
         if (T_mc_in < m_T_mc_in_min)
 		{
@@ -273,7 +279,8 @@ void C_sco2_phx_air_cooler::design_core()
         des_params.m_T_htf_hot_in = ms_des_par.m_T_htf_hot_in;
 
 		auto_err_code = mpc_sco2_cycle->auto_opt_design(des_params);
-	}
+
+    }
 	else
 	{
 		std::string ex_msg = "The " + s_cycle_config + " cycle and CSP integration design, design method can only be:"
