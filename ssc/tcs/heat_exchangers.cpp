@@ -1794,7 +1794,7 @@ double /*M$*/ C_HX_counterflow_CRM::calculate_equipment_cost(double UA /*kWt/K*/
     case C_HX_counterflow_CRM::E_COST_MODEL::E_CARLSON_17_PHX:
         return 3.5 * 1.E-3 * UA;		                    //[M$] needs UA in kWt/K
     case C_HX_counterflow_CRM::E_COST_MODEL::E_SIC_PHX: 
-        return 3.5 * 1.E-3 * UA * 0.25;                 //[M$] assuming 5% reduction in $/UA
+        return 3.5 * 1.E-3 * UA * 0.75;                 //[M$] assuming X% reduction in $/UA
     default:
         return std::numeric_limits<double>::quiet_NaN();
     }

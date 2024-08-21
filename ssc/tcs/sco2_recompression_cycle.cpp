@@ -2293,7 +2293,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
         // Particle Properties
         double rho = 1625;  // kg/m3
-        double cp = 0.18;   // $/kg
+        double cp = 1;   // $/kg
         double al = 0.559;  // rad (angle of repose)
 
         // thermal energy storage bin size
@@ -2304,30 +2304,6 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double H_bin = (V_htf - ((M_PI / 3) * pow(r_bin, 3) * tan(al))) / (M_PI * pow(r_bin, 2)); 
         double A_bin_surf = 2 * M_PI * r_bin * H_bin + M_PI * r_bin * pow(H_bin * H_bin + r_bin * r_bin, 0.5);
 
-        // other parameters
-        double W_dot_th = m_W_dot_net_last / m_eta_thermal_calc_last;
-        double eta_rec = 0.9;
-        double eta_lft = 0.8; 
-        double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM; 
-        double H_LFT = H_TWR; 
-        double T_phx_i = ms_phx_des_par.m_T_h_in;
-        double T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;
-        double c_bin_h = 1230 * (1 + 0.3 * ((T_phx_i - 600) / 400));
-        double c_bin_c = 1230 * (1 + 0.3 * ((T_phx_o - 600) / 400));
-        double NS = 0.05; // non-thermal storage
-        double eta_field = 0.5;
-        double eta_receiver = 0.9;
-        double A_field_surf = SM * W_dot_th / (eta_receiver * eta_field * DNI);
-
-        // cost calculations
-        double cost_TWR = 1E-6 * 157.44 * pow(H_TWR, 1.9174);
-        double cost_REC = 1E-6 * 37400 * A_REC;
-        double cost_LFT = 1E-6 * 58.37 * H_LFT * m_dot_p;
-        double cost_HTF = 1E-6 * (1 + NS) * cp * m_htf; 
-        double cost_TES = 1E-6 * (c_bin_h * A_bin_surf + c_bin_c * A_bin_surf);
-        double cost_FLD = 1E-6 * (75 + 10) * A_field_surf; 
-        total_cost += cost_TWR + cost_REC + cost_LFT + cost_HTF + cost_TES + cost_FLD; 
-
         // LCOE parameteres
         double total_life = 30; //[years]
         double capacity_factor = 0.7;
@@ -2336,9 +2312,36 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double f_construction = 0.06;
         double f_indirect = 0.13;
         double f_financing = 0.07;
-        double i_inflation = 0.025; 
+        double i_inflation = 0.025;
         double f_prime = ((1 + f_financing) / (1 + i_inflation)) - 1;
-        double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1); 
+        double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1);
+
+        // other parameters
+        double W_dot_th = m_W_dot_net_last / m_eta_thermal_calc_last;
+        double eta_rec = 0.9; 
+        double eta_lft = 0.8; 
+        double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM; 
+        double H_LFT = H_bin * 3; 
+        double T_phx_i = ms_phx_des_par.m_T_h_in; 
+        double T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; 
+        double c_bin_h = 1230 + 0.37 * ((T_phx_i - 600) / 400); //[$]
+        double c_bin_c = 1230 + 0.37 * ((T_phx_o - 600) / 400); //[$]
+        double f_losses = 1E-6; 
+        double c_losses = total_life * cp * m_dot_p * (hours / SM) * 365 * f_losses; //[$]
+        double NS = 0.05; // non-thermal storage
+        double eta_field = 0.5; 
+        double eta_receiver = 0.9; 
+        double A_field_surf = SM * W_dot_th / (eta_receiver * eta_field * DNI); 
+
+        // cost calculations
+        double cost_LND = 1E-6 * 2.5 * (A_field_surf * 4 + 2500); //[M$]
+        double cost_TWR = 1E-6 * 157.44 * pow(H_TWR, 1.9174);     //[M$]
+        double cost_REC = 1E-6 * 37400 * A_REC;                   //[M$]
+        double cost_LFT = 1E-6 * 58.37 * H_LFT * m_dot_p;         //[M$]
+        double cost_HTF = 1E-6 * (1 + NS) * cp * m_htf;           //[M$]
+        double cost_TES = 1E-6 * ((c_bin_h * A_bin_surf) + (c_bin_c * A_bin_surf) + c_losses); //[M$]
+        double cost_FLD = 1E-6 * (75 + 10) * A_field_surf + cost_LND; //[M$]
+        total_cost += cost_TWR + cost_REC + cost_LFT + cost_HTF + cost_TES + cost_FLD; //[M$]
 
         // Power parasitics
         double W_dot_lift = 1E-3 * m_dot_p * H_LFT * 9.80665 / eta_lft; //[kWe]
