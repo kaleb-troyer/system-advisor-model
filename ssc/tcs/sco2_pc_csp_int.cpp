@@ -331,14 +331,82 @@ void C_sco2_phx_air_cooler::design_core()
 	mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
     // Calculating CSP equipment costs
-    ms_des_solved.m_cost_receiver = 125 * (ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal) * 1E-6;
-    ms_des_solved.m_cost_HTF = 0.18 * 907.185 * 17000 * 1E-6;
-    ms_des_solved.m_cost_TES = 15.0 * 12 * (ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal) * 1E-6;
-    ms_des_solved.m_cost_tower = 0;
-    ms_des_solved.m_cost_solar_field = 0;
+        // SolarPILOT outs
+    double SM = 3;
+    double A_REC = 200;
+    double DNI = 900E-3;
+    double H_TWR = 250;
+
+        // Particle Properties
+    double rho = 1625;  // kg/m3
+    double cp = 0.18;   // $/kg
+    double al = 0.559;  // rad (angle of repose)
+
+        // thermal energy storage bin size
+    double hours = 16;     // hours of storage
+    double r_bin = 12;     // [m] bin radius
+    double m_htf = ms_phx_des_par.m_m_dot_hot_des * hours * 3600;
+    double V_htf = m_htf / rho;
+    double H_bin = (V_htf - ((M_PI / 3) * pow(r_bin, 3) * tan(al))) / (M_PI * pow(r_bin, 2));
+    double A_bin_surf = 2 * M_PI * r_bin * H_bin + M_PI * r_bin * pow(H_bin * H_bin + r_bin * r_bin, 0.5);
+
+        // other parameters
+    double W_dot_th = ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;
+    double eta_rec = 0.9;
+    double eta_lft = 0.8; 
+    double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM;
+    double H_LFT = H_TWR;
+    double T_phx_i = ms_phx_des_par.m_T_h_in;
+    double T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;
+    double c_bin_h = 1230 * (1 + 0.3 * ((T_phx_i - 600) / 400));
+    double c_bin_c = 1230 * (1 + 0.3 * ((T_phx_o - 600) / 400));
+    double NS = 0.05; // non-thermal storage
+    double eta_field = 0.5;
+    double eta_receiver = 0.9;
+    double A_field_surf = SM * W_dot_th / (eta_receiver * eta_field * DNI);
+
+        // cost calculations
+    ms_des_solved.m_cost_receiver    = 1E-6 * 37400 * A_REC;
+    ms_des_solved.m_cost_HTF         = 1E-6 * (1 + NS) * cp * m_htf;
+    ms_des_solved.m_cost_TES         = 1E-6 * (c_bin_h * A_bin_surf + c_bin_c * A_bin_surf);
+    ms_des_solved.m_cost_tower       = 1E-6 * (157.44 * pow(H_TWR, 1.9174) + 58.37 * H_LFT * m_dot_p); // power tower + lift
+    ms_des_solved.m_cost_solar_field = 1E-6 * (75 + 10) * A_field_surf; // solar field
     ms_des_solved.m_cost_CSP_equip = ms_des_solved.m_cost_receiver +
         ms_des_solved.m_cost_HTF + ms_des_solved.m_cost_TES +
         ms_des_solved.m_cost_tower + ms_des_solved.m_cost_solar_field;
+
+    double cost_MC = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment; // main compressor cost
+    double cost_RC = ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
+    double cost_HT = ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;     // turbine cost
+    double cost_LR = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;   // low-temp recuperator cost
+    double cost_HR = ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;   // high-temp recuperator cost
+    double cost_AC = ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;    // air cooler cost
+    double cost_HX = ms_des_solved.ms_phx_des_solved.m_cost_equipment;   // primary HX cost
+    double cycle_cost = cost_MC + cost_RC + cost_HT + cost_LR + cost_HR + cost_AC + cost_HX;
+    double total_cost = cycle_cost + ms_des_solved.m_cost_CSP_equip;
+    
+    // LCOE parameteres
+    double total_life = 30; //[years]
+    double capacity_factor = 0.7;
+    double operation_maintenance = 40; //[$/kWe-year]
+    double f_contingency = 0.1;
+    double f_construction = 0.06;
+    double f_indirect = 0.13;
+    double f_financing = 0.07;
+    double i_inflation = 0.025;
+    double f_prime = ((1 + f_financing) / (1 + i_inflation)) - 1;
+    double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1);
+
+    // Power parasitics
+    double W_dot_lift = 1E-3 * m_dot_p * H_LFT * 9.80665 / eta_lft; //[kWe]
+    double W_dot_cool = ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_W_dot_fan; //[kWe]
+    double W_dot_less = ms_des_par.m_W_dot_net - W_dot_lift - W_dot_cool; //[kWe]
+
+    // LCOE calculation
+    double W_annual = capacity_factor * W_dot_less * 24 * 365; //[kWe-h]
+    double installed_cost = (1 + f_construction) * (1 + f_indirect) * ((1 + f_contingency) * total_cost) * 1E6;
+    double levelized_cost_of_energy = ((installed_cost * capital_recovery_factor) + (operation_maintenance * ms_des_par.m_W_dot_net)) / W_annual;
+    ms_des_solved.m_LCOE = levelized_cost_of_energy; 
 
 	//*************************************************************************************
 	//*************************************************************************************

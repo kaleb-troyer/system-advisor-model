@@ -834,6 +834,9 @@ var_info vtab_sco2_design[] = {
     { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",     "Solar field cost bare erected",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "CSP_equip_cost",       "Total CSP equipment cost",                               "M$",         "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "total_cost",           "Total cost of CSP and power cycle",                      "M$",         "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",      "Total specific cost bare erected",                       "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal", "Total specific (thermal) cost bare erected",          "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "LCOE",                 "Levelized cost of energy",                               "$/kWe-h",    "System Design Solution",    "",      "*",     "",       "" },
 
     // Compressor
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_comp_in",            "Compressor inlet temperature",                           "C",          "Compressor",    "",      "*",     "",       "" },
@@ -1689,10 +1692,10 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 		cm->assign("HTR_HP_T_in_des", ssc_nan);		//[C]
 		cm->assign("HTR_UA_assigned", ssc_nan);		//[MW/K]
         cm->assign("HTR_UA_calculated", ssc_nan);	//[MW/K]
-        cm->assign("eff_HTR", ssc_nan);		//[-]
-		cm->assign("NTU_HTR", ssc_nan);		//[-]
-		cm->assign("q_dot_HTR", ssc_nan);	//[MWt] convert from kWt
-		cm->assign("HTR_min_dT", ssc_nan);	//[C/K]
+        cm->assign("eff_HTR", ssc_nan);		        //[-]
+		cm->assign("NTU_HTR", ssc_nan);		        //[-]
+		cm->assign("q_dot_HTR", ssc_nan);	        //[MWt] convert from kWt
+		cm->assign("HTR_min_dT", ssc_nan);	        //[C/K]
 		cm->assign("HTR_cost_equipment", ssc_nan);	    //[M$]
         cm->assign("HTR_cost_bare_erected", ssc_nan);	//[M$]
         cm->assign("recup_LTR_UA_frac", ssc_nan);	//[-]
@@ -1797,7 +1800,11 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	cm->assign("cycle_spec_cost_thermal", (ssc_number_t)(cost_bare_erected_sum*1.E6 / (s_sco2_des_par.m_W_dot_net / c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal)));	//[$/kWt]
 
     // Report total plant cost
-    cm->assign("total_cost", (ssc_number_t)(cost_bare_erected_sum + cost_CSP_bare_erected_sum)); //[M$]
+    double total_plant_cost = cost_bare_erected_sum + cost_CSP_bare_erected_sum; 
+    cm->assign("total_cost", (ssc_number_t)(total_plant_cost)); //[M$]
+    cm->assign("total_spec_cost", (ssc_number_t)(total_plant_cost * 1.E6 / s_sco2_des_par.m_W_dot_net));	//[$/kWe]
+    cm->assign("total_spec_cost_thermal", (ssc_number_t)(total_plant_cost * 1.E6 / (s_sco2_des_par.m_W_dot_net / c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal)));	//[$/kWt]
+    cm->assign("LCOE", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_LCOE)); //[$/kWe-h]
 
     double W_dot_net_less_cooling = (1.0 - s_sco2_des_par.m_frac_fan_power) * s_sco2_des_par.m_W_dot_net * 1.E-3;   //[MWe]
     cm->assign("W_dot_net_less_cooling", (ssc_number_t)W_dot_net_less_cooling);     //[MWe]

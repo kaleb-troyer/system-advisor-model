@@ -191,6 +191,7 @@ public:
         double m_cost_tower;        //[M$]
         double m_cost_solar_field;  //[M$]
         double m_cost_CSP_equip;    //[M$]
+        double m_LCOE;              //[$/kWe-h]
 
     };
 

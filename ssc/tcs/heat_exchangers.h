@@ -525,12 +525,12 @@ public:
         double m_eff_max;			//[-] Max allowable effectiveness
 
         S_des_calc_UA_par()
-        {
+        { 
             m_T_h_in = m_P_h_in = m_P_h_out = m_m_dot_hot_des =
                 m_T_c_in = m_P_c_in = m_P_c_out = m_m_dot_cold_des =
                 m_V_dot_hot_des = m_V_dot_cold_des = 
                 m_eff_max = std::numeric_limits<double>::quiet_NaN();
-        }
+        } 
     };
 
     struct S_des_solved
