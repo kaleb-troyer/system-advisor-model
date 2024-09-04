@@ -2285,15 +2285,18 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // Collecting CSP equipment costs
         // ********************************
 
+        double W_dot_th = m_W_dot_net_last / m_eta_thermal_calc_last; //[kW] power required by power block
+        double eta_rec = 0.9;                       //[-]  receiver efficiency
+        double SM = 3;                              //[-]  solar multiple
+        double W_dot_htf = SM * W_dot_th / eta_rec; //[kW] power delivered to heat transfer fluid
         // SolarPILOT outs
-        double SM = 3; 
-        double A_REC = 200;
-        double DNI = 900E-3;
-        double H_TWR = 250;
+        double A_REC = 20 * (12.01 + 0.01255 * (W_dot_htf / 1000));
+        double H_TWR = 7.830e+01 + 3.764e-01 * (W_dot_htf / 1000);
+        double A_field_surf = -1.316e+05 + 2.880e+03 * (W_dot_htf / 1000);
 
         // Particle Properties
         double rho = 1625;  // kg/m3
-        double cp = 1;   // $/kg
+        double cp = 0.185;  // $/kg
         double al = 0.559;  // rad (angle of repose)
 
         // thermal energy storage bin size
@@ -2317,8 +2320,6 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1);
 
         // other parameters
-        double W_dot_th = m_W_dot_net_last / m_eta_thermal_calc_last;
-        double eta_rec = 0.9; 
         double eta_lft = 0.8; 
         double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM; 
         double H_LFT = H_bin * 3; 
@@ -2329,12 +2330,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double f_losses = 1E-6; 
         double c_losses = total_life * cp * m_dot_p * (hours / SM) * 365 * f_losses; //[$]
         double NS = 0.05; // non-thermal storage
-        double eta_field = 0.5; 
-        double eta_receiver = 0.9; 
-        double A_field_surf = SM * W_dot_th / (eta_receiver * eta_field * DNI); 
 
         // cost calculations
-        double cost_LND = 1E-6 * 2.5 * (A_field_surf * 4 + 2500); //[M$]
+        double cost_LND = 1E-6 * 2.5 * (A_field_surf * 9 + 2500); //[M$]
         double cost_TWR = 1E-6 * 157.44 * pow(H_TWR, 1.9174);     //[M$]
         double cost_REC = 1E-6 * 37400 * A_REC;                   //[M$]
         double cost_LFT = 1E-6 * 58.37 * H_LFT * m_dot_p;         //[M$]

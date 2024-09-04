@@ -331,20 +331,23 @@ void C_sco2_phx_air_cooler::design_core()
 	mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
     // Calculating CSP equipment costs
-        // SolarPILOT outs (need routine to grab these)
-    double SM = 3;
-    double A_REC = 200;
-    double DNI = 900E-3;
-    double H_TWR = 250;
+    double W_dot_th = ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal; //[MW] power required by power block
+    double eta_rec = 0.9;                       //[-]  receiver efficiency
+    double SM = 3;                              //[-]  solar multiple
+    double W_dot_htf = SM * W_dot_th / eta_rec; //[MW] power delivered to heat transfer fluid
+        // SolarPILOT outs
+    double A_REC = 20 * (12.01 + 0.01255 * (W_dot_htf / 1000));
+    double H_TWR = 7.830e+01 + 3.764e-01 * (W_dot_htf / 1000);
+    double A_field_surf = -1.316e+05 + 2.880e+03 * (W_dot_htf / 1000);
 
         // Particle Properties (need routine to grab these)
-    double rho = 1625;  // kg/m3
-    double cp = 1;   // $/kg
-    double al = 0.559;  // rad (angle of repose)
+    double rho = 1625;  // [kg/m3]
+    double cp = 0.185;  // [$/kg]
+    double al = 0.559;  // [rad] (angle of repose)
 
         // thermal energy storage bin size
-    double hours = 16;     // hours of storage
-    double r_bin = 12;     // [m] bin radius
+    double hours = 16;  // [h] hours of storage
+    double r_bin = 12;  // [m] bin radius
     double m_htf = ms_phx_des_par.m_m_dot_hot_des * hours * 3600;
     double V_htf = m_htf / rho;
     double H_bin = (V_htf - ((M_PI / 3) * pow(r_bin, 3) * tan(al))) / (M_PI * pow(r_bin, 2));
@@ -363,8 +366,6 @@ void C_sco2_phx_air_cooler::design_core()
     double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1);
 
         // other parameters (some of these should be design parameters)
-    double W_dot_th = ms_des_par.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;
-    double eta_rec = 0.9;
     double eta_lft = 0.8; 
     double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM;
     double H_LFT = H_bin * 3;
@@ -375,12 +376,9 @@ void C_sco2_phx_air_cooler::design_core()
     double f_losses = 1E-6; 
     double c_losses = total_life * cp * m_dot_p * (hours / SM) * 365 * f_losses; //[$]
     double NS = 0.05; // non-thermal storage
-    double eta_field = 0.5;
-    double eta_receiver = 0.9;
-    double A_field_surf = SM * W_dot_th / (eta_receiver * eta_field * DNI);
 
         // cost calculations
-    double cost_LND = 1E-6 * 2.5 * (A_field_surf * 4 + 2500); //[M$]
+    double cost_LND = 1E-6 * 2.5 * (A_field_surf * 9 + 2500); //[M$]
     ms_des_solved.m_cost_receiver    = 1E-6 * 37400 * A_REC; //[M$] 
     ms_des_solved.m_cost_HTF         = 1E-6 * (1 + NS) * cp * m_htf; //[M$] 
     ms_des_solved.m_cost_TES         = 1E-6 * ((c_bin_h * A_bin_surf) + (c_bin_c * A_bin_surf) + c_losses); //[M$] 
