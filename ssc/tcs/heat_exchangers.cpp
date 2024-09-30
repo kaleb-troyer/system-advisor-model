@@ -1794,23 +1794,25 @@ double /*M$*/ C_HX_counterflow_CRM::calculate_equipment_cost(double UA /*kWt/K*/
     case C_HX_counterflow_CRM::E_COST_MODEL::E_CARLSON_17_PHX:
         return 3.5 * 1.E-3 * UA;		                //[M$] needs UA in kWt/K
     case C_HX_counterflow_CRM::E_COST_MODEL::E_SIC_PHX: 
-        return 3.5 * 1.E-3 * UA * 0.1;                 //[M$] assuming X% reduction in $/UA
-    case 5:
-        return 3.5 * 1.E-3 * UA * 0.2;                 //[M$] assuming X% reduction in $/UA
-    case 6:
-        return 3.5 * 1.E-3 * UA * 0.3;                 //[M$] assuming X% reduction in $/UA
-    case 7:
-        return 3.5 * 1.E-3 * UA * 0.4;                 //[M$] assuming X% reduction in $/UA
-    case 8:
         return 3.5 * 1.E-3 * UA * 0.5;                 //[M$] assuming X% reduction in $/UA
-    case 9:
+    case 5:
         return 3.5 * 1.E-3 * UA * 0.6;                 //[M$] assuming X% reduction in $/UA
-    case 10:
+    case 6:
         return 3.5 * 1.E-3 * UA * 0.7;                 //[M$] assuming X% reduction in $/UA
-    case 11:
+    case 7:
         return 3.5 * 1.E-3 * UA * 0.8;                 //[M$] assuming X% reduction in $/UA
-    case 12:
+    case 8:
         return 3.5 * 1.E-3 * UA * 0.9;                 //[M$] assuming X% reduction in $/UA
+    case 9:
+        return 3.5 * 1.E-3 * UA * 1.1;                 //[M$] assuming X% reduction in $/UA
+    case 10:
+        return 3.5 * 1.E-3 * UA * 1.2;                 //[M$] assuming X% reduction in $/UA
+    case 11:
+        return 3.5 * 1.E-3 * UA * 1.3;                 //[M$] assuming X% reduction in $/UA
+    case 12:
+        return 3.5 * 1.E-3 * UA * 1.4;                 //[M$] assuming X% reduction in $/UA
+    case 13:
+        return 3.5 * 1.E-3 * UA * 1.5;                 //[M$] assuming X% reduction in $/UA
     default:
         return std::numeric_limits<double>::quiet_NaN();
     }

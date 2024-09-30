@@ -2025,8 +2025,8 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	}
 
 	// ****************************************************
-	// ****************************************************
 	// Solve the recuperators
+	// ****************************************************
     C_mono_eq_HTR_des HTR_des_eq(this, w_mc, w_t);
     C_monotonic_eq_solver HTR_des_solver(HTR_des_eq);
     
@@ -2290,9 +2290,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double SM = 3;                              //[-]  solar multiple
         double W_dot_htf = SM * W_dot_th / eta_rec; //[kW] power delivered to heat transfer fluid
         // SolarPILOT outs
-        double A_REC = 20 * (12.01 + 0.01255 * (W_dot_htf / 1000));
-        double H_TWR = 7.830e+01 + 3.764e-01 * (W_dot_htf / 1000);
-        double A_field_surf = -1.316e+05 + 2.880e+03 * (W_dot_htf / 1000);
+        double A_REC = 15 * (14.31 + 0.02414 * (W_dot_htf / 1000));
+        double H_TWR = 4.821e+01 + 4.447e-01 * (W_dot_htf / 1000);
+        double A_field_surf = -6.272e+04 + 2.174e+03 * (W_dot_htf / 1000);
 
         // Particle Properties
         double rho = 1625;  // kg/m3
@@ -2352,6 +2352,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         double levelized_cost_of_energy = ((installed_cost * capital_recovery_factor) + (operation_maintenance * m_W_dot_net_last)) / W_annual; 
 
         m_objective_metric_last = 1/levelized_cost_of_energy;
+
 
     }
     else
@@ -3055,9 +3056,9 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
             ms_opt_des_par.m_PR_HP_to_LP_guess = PR_mc_guess;		//[-]
         }
 
-        ms_opt_des_par.m_recomp_frac_guess = 0.0;
+        ms_opt_des_par.m_recomp_frac_guess = 0.5;
         ms_opt_des_par.m_fixed_recomp_frac = true;
-        ms_opt_des_par.m_LT_frac_guess = 1.0;
+        ms_opt_des_par.m_LT_frac_guess = 0.5;
         ms_opt_des_par.m_fixed_LT_frac = true;
 
         int s_error_code = 0;

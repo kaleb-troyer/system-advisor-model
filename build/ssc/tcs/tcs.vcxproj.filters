@@ -271,6 +271,12 @@
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\flat_plate_solar_collector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="csp_system_costs_gen3.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="csp_system_costs_gen3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\source\.repositories\sam_dev\ssc\tcs\atmospheric_aod.h">

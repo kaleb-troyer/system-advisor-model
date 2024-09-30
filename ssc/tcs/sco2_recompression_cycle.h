@@ -47,7 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "numeric_solvers.h"
 
+#include "csp_system_costs_gen3.h"
+
 using namespace std;
+
 
 class C_RecompCycle : public C_sco2_cycle_core
 {
@@ -393,6 +396,22 @@ public:
 			m_m_dot_htf_des = m_T_htf_hot = m_m_dot_htf = m_T_htf_cold = m_UA_PHX_des = m_cp_htf = std::numeric_limits<double>::quiet_NaN();
 		}
 	};
+
+    S_design_solved getDesignSolution() {
+        return ms_des_solved; 
+    };
+
+    double getNetWork() {
+        return m_W_dot_net_last; 
+    }; 
+
+    double getEfficiency() {
+        return m_eta_thermal_calc_last; 
+    }; 
+
+    double getHeatExchangerHotInletTemp() {
+        return ms_phx_des_par.m_T_h_in; 
+    }; 
 
 private:
 		// Component classes
