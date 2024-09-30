@@ -42,13 +42,6 @@ void cspGen3CostModel::designRoutine(double SM) {
     8) Calculate the levelized cost of energy.
     */
 
-    // extracting power cycle parameters
-    //s_cycle.des_sol = cycle->getDesignSolution(); 
-    //s_cycle.W_dot_net = cycle->getNetWork() * 1E-3;                 // [MWe]
-    //s_cycle.efficiency = cycle->getEfficiency();                    // [-]
-    //s_cycle.T_phx_i = cycle->getHeatExchangerHotInletTemp();        // [K]
-    //s_cycle.T_phx_o = s_cycle.des_sol.ms_phx_des_solved.m_T_h_out;  // [K]
-
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
     s_particles.bulk_density = 1625;
@@ -62,15 +55,6 @@ void cspGen3CostModel::designRoutine(double SM) {
     powerReceiver();
     sizeEquipment();
 
-    // getting power block costs from cycle
-    //s_costs.HTR_capital_cost = 1E6 * s_cycle.des_sol.ms_t_des_solved.m_equipment_cost;                // [$] HTR_capital_cost;
-    //s_costs.LTR_capital_cost = 1E6 * s_cycle.des_sol.ms_LTR_des_solved.m_cost_equipment;              // [$] LTR_capital_cost;
-    //s_costs.PHX_capital_cost = 1E6 * s_cycle.des_sol.ms_phx_des_solved.m_cost_equipment;;             // [$] PHX_capital_cost;
-    //s_costs.air_cooler_capital_cost = 1E6 * s_cycle.des_sol.ms_mc_air_cooler.m_cost_equipment;        // [$] air_cooler_capital_cost;
-    //s_costs.compressor_capital_cost = 1E6 * s_cycle.des_sol.ms_mc_ms_des_solved.m_cost_equipment;     // [$] compressor_capital_cost;
-    //s_costs.recompressor_capital_cost = 1E6 * s_cycle.des_sol.ms_rc_ms_des_solved.m_cost_equipment;   // [$] recompressor_capital_cost;
-    //s_costs.turbine_capital_cost = 1E6 * s_cycle.des_sol.ms_t_des_solved.m_equipment_cost;            // [$] turbine_capital_cost;
-
     // getting CSP costs from cost models
     s_costs.solar_tower = costTower();                      // [$]
     s_costs.solar_field = costField();                      // [$]
@@ -82,11 +66,10 @@ void cspGen3CostModel::designRoutine(double SM) {
     s_costs.land = costLand();                              // [$]
 
     // calculating parasitics and annual electricity produced
-    s_parasitics.cooler = s_cycle.des_sol.ms_mc_air_cooler.m_W_dot_fan * 1E-3;  // [MWe] 
-    s_parasitics.field = s_field.tracking_power * W_dot_rec;                    // [MWe]
+    s_parasitics.field = s_field.tracking_power * W_dot_rec;                                            // [MWe]
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
     W_dot_less = s_cycle.W_dot_net - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
-    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);    // [MWe-h]
+    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h]
 
     // calculating levelized cost of energy
     s_costs.total_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land +
@@ -208,7 +191,7 @@ double cspGen3CostModel::costStorage() {
     /*
     Albrecht, K.J.; Bauer, M.L.; Ho, C.K. Parametric analysis of particle CSP system performance and cost to intrinsec particle
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
-    WA, USA, 14–17 July 2019.
+    WA, USA, 14â€“17 July 2019.
     */
     const double C1 = 1230; // [$/m^2] 
     const double C2 = 0.37; // [$/m^2] 
@@ -235,7 +218,7 @@ double cspGen3CostModel::costParticles() {
     /*
     Albrecht, K.J.; Bauer, M.L.; Ho, C.K. Parametric analysis of particle CSP system performance and cost to intrinsec particle
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
-    WA, USA, 14–17 July 2019.
+    WA, USA, 14â€“17 July 2019.
 
     M. Mehos, C. Turchi, J. Vidal, M. Wagner, Z. Ma, C. Ho,
     W. Kolb, C. Andraka and A. Kruizenga, "Concentrating
@@ -249,7 +232,7 @@ double cspGen3CostModel::costParticleLosses() {
     /*
     Albrecht, K.J.; Bauer, M.L.; Ho, C.K. Parametric analysis of particle CSP system performance and cost to intrinsec particle
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
-    WA, USA, 14–17 July 2019.
+    WA, USA, 14â€“17 July 2019.
     */
     const double C1 = 365;  // [days / year]
     const double C2 = 3600; // [seconds / hour] 

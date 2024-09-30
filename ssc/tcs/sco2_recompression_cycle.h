@@ -69,6 +69,8 @@ public:
 	//	}
 	//};
 
+    cspGen3CostModel csp_cost_model; 
+
 	struct S_design_parameters
 	{
 		double m_P_mc_in;					//[kPa] Compressor inlet pressure

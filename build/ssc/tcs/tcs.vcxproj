@@ -165,6 +165,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\ssc\tcs\csp_system_costs_gen3.cpp" />
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\atmospheric_aod.cpp" />
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\base_dispatch.cpp" />
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\co2_compressor_library.cpp" />
@@ -255,8 +256,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\thermocline_tes.cpp" />
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\tou_translator.cpp" />
     <ClCompile Include="C:\source\.repositories\sam_dev\ssc\tcs\flat_plate_solar_collector.cpp" />
-    <ClCompile Include="csp_system_costs_gen3.cpp" />
-    <ClCompile Include="csp_system_costs_gen3.h" />
+    <ClInclude Include="..\..\..\ssc\tcs\csp_system_costs_gen3.h" />
     <ClInclude Include="C:\source\.repositories\sam_dev\ssc\tcs\atmospheric_aod.h" />
     <ClInclude Include="C:\source\.repositories\sam_dev\ssc\tcs\base_dispatch.h" />
     <ClInclude Include="C:\source\.repositories\sam_dev\ssc\tcs\cavity_calcs.h" />
