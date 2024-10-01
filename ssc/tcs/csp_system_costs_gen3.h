@@ -13,14 +13,11 @@ public:
     ~cspGen3CostModel() = default;                  // Default destructor. Memory is out-of-scope after the optimization is completed. 
     void designRoutine(double SM); // Accepts a power block and solar multiple to design a CSP plant and calculate LCOE. 
 
-    // decision variables
-    double solar_multiple;  // [-]      ratio of solar field installed power to power block design point
-
     // derived parameters    
     double W_dot_thm;       // [MWt]    power cycle thermal input
     double W_dot_rec;       // [MWt]    power required at receiver
     double W_dot_less;      // [MWe]    net power, less parasitics
-    double W_elec_annual;   // [kW-h]   annual electricity produced
+    double W_elec_annual;   // [MWe-h]  annual electricity produced
 
     struct cycle { // power block data structure
 
@@ -58,8 +55,11 @@ public:
         double turbine_capital_cost;        // [$] turbine capital cost
 
         // Total capital, maintenance, and LCOE
+        double cycle_capital;               // [$]       Power block capital costs
+        double plant_capital;               // [$]       CSP equipment capital costs
         double total_capital;               // [$]       total expected capital cost of plant
         double annual_maintenance;          // [$/year]  expected O&M annual costs
+        double total_adjusted_cost;         // [$]       total cost of capital, construction, and contingencies 
         double levelized_cost_of_energy;    // [$/MWe-h] CSP Gen3 levelized cost of energy
 
         costs() {
@@ -91,8 +91,8 @@ public:
         financing() {
             real_discount_rate = (1 + discount_rate) / (1 + inflation); // [-]
             capital_recovery_factor =
-                real_discount_rate * pow(1 + real_discount_rate, lifetime)
-                / (pow(1 + real_discount_rate, lifetime) - 1);
+                (real_discount_rate * pow(1 + real_discount_rate, lifetime)
+                / pow(1 + real_discount_rate, lifetime)) - 1;
         };
     } s_financing;
 
@@ -124,7 +124,7 @@ public:
             double efficiency;  // [-]
 
             warm() {
-                height = radius = volume = temperature = 0;
+                height = radius = volume = temperature = efficiency = 0;
             }
         } s_warm;
 
@@ -138,7 +138,7 @@ public:
             double efficiency;  // [-]
 
             cold() {
-                height = radius = volume = temperature = 0;
+                height = radius = volume = temperature = efficiency = 0;
             }
         } s_cold;
 

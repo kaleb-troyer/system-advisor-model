@@ -45,11 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ud_power_cycle.h"
 
+#include "csp_system_costs_gen3.h"
+
 #include <iosfwd>
 
 class C_sco2_phx_air_cooler
 {
 public:
+
+    cspGen3CostModel csp_cost_model; 
 
 	struct S_des_par
 	{

@@ -2356,6 +2356,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.efficiency = m_eta_thermal_calc_last;    // [-]
         csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;       // [K]
         csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; // [K]
+        csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
 
         csp_cost_model.designRoutine(solar_multiple); 
         m_objective_metric_last = 1 / csp_cost_model.s_costs.levelized_cost_of_energy; 

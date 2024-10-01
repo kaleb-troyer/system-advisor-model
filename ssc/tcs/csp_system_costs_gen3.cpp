@@ -7,7 +7,6 @@ const double pi = 3.14159265358979323846;
 cspGen3CostModel::cspGen3CostModel() {
 
     // initializing unstructured parameters
-    solar_multiple = 0;
     W_dot_thm = W_dot_rec = W_dot_less = W_elec_annual = 0;
 
     // initializing structs
@@ -49,7 +48,7 @@ void cspGen3CostModel::designRoutine(double SM) {
 
     // solar multiple, thermal energy storage
     s_field.solar_multiple = SM;
-    s_storage.hours_of_capacity = SM * 5; // assuming 5 hours at design point, yielding SM*5 TES hours. 
+    s_storage.hours_of_capacity = s_field.solar_multiple * 5; // assuming 5 hours at design point, yielding SM*5 TES hours. 
     s_storage.capacity_factor = s_storage.hours_of_capacity / 24; // calculated for a 24 hour periood. 
 
     powerReceiver();
@@ -70,12 +69,16 @@ void cspGen3CostModel::designRoutine(double SM) {
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
     W_dot_less = s_cycle.W_dot_net - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
     W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h]
-
+    
     // calculating levelized cost of energy
-    s_costs.total_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land +
-        s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
-    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net * 1000;
-    s_costs.levelized_cost_of_energy = (s_financing.lifetime * s_costs.total_capital * s_financing.capital_recovery_factor + s_financing.lifetime * s_costs.annual_maintenance) / (s_financing.lifetime * W_elec_annual);
+    s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
+    s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land;
+    s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
+    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
+    s_costs.total_adjusted_cost = (1 + s_financing.construction) * (1 + s_financing.indirect) * (1 + s_financing.contingency) * s_costs.total_capital; 
+    s_costs.levelized_cost_of_energy =
+        (s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor + s_financing.lifetime * s_costs.annual_maintenance)
+        / (s_financing.lifetime * W_elec_annual);
 
 };
 
@@ -126,9 +129,10 @@ void cspGen3CostModel::sizeEquipment() {
     s_receiver.area_aperature = s_receiver.height * s_receiver.width;
     s_receiver.aspect_ratio = s_receiver.height / s_receiver.width;
     s_receiver.particle_loss_factor = 0.000001;     // assumed
-
+    
     // Particle bulk calculations
     s_particles.m_particles = s_particles.m_dot_phx * s_storage.hours_of_capacity * 3600;
+    s_particles.m_dot_rec = s_particles.m_dot_phx * s_field.solar_multiple; 
 
     // particle storage sizing
     s_storage.s_warm.radius = 12;   // assumed
@@ -193,10 +197,12 @@ double cspGen3CostModel::costStorage() {
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
     WA, USA, 14–17 July 2019.
     */
+    s_storage.s_warm.temperature = s_cycle.T_phx_i;
+    s_storage.s_cold.temperature = s_cycle.T_phx_o; 
     const double C1 = 1230; // [$/m^2] 
     const double C2 = 0.37; // [$/m^2] 
     const double C3 = 600;  // [K] 
-    const double C4 = 400;  // [K] 
+    const double C4 = 400;  // [K]
     double C_bin_warm = C1 + C2 * ((s_storage.s_warm.temperature - C3) / C4); // [$/m2] cost of bin insulation
     double C_bin_cold = C1 + C2 * ((s_storage.s_cold.temperature - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
