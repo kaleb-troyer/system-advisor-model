@@ -2340,15 +2340,15 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
         //m_objective_metric_last = 1/levelized_cost_of_energy;
 
-        double solar_multiple = 3; 
+        double solar_multiple = 2; 
 
-        csp_cost_model.s_costs.HTR_capital_cost = ms_des_solved.ms_mc_ms_des_solved.m_cost_equipment;       // main compressor cost
-        csp_cost_model.s_costs.LTR_capital_cost = ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;       // recompressor cost
-        csp_cost_model.s_costs.PHX_capital_cost = ms_des_solved.ms_t_des_solved.m_equipment_cost;           // turbine cost
-        csp_cost_model.s_costs.air_cooler_capital_cost = ms_des_solved.ms_LTR_des_solved.m_cost_equipment;  // low-temp recuperator cost
-        csp_cost_model.s_costs.compressor_capital_cost = ms_des_solved.ms_HTR_des_solved.m_cost_equipment;  // high-temp recuperator cost
-        csp_cost_model.s_costs.recompressor_capital_cost = ms_des_solved.ms_mc_air_cooler.m_cost_equipment; // air cooler cost
-        csp_cost_model.s_costs.turbine_capital_cost = ms_des_solved.ms_phx_des_solved.m_cost_equipment;     // primary HX cost
+        csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_HTR_des_solved.m_cost_equipment;             // high-temp recuperator cost
+        csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_LTR_des_solved.m_cost_equipment;             // low-temp recuperator cost
+        csp_cost_model.s_costs.PHX_capital_cost = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;             // primary HX cost
+        csp_cost_model.s_costs.air_cooler_capital_cost = 1E6 * ms_des_solved.ms_mc_air_cooler.m_cost_equipment;       // air cooler cost
+        csp_cost_model.s_costs.compressor_capital_cost = 1E6 * ms_des_solved.ms_mc_ms_des_solved.m_cost_equipment;    // main compressor cost
+        csp_cost_model.s_costs.recompressor_capital_cost = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
+        csp_cost_model.s_costs.turbine_capital_cost = 1E6 * ms_des_solved.ms_t_des_solved.m_equipment_cost;           // turbine cost
 
         csp_cost_model.s_parasitics.cooler = 1E-3 * ms_des_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
 
@@ -2709,7 +2709,7 @@ void C_RecompCycle::opt_design_core(int & error_code)
         x.push_back(ms_opt_des_par.m_UA_frac_guess); 
         lb.push_back(0.0); 
         ub.push_back(1.0); 
-        scale.push_back(0.01); 
+        scale.push_back(0.1); 
 
         index++; 
     }
@@ -2731,8 +2731,8 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		m_objective_metric_opt = 0.0;
 
 		// Set up instance of nlopt class and set optimization parameters
-		nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
-		opt_des_cycle.set_lower_bounds(lb);
+        nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
+        opt_des_cycle.set_lower_bounds(lb);
 		opt_des_cycle.set_upper_bounds(ub);
 		opt_des_cycle.set_initial_step(scale);
 		opt_des_cycle.set_xtol_rel(ms_opt_des_par.m_des_opt_tol);
@@ -2946,7 +2946,16 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
     ms_opt_des_par.m_HTR_eff_target = ms_auto_opt_des_par.m_HTR_eff_target; //[-]
 	ms_opt_des_par.m_HTR_eff_max = ms_auto_opt_des_par.m_HTR_eff_max;
     ms_opt_des_par.m_HTR_od_UA_target_type = ms_auto_opt_des_par.m_HTR_od_UA_target_type;
-        //
+
+    if (ms_opt_des_par.m_HTR_min_dT < 5) {
+        ms_opt_des_par.m_HTR_min_dT = 5; 
+    }
+
+    if (ms_opt_des_par.m_LTR_min_dT < 5) {
+        ms_opt_des_par.m_LTR_min_dT = 5;
+    }
+
+    //
     ms_opt_des_par.m_UA_rec_total = ms_auto_opt_des_par.m_UA_rec_total;
 
 	ms_opt_des_par.m_des_tol = ms_auto_opt_des_par.m_des_tol;

@@ -188,7 +188,7 @@ public:
                 std::numeric_limits<double>::quiet_NaN();
 
             m_fixed_UA_frac = true; 
-            m_UA_frac_guess = 1.0; 
+            m_UA_frac_guess = 0.5; 
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance
@@ -399,21 +399,9 @@ public:
 		}
 	};
 
-    S_design_solved getDesignSolution() {
+    S_design_solved get_des_solved() {
         return ms_des_solved; 
     };
-
-    double getNetWork() {
-        return m_W_dot_net_last; 
-    }; 
-
-    double getEfficiency() {
-        return m_eta_thermal_calc_last; 
-    }; 
-
-    double getHeatExchangerHotInletTemp() {
-        return ms_phx_des_par.m_T_h_in; 
-    }; 
 
 private:
 		// Component classes

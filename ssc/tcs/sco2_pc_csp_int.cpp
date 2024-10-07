@@ -217,6 +217,7 @@ void C_sco2_phx_air_cooler::design_core()
 			{
                 // Negative UA is now permissable. If UA < 0, UA is optimized, not fixed. 
                 des_params.m_fixed_UA_frac = false;
+                des_params.m_UA_frac_guess = 0.50; 
                 ms_des_par.m_UA_recup_tot_des = abs(ms_des_par.m_UA_recup_tot_des);
 
                 // error handling if UA is negative
@@ -409,15 +410,15 @@ void C_sco2_phx_air_cooler::design_core()
     //double levelized_cost_of_energy = ((installed_cost * capital_recovery_factor) + (operation_maintenance * ms_des_par.m_W_dot_net)) / W_annual;
     //ms_des_solved.m_LCOE = levelized_cost_of_energy; 
 
-    double solar_multiple = 3;
+    double solar_multiple = 2;
 
-    csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment;        // main compressor cost
-    csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment;        // recompressor cost
-    csp_cost_model.s_costs.PHX_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;            // turbine cost
-    csp_cost_model.s_costs.air_cooler_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;   // low-temp recuperator cost
-    csp_cost_model.s_costs.compressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;   // high-temp recuperator cost
-    csp_cost_model.s_costs.recompressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;  // air cooler cost
-    csp_cost_model.s_costs.turbine_capital_cost = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;                         // primary HX cost
+    csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;            // high-temp recuperator cost
+    csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;            // low-temp recuperator cost
+    csp_cost_model.s_costs.PHX_capital_cost = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;                               // primary HX cost
+    csp_cost_model.s_costs.air_cooler_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;      // air cooler cost
+    csp_cost_model.s_costs.compressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment;   // main compressor cost
+    csp_cost_model.s_costs.recompressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
+    csp_cost_model.s_costs.turbine_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;          // turbine cost
 
     csp_cost_model.s_parasitics.cooler = 1E-3 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
 

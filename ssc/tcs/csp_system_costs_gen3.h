@@ -9,9 +9,9 @@ using namespace std;
 class cspGen3CostModel {
 public:
 
-    cspGen3CostModel();                             // Class initializer. Memory is shared and modified between optimizations. 
-    ~cspGen3CostModel() = default;                  // Default destructor. Memory is out-of-scope after the optimization is completed. 
-    void designRoutine(double SM); // Accepts a power block and solar multiple to design a CSP plant and calculate LCOE. 
+    cspGen3CostModel();             // Class initializer. Memory is shared and modified between optimizations. 
+    ~cspGen3CostModel() = default;  // Default destructor. Memory is out-of-scope after the optimization is completed. 
+    void designRoutine(double SM);  // Accepts a power block and solar multiple to design a CSP plant and calculate LCOE. 
 
     // derived parameters    
     double W_dot_thm;       // [MWt]    power cycle thermal input

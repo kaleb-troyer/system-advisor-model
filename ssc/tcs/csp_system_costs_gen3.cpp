@@ -41,6 +41,11 @@ void cspGen3CostModel::designRoutine(double SM) {
     8) Calculate the levelized cost of energy.
     */
 
+
+
+
+
+
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
     s_particles.bulk_density = 1625;
@@ -48,8 +53,8 @@ void cspGen3CostModel::designRoutine(double SM) {
 
     // solar multiple, thermal energy storage
     s_field.solar_multiple = SM;
-    s_storage.hours_of_capacity = s_field.solar_multiple * 5; // assuming 5 hours at design point, yielding SM*5 TES hours. 
-    s_storage.capacity_factor = s_storage.hours_of_capacity / 24; // calculated for a 24 hour periood. 
+    s_storage.hours_of_capacity = (s_field.solar_multiple) * 5;     // assuming 8 hours at design point, yielding (SM-1)*8 TES hours. 
+    s_storage.capacity_factor = s_storage.hours_of_capacity / 24;   // calculated for a 24 hour periood. 
 
     powerReceiver();
     sizeEquipment();
