@@ -7,7 +7,7 @@ const double pi = 3.14159265358979323846;
 cspGen3CostModel::cspGen3CostModel() {
 
     // initializing unstructured parameters
-    W_dot_thm = W_dot_rec = W_dot_less = W_elec_annual = 0;
+    W_dot_therm = W_dot_rec = W_dot_less = W_elec_annual = W_dot_field = W_dot_losses = 0;
 
     // initializing structs
     s_parasitics = parasitics();
@@ -41,11 +41,6 @@ void cspGen3CostModel::designRoutine(double SM) {
     8) Calculate the levelized cost of energy.
     */
 
-
-
-
-
-
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
     s_particles.bulk_density = 1625;
@@ -56,21 +51,47 @@ void cspGen3CostModel::designRoutine(double SM) {
     s_storage.hours_of_capacity = (s_field.solar_multiple) * 5;     // assuming 8 hours at design point, yielding (SM-1)*8 TES hours. 
     s_storage.capacity_factor = s_storage.hours_of_capacity / 24;   // calculated for a 24 hour periood. 
 
-    powerReceiver();
-    sizeEquipment();
+    // estimate efficiencies here
+    s_storage.s_warm.efficiency = 0.98;     // assumed
+    s_storage.s_cold.efficiency = 0.98;     // assumed
+    s_receiver.efficiency = 0.9;            // assumed
+    s_lifts.efficiency = 0.8;               // assumed
+
+    // calculating power required at the receiver, according to cycle efficiency
+    W_dot_therm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWt] power required at power block
+    W_dot_rec = s_field.solar_multiple * W_dot_therm;     // [MWt] power absorbed by receiver
+
+    temperatures();
+
+    double tolerance = W_dot_rec * 1E-4;    // convergence criteria for receiver losses
+    double iterations = 0;                  // iteration count for convergence
+    double max_iters = 10;                  // maximum iterations allowed for convergence
+
+    do {
+        /*
+        Iteratively solving for equipment sizes until thermal losses
+        in the receiver has converged. 
+        */
+
+        W_dot_field = W_dot_rec + W_dot_losses;  // Update field power requirements
+        sizeEquipment();   // Recalculate equipment sizing based on new field power
+        receiverLosses();  // Recalculate receiver losses based on current setup
+
+        iterations++;
+    } while (abs(W_dot_field - (W_dot_rec + W_dot_losses)) > tolerance && iterations < max_iters);
 
     // getting CSP costs from cost models
-    s_costs.solar_tower = costTower();                      // [$]
-    s_costs.solar_field = costField();                      // [$]
-    s_costs.falling_particle_receiver = costReceiver();     // [$]
-    s_costs.particles = costParticles();                    // [$]
-    s_costs.particle_losses = costParticleLosses();         // [$]
-    s_costs.particle_storage = costStorage();               // [$]
-    s_costs.particle_lifts = costLifts();                   // [$]
-    s_costs.land = costLand();                              // [$]
+    s_costs.solar_tower = costTower();                  // [$]
+    s_costs.solar_field = costField();                  // [$]
+    s_costs.falling_particle_receiver = costReceiver(); // [$]
+    s_costs.particles = costParticles();                // [$]
+    s_costs.particle_losses = costParticleLosses();     // [$]
+    s_costs.particle_storage = costStorage();           // [$]
+    s_costs.particle_lifts = costLifts();               // [$]
+    s_costs.land = costLand();                          // [$]
 
     // calculating parasitics and annual electricity produced
-    s_parasitics.field = s_field.tracking_power * W_dot_rec;                                            // [MWe]
+    s_parasitics.field = s_field.tracking_power * W_dot_field;                                            // [MWe]
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
     W_dot_less = s_cycle.W_dot_net - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
     W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h]
@@ -87,23 +108,33 @@ void cspGen3CostModel::designRoutine(double SM) {
 
 };
 
-void cspGen3CostModel::powerReceiver() {
+void cspGen3CostModel::receiverLosses() {
+
     /*
-    Calculating the power required at the falling particle
-    receiver using equipment efficiencies and losses.
+    Probably need to iteratively solve until the answer has converged.
     */
 
-    // estimate efficiencies here
-    s_storage.s_warm.efficiency = 0.95;     // assumed
-    s_storage.s_cold.efficiency = 0.95;     // assumed
-    s_receiver.efficiency = 0.9;            // assumed
-    s_lifts.efficiency = 0.8;               // assumed
+    const double sigma = 5.670374419E-8;              // Stefan-Boltzmann Constant 
+    const double epsilon = 0.95;                      // receiver emissivity (assumed)
+    const double heat_transfer_coefficient = 100;     // (assumed)
+    const double T_ambient = 303.15;                  // (assumed)
+    const double T_baseline = 1073.15;                // (assumed)
 
-    // calculating power required at the receiver, according to cycle and equipment efficiencies
-    W_dot_thm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWe]
-    W_dot_rec = s_field.solar_multiple * W_dot_thm / (s_receiver.efficiency * s_storage.s_warm.efficiency * s_storage.s_cold.efficiency);   // [MWe]
+    // losses are scaled by receiver temperature
+    double E1 = sigma * epsilon * (pow(s_receiver.T_body, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (s_receiver.T_body - T_ambient);
+    double E2 = sigma * epsilon * (pow(T_baseline, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (T_baseline - T_ambient);
+    double scale = E1 / E2; 
 
-};
+    // model developed by me from work done by Gonzales-Portillo, 2020. 
+    double C1 = 2.771e-02; 
+    double C2 = 5.245e-04; 
+    double C3 = 6.403e-08; 
+    double C4 = -5.735e-07; 
+    W_dot_losses = (C1 + C2 * s_receiver.area_aperature
+        + C3 * pow(s_receiver.area_aperature, 2)
+        + C4 * s_receiver.area_aperature * W_dot_field) * W_dot_field * scale;
+
+}; 
 
 void cspGen3CostModel::sizeEquipment() {
     /*
@@ -121,16 +152,16 @@ void cspGen3CostModel::sizeEquipment() {
     */
 
     // Solar tower sizing
-    s_tower.height = 4.821e+01 + (W_dot_rec * 4.665e-01);
+    s_tower.height = 4.821e+01 + (W_dot_field * 4.665e-01);
     s_tower.radius = 15;
 
     // Solar field sizing
-    s_field.area_heliostats = -6.272e+04 + (W_dot_rec * 2.174e+03);
+    s_field.area_heliostats = -6.272e+04 + (W_dot_field * 2.174e+03);
     s_field.area_total_land = s_field.area_heliostats * 6 + 45000;
 
     // Receiver sizing
     s_receiver.height = 15;     // assumed in SolarPILOT study
-    s_receiver.width = 9.113 + (3.274e-02 * W_dot_rec);
+    s_receiver.width = 9.113 + (3.274e-02 * W_dot_field);
     s_receiver.area_aperature = s_receiver.height * s_receiver.width;
     s_receiver.aspect_ratio = s_receiver.height / s_receiver.width;
     s_receiver.particle_loss_factor = 0.000001;     // assumed
@@ -157,6 +188,24 @@ void cspGen3CostModel::sizeEquipment() {
     }
 
 };
+
+void cspGen3CostModel::temperatures() {
+
+    // thermal energy storage inlet / outlet temperatures
+    s_storage.s_warm.To = s_cycle.T_phx_i;
+    s_storage.s_cold.Ti = s_cycle.T_phx_o;
+    s_storage.s_warm.Ti = s_storage.s_warm.To + 15;
+    s_storage.s_cold.To = s_storage.s_cold.Ti - 15; 
+    s_storage.s_warm.T_avg = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
+    s_storage.s_cold.T_avg = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
+
+    // receiver particle inlet / outlet and body temperatures
+    s_receiver.T_htf_i = s_storage.s_cold.To;
+    s_receiver.T_htf_o = s_storage.s_warm.Ti;
+    s_receiver.T_htf_avg = (s_receiver.T_htf_i + s_receiver.T_htf_o) / 2; 
+    s_receiver.T_body = s_receiver.T_htf_avg + 50; 
+
+}
 
 double cspGen3CostModel::costTower() {
     /*
@@ -202,14 +251,12 @@ double cspGen3CostModel::costStorage() {
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
     WA, USA, 14–17 July 2019.
     */
-    s_storage.s_warm.temperature = s_cycle.T_phx_i;
-    s_storage.s_cold.temperature = s_cycle.T_phx_o; 
     const double C1 = 1230; // [$/m^2] 
     const double C2 = 0.37; // [$/m^2] 
     const double C3 = 600;  // [K] 
     const double C4 = 400;  // [K]
-    double C_bin_warm = C1 + C2 * ((s_storage.s_warm.temperature - C3) / C4); // [$/m2] cost of bin insulation
-    double C_bin_cold = C1 + C2 * ((s_storage.s_cold.temperature - C3) / C4); // [$/m2] cost of bin insulation
+    double C_bin_warm = C1 + C2 * ((s_storage.s_warm.T_avg - C3) / C4); // [$/m2] cost of bin insulation
+    double C_bin_cold = C1 + C2 * ((s_storage.s_cold.T_avg - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
     double A_bin_cold = 2 * pi * s_storage.s_cold.radius * s_storage.s_cold.height + pi * s_storage.s_cold.radius * pow(pow(s_storage.s_cold.height, 2) + pow(s_storage.s_cold.radius, 2), 0.5);
     return (C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold);

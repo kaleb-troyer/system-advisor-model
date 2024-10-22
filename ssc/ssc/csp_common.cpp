@@ -1035,7 +1035,10 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	if (s_sco2_des_par.m_design_method == 1)
 	{
 		s_sco2_des_par.m_LTR_target_code = 0;      // 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
-		s_sco2_des_par.m_HTR_target_code = 0;		// 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
+		s_sco2_des_par.m_HTR_target_code = 0;	   // 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
+
+        s_sco2_des_par.m_LTR_min_dT = cm->as_double("LTR_min_dT_des_in");			//[C]
+        s_sco2_des_par.m_HTR_min_dT = cm->as_double("HTR_min_dT_des_in");			//[C]
 
         s_sco2_des_par.m_eta_thermal = cm->as_double("eta_thermal_des");				//[-] Cycle thermal efficiency
 		if (s_sco2_des_par.m_eta_thermal < 0.0)
@@ -1048,7 +1051,10 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	else if (s_sco2_des_par.m_design_method == 2)
 	{
 		s_sco2_des_par.m_LTR_target_code = 0;      // 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
-		s_sco2_des_par.m_HTR_target_code = 0;		// 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
+		s_sco2_des_par.m_HTR_target_code = 0;	   // 0 = optimize, 1 = UA, 2 = min dT, 3 = effectiveness
+
+        s_sco2_des_par.m_LTR_min_dT = cm->as_double("LTR_min_dT_des_in");			//[C]
+        s_sco2_des_par.m_HTR_min_dT = cm->as_double("HTR_min_dT_des_in");			//[C]
 
         s_sco2_des_par.m_UA_recup_tot_des = cm->as_double("UA_recup_tot_des");		//[kW/K] Total recuperator conductance
 		if (s_sco2_des_par.m_UA_recup_tot_des < 0.0)

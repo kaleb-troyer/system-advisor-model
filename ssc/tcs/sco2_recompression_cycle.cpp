@@ -2272,75 +2272,24 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // Collecting CSP equipment costs
         // ********************************
 
-        //double W_dot_th = m_W_dot_net_last / m_eta_thermal_calc_last; //[kW] power required by power block
-        //double eta_rec = 0.9;                       //[-]  receiver efficiency
-        //double SM = 3;                              //[-]  solar multiple
-        //double W_dot_htf = SM * W_dot_th / eta_rec; //[kW] power delivered to heat transfer fluid
-        //// SolarPILOT outs
-        //double A_REC = 15 * (14.31 + 0.02414 * (W_dot_htf / 1000));
-        //double H_TWR = 4.821e+01 + 4.447e-01 * (W_dot_htf / 1000);
-        //double A_field_surf = -6.272e+04 + 2.174e+03 * (W_dot_htf / 1000);
+        double solar_multiple = 2;  // optional decision variable - not yet optimized
 
-        //// Particle Properties
-        //double rho = 1625;  // kg/m3
-        //double cp = 0.185;  // $/kg
-        //double al = 0.559;  // rad (angle of repose)
+        /*
+        This penalty function steers the optimizer away from designing massive recuperators
+        with very aggressive approach temperatures.
 
-        //// thermal energy storage bin size
-        //double hours = 16;     // hours of storage
-        //double r_bin = 12;     // [m] bin radius
-        //double m_htf = ms_phx_des_par.m_m_dot_hot_des * hours * 3600;
-        //double V_htf = m_htf / rho;
-        //double H_bin = (V_htf - ((M_PI / 3) * pow(r_bin, 3) * tan(al))) / (M_PI * pow(r_bin, 2)); 
-        //double A_bin_surf = 2 * M_PI * r_bin * H_bin + M_PI * r_bin * pow(H_bin * H_bin + r_bin * r_bin, 0.5);
-
-        //// LCOE parameteres
-        //double total_life = 30; //[years]
-        //double capacity_factor = 0.7;
-        //double operation_maintenance = 40; //[$/kWe-year]
-        //double f_contingency = 0.1;
-        //double f_construction = 0.06;
-        //double f_indirect = 0.13;
-        //double f_financing = 0.07;
-        //double i_inflation = 0.025;
-        //double f_prime = ((1 + f_financing) / (1 + i_inflation)) - 1;
-        //double capital_recovery_factor = f_prime * pow(1 + f_prime, total_life) / (pow(1 + f_prime, total_life) - 1);
-
-        //// other parameters
-        //double eta_lft = 0.8; 
-        //double m_dot_p = ms_phx_des_par.m_m_dot_hot_des * SM; 
-        //double H_LFT = H_bin * 3; 
-        //double T_phx_i = ms_phx_des_par.m_T_h_in; 
-        //double T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; 
-        //double c_bin_h = 1230 + 0.37 * ((T_phx_i - 600) / 400); //[$]
-        //double c_bin_c = 1230 + 0.37 * ((T_phx_o - 600) / 400); //[$]
-        //double f_losses = 1E-6; 
-        //double c_losses = total_life * cp * m_dot_p * (hours / SM) * 365 * f_losses; //[$]
-        //double NS = 0.05; // non-thermal storage
-
-        //// cost calculations
-        //double cost_LND = 1E-6 * 2.5 * (A_field_surf * 9 + 2500); //[M$]
-        //double cost_TWR = 1E-6 * 157.44 * pow(H_TWR, 1.9174);     //[M$]
-        //double cost_REC = 1E-6 * 37400 * A_REC;                   //[M$]
-        //double cost_LFT = 1E-6 * 58.37 * H_LFT * m_dot_p;         //[M$]
-        //double cost_HTF = 1E-6 * (1 + NS) * cp * m_htf;           //[M$]
-        //double cost_TES = 1E-6 * ((c_bin_h * A_bin_surf) + (c_bin_c * A_bin_surf) + c_losses); //[M$]
-        //double cost_FLD = 1E-6 * (75 + 10) * A_field_surf + cost_LND; //[M$]
-        //total_cost += cost_TWR + cost_REC + cost_LFT + cost_HTF + cost_TES + cost_FLD; //[M$]
-
-        //// Power parasitics
-        //double W_dot_lift = 1E-3 * m_dot_p * H_LFT * 9.80665 / eta_lft; //[kWe]
-        //double W_dot_cool = ms_des_solved.ms_mc_air_cooler.m_W_dot_fan; //[kWe]
-        //double W_dot_less = m_W_dot_net_last - W_dot_lift - W_dot_cool; //[kWe]
-
-        //// LCOE calculation
-        //double W_annual = capacity_factor * m_W_dot_net_last * 24 * 365; //[kWe]
-        //double installed_cost = (1 + f_construction) * (1 + f_indirect) * ((1 + f_contingency) * total_cost) * 1E6; 
-        //double levelized_cost_of_energy = ((installed_cost * capital_recovery_factor) + (operation_maintenance * m_W_dot_net_last)) / W_annual; 
-
-        //m_objective_metric_last = 1/levelized_cost_of_energy;
-
-        double solar_multiple = 2; 
+        penalty = C2^(dT_min - C3*dT)
+        */
+        double penalty = 0;    // single penalty term for all constraint violations
+        const double C1 = 1.5; // buffer determines when the penalty is triggered
+        const double C2 = 6.0; // base value in exponential penalty function determines aggressiveness
+        const double C3 = 2.0; // fine-tuning parameter for x-positioning
+        if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT)) {
+            penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
+        } else {penalty += 0;} 
+        if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT)) {
+            penalty += pow(C2, ms_des_par.m_HTR_min_dT - (C3 + ms_des_solved.ms_HTR_des_solved.m_min_DT_design));
+        } else {penalty += 0;} 
 
         csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_HTR_des_solved.m_cost_equipment;             // high-temp recuperator cost
         csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_LTR_des_solved.m_cost_equipment;             // low-temp recuperator cost
@@ -2359,7 +2308,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
 
         csp_cost_model.designRoutine(solar_multiple); 
-        m_objective_metric_last = 1 / csp_cost_model.s_costs.levelized_cost_of_energy; 
+        m_objective_metric_last = 1 / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
 
     }
     else
@@ -2704,16 +2653,6 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		index++;
 	}
 
-    if (!ms_opt_des_par.m_fixed_UA_frac)
-    {
-        x.push_back(ms_opt_des_par.m_UA_frac_guess); 
-        lb.push_back(0.0); 
-        ub.push_back(1.0); 
-        scale.push_back(0.1); 
-
-        index++; 
-    }
-
 	if( !ms_opt_des_par.m_fixed_LT_frac )
 	{
 		x.push_back(ms_opt_des_par.m_LT_frac_guess);
@@ -2724,7 +2663,27 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		index++;
 	}
 
-	error_code = 0;
+    if (!ms_opt_des_par.m_fixed_UA_frac)
+    {
+        x.push_back(ms_opt_des_par.m_UA_frac_guess);
+        lb.push_back(0.0);
+        ub.push_back(1.0);
+        scale.push_back(0.1);
+
+        index++;
+    }
+
+    //if (!ms_opt_des_par.m_fixed_T_htf_in)
+    //{
+    //    x.push_back(ms_opt_des_par.m_T_htf_in_guess);
+    //    lb.push_back(0.0);
+    //    ub.push_back(1.0);
+    //    scale.push_back(0.1);
+
+    //    index++;
+    //}
+
+    error_code = 0;
 	if( index > 0 )
 	{
 		// Ensure thermal efficiency is initialized to 0
@@ -2934,7 +2893,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 	// map 'auto_opt_des_par_in' to 'ms_auto_opt_des_par'
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
-    ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;            //[kW/K]
+    ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                 //[kW/K]
     ms_opt_des_par.m_LTR_min_dT = ms_auto_opt_des_par.m_LTR_min_dT;         //[K]
     ms_opt_des_par.m_LTR_eff_target = ms_auto_opt_des_par.m_LTR_eff_target; //[-]
 	ms_opt_des_par.m_LTR_eff_max = ms_auto_opt_des_par.m_LTR_eff_max;    //[-]
@@ -2946,14 +2905,6 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
     ms_opt_des_par.m_HTR_eff_target = ms_auto_opt_des_par.m_HTR_eff_target; //[-]
 	ms_opt_des_par.m_HTR_eff_max = ms_auto_opt_des_par.m_HTR_eff_max;
     ms_opt_des_par.m_HTR_od_UA_target_type = ms_auto_opt_des_par.m_HTR_od_UA_target_type;
-
-    if (ms_opt_des_par.m_HTR_min_dT < 5) {
-        ms_opt_des_par.m_HTR_min_dT = 5; 
-    }
-
-    if (ms_opt_des_par.m_LTR_min_dT < 5) {
-        ms_opt_des_par.m_LTR_min_dT = 5;
-    }
 
     //
     ms_opt_des_par.m_UA_rec_total = ms_auto_opt_des_par.m_UA_rec_total;

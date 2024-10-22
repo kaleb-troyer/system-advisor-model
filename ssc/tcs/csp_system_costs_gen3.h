@@ -14,9 +14,11 @@ public:
     void designRoutine(double SM);  // Accepts a power block and solar multiple to design a CSP plant and calculate LCOE. 
 
     // derived parameters    
-    double W_dot_thm;       // [MWt]    power cycle thermal input
-    double W_dot_rec;       // [MWt]    power required at receiver
+    double W_dot_therm;     // [MWt]    power cycle thermal input
+    double W_dot_field;     // [MWt]    power delivered to the receiver from the solar field
+    double W_dot_rec;       // [MWt]    power required at and absorbed by the receiver
     double W_dot_less;      // [MWe]    net power, less parasitics
+    double W_dot_losses;    // [MWt]    receiver estimated losses
     double W_elec_annual;   // [MWe-h]  annual electricity produced
 
     struct cycle { // power block data structure
@@ -69,7 +71,8 @@ public:
             HTR_capital_cost = LTR_capital_cost = PHX_capital_cost = air_cooler_capital_cost =
                 compressor_capital_cost = recompressor_capital_cost = turbine_capital_cost = 0;
 
-            annual_maintenance = total_capital = levelized_cost_of_energy = 0;
+            annual_maintenance = total_adjusted_cost = cycle_capital =
+                plant_capital = total_capital = levelized_cost_of_energy = 0;
         };
     } s_costs;
 
@@ -120,11 +123,14 @@ public:
             double height;      // [m]
             double radius;      // [m]
             double volume;      // [m2]
-            double temperature; // [K]
+            double T_avg;       // [K] 
             double efficiency;  // [-]
+            double Ti;          // [K] 
+            double To;          // [K] 
 
             warm() {
-                height = radius = volume = temperature = efficiency = 0;
+                height = radius = volume = efficiency = 0;
+                T_avg = Ti = To = 0; 
             }
         } s_warm;
 
@@ -134,11 +140,14 @@ public:
             double height;      // [m]
             double radius;      // [m]
             double volume;      // [m2]
-            double temperature; // [K]
+            double T_avg;       // [K] 
             double efficiency;  // [-]
+            double Ti;          // [K] 
+            double To;          // [K] 
 
             cold() {
-                height = radius = volume = temperature = efficiency = 0;
+                height = radius = volume = efficiency = 0;
+                T_avg = Ti = To = 0;
             }
         } s_cold;
 
@@ -208,10 +217,14 @@ public:
         double aspect_ratio;         // [-]  receiver height / receiver width
         double particle_loss_factor; // [-]  particle loss from open air receiver
         double efficiency;           // [-]  receiver efficiency
+        double T_htf_avg;            // [K]  particle average temperature in receiver 
+        double T_htf_i;              // [K]  particle temperature at receiver inlet
+        double T_htf_o;              // [K]  particle temperature at receiver outlet 
+        double T_body;               // [K]  receiver body temperature
 
         receiver() {
-            height = width = area_aperature = aspect_ratio = 0;
-            particle_loss_factor = efficiency = 0;
+            height = width = area_aperature = aspect_ratio = T_body = 0;
+            particle_loss_factor = efficiency = T_htf_avg = T_htf_i = T_htf_o = 0;
         };
     } s_receiver;
 
@@ -228,7 +241,8 @@ public:
 
 private:
 
-    void powerReceiver();           // Calculates power required at the receiver. 
+    void temperatures();      // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
+    void receiverLosses();          // Calculates estimated receiver losses
     void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc). 
     double costLand();              // Calculates cost of the total land required.
     double costTower();             // Calculates cost of the solar tower. 
