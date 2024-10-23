@@ -11,7 +11,7 @@ public:
 
     cspGen3CostModel();             // Class initializer. Memory is shared and modified between optimizations. 
     ~cspGen3CostModel() = default;  // Default destructor. Memory is out-of-scope after the optimization is completed. 
-    void designRoutine(double SM);  // Accepts a power block and solar multiple to design a CSP plant and calculate LCOE. 
+    void designRoutine();           // Accepts a power block to design a CSP plant and calculate LCOE. 
 
     // derived parameters    
     double W_dot_therm;     // [MWt]    power cycle thermal input
@@ -55,6 +55,7 @@ public:
         double compressor_capital_cost;     // [$] primary compressor capital cost
         double recompressor_capital_cost;   // [$] recompressor capital cost
         double turbine_capital_cost;        // [$] turbine capital cost
+        double piping_inventory_etc;        // [$] piping, inventory control, etc. 
 
         // Total capital, maintenance, and LCOE
         double cycle_capital;               // [$]       Power block capital costs
@@ -71,7 +72,7 @@ public:
             HTR_capital_cost = LTR_capital_cost = PHX_capital_cost = air_cooler_capital_cost =
                 compressor_capital_cost = recompressor_capital_cost = turbine_capital_cost = 0;
 
-            annual_maintenance = total_adjusted_cost = cycle_capital =
+            annual_maintenance = total_adjusted_cost = cycle_capital = piping_inventory_etc = 
                 plant_capital = total_capital = levelized_cost_of_energy = 0;
         };
     } s_costs;
@@ -92,10 +93,10 @@ public:
         double capital_recovery_factor; // [-] calculated using real discount rate and assumed lifetime
 
         financing() {
-            real_discount_rate = (1 + discount_rate) / (1 + inflation); // [-]
+            real_discount_rate = ((1 + discount_rate) / (1 + inflation)) - 1; // [-]
             capital_recovery_factor =
-                (real_discount_rate * pow(1 + real_discount_rate, lifetime)
-                / pow(1 + real_discount_rate, lifetime)) - 1;
+                real_discount_rate * pow(1 + real_discount_rate, lifetime)
+                / (pow(1 + real_discount_rate, lifetime) - 1);
         };
     } s_financing;
 
@@ -217,14 +218,13 @@ public:
         double aspect_ratio;         // [-]  receiver height / receiver width
         double particle_loss_factor; // [-]  particle loss from open air receiver
         double efficiency;           // [-]  receiver efficiency
-        double T_htf_avg;            // [K]  particle average temperature in receiver 
-        double T_htf_i;              // [K]  particle temperature at receiver inlet
-        double T_htf_o;              // [K]  particle temperature at receiver outlet 
-        double T_body;               // [K]  receiver body temperature
+        double T_avg;                // [K]  particle average temperature in receiver 
+        double Ti;                   // [K]  particle temperature at receiver inlet
+        double To;                   // [K]  particle temperature at receiver outlet 
 
         receiver() {
-            height = width = area_aperature = aspect_ratio = T_body = 0;
-            particle_loss_factor = efficiency = T_htf_avg = T_htf_i = T_htf_o = 0;
+            height = width = area_aperature = aspect_ratio = 0;
+            particle_loss_factor = efficiency = T_avg = Ti = To = 0;
         };
     } s_receiver;
 

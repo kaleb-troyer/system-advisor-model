@@ -23,7 +23,7 @@ cspGen3CostModel::cspGen3CostModel() {
 
 };
 
-void cspGen3CostModel::designRoutine(double SM) {
+void cspGen3CostModel::designRoutine() {
     /*
     Kaleb Troyer, 2024.
 
@@ -47,9 +47,9 @@ void cspGen3CostModel::designRoutine(double SM) {
     s_particles.cost_per_kg = 0.185;
 
     // solar multiple, thermal energy storage
-    s_field.solar_multiple = SM;
-    s_storage.hours_of_capacity = (s_field.solar_multiple) * 5;     // assuming 8 hours at design point, yielding (SM-1)*8 TES hours. 
-    s_storage.capacity_factor = s_storage.hours_of_capacity / 24;   // calculated for a 24 hour periood. 
+    s_field.solar_multiple = 2.5;       // [-] (Albrecht, 2019) 
+    s_storage.hours_of_capacity = 14;   // [h] (Albrecht, 2019) 
+    s_storage.capacity_factor = 0.71;   // [-] (Albrecht, 2019) 
 
     // estimate efficiencies here
     s_storage.s_warm.efficiency = 0.98;     // assumed
@@ -91,41 +91,47 @@ void cspGen3CostModel::designRoutine(double SM) {
     s_costs.land = costLand();                          // [$]
 
     // calculating parasitics and annual electricity produced
-    s_parasitics.field = s_field.tracking_power * W_dot_field;                                            // [MWe]
+    s_parasitics.field = s_field.tracking_power * W_dot_field;                                          // [MWe]
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
     W_dot_less = s_cycle.W_dot_net - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
-    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h]
+    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h / year]
     
     // calculating levelized cost of energy
     s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
+    s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.2; 
+    s_costs.cycle_capital += s_costs.piping_inventory_etc; 
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
     s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
     s_costs.total_adjusted_cost = (1 + s_financing.construction) * (1 + s_financing.indirect) * (1 + s_financing.contingency) * s_costs.total_capital; 
     s_costs.levelized_cost_of_energy =
-        (s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor + s_financing.lifetime * s_costs.annual_maintenance)
+        ((s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor) + (s_financing.lifetime * s_costs.annual_maintenance))
         / (s_financing.lifetime * W_elec_annual);
 
 };
 
 void cspGen3CostModel::receiverLosses() {
-
     /*
-    Probably need to iteratively solve until the answer has converged.
+    Falling-particle receiver thermal losses are estimated using the receiver
+    temperature, aperature area, and power delivered to the receiver. Work done
+    by Gonzales-Portillo (2020) is extended to cover solar field powers greater
+    than 700MW and less than 375MW.
+
+    Losses are then scaled to cover receiver temperatures above and below 700C.
     */
 
     const double sigma = 5.670374419E-8;              // Stefan-Boltzmann Constant 
-    const double epsilon = 0.95;                      // receiver emissivity (assumed)
-    const double heat_transfer_coefficient = 100;     // (assumed)
-    const double T_ambient = 303.15;                  // (assumed)
-    const double T_baseline = 1073.15;                // (assumed)
+    const double epsilon = 0.80;                      // receiver emissivity (Gonzales-Portillo, 2020) (assumed)
+    const double heat_transfer_coefficient = 95;      // (Gonzales-Portillo, 2020) (assumed)
+    const double T_baseline = 1073.15;                // (Gonzales-Portillo, 2020) (assumed)
+    const double T_ambient = 308.15;                  // (Gonzales-Portillo, 2020) (assumed)
 
     // losses are scaled by receiver temperature
-    double E1 = sigma * epsilon * (pow(s_receiver.T_body, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (s_receiver.T_body - T_ambient);
+    double E1 = sigma * epsilon * (pow(s_receiver.T_avg, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (s_receiver.T_avg - T_ambient);
     double E2 = sigma * epsilon * (pow(T_baseline, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (T_baseline - T_ambient);
     double scale = E1 / E2; 
 
-    // model developed by me from work done by Gonzales-Portillo, 2020. 
+    // model developed from work done by Gonzales-Portillo, 2020. 
     double C1 = 2.771e-02; 
     double C2 = 5.245e-04; 
     double C3 = 6.403e-08; 
@@ -171,16 +177,20 @@ void cspGen3CostModel::sizeEquipment() {
     s_particles.m_dot_rec = s_particles.m_dot_phx * s_field.solar_multiple; 
 
     // particle storage sizing
-    s_storage.s_warm.radius = 12;   // assumed
-    s_storage.s_cold.radius = 12;   // assumed
+    double height_buffer = 2;       // [m] assumed
+    s_storage.s_warm.radius = 12;   // [m] assumed
+    s_storage.s_cold.radius = 12;   // [m] assumed
     s_storage.s_warm.volume = s_particles.m_particles / s_particles.bulk_density;
     s_storage.s_cold.volume = s_particles.m_particles / s_particles.bulk_density;
-    s_storage.s_warm.height = (s_storage.s_warm.volume - (pi / 3) * pow(s_storage.s_warm.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2));
-    s_storage.s_cold.height = (s_storage.s_cold.volume - (pi / 3) * pow(s_storage.s_cold.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_cold.radius, 2));
+    s_storage.s_warm.height = height_buffer + (s_storage.s_warm.volume - (pi / 3) * pow(s_storage.s_warm.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2));   // height from required volume of cylinder + cone, calculated with angle of repose
+    s_storage.s_cold.height = height_buffer + (s_storage.s_cold.volume - (pi / 3) * pow(s_storage.s_cold.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_cold.radius, 2));   // height from required volume of cylinder + cone, calculated with angle of repose
 
     // Determining if particle storage can fit inside tower to calculate total lift height
-    double height_required = s_storage.s_warm.height + s_storage.s_cold.height + s_cycle.phx_height;
-    if (height_required < s_tower.height - s_receiver.height - 10) {
+    if (s_cycle.phx_height == 0) { s_cycle.phx_height = s_storage.s_warm.height; }
+
+    double tower_free_space = s_tower.height * 0.1;    // [m] space left intentionally free in tower (assumed)
+    double height_required = s_storage.s_warm.height + s_storage.s_cold.height + s_cycle.phx_height + s_receiver.height;
+    if (height_required < s_tower.height - tower_free_space) {
         s_lifts.height = height_required;
     }
     else {
@@ -190,20 +200,25 @@ void cspGen3CostModel::sizeEquipment() {
 };
 
 void cspGen3CostModel::temperatures() {
+    /*
+    Estimating the receiver and TES inlet / outlet temperatures. These
+    temperatures are derived from the PHX particle inlet temperature, which
+    is a decision variable in the optimization process. 
+    */
 
+    double dT = 5; // TES temperature drop
     // thermal energy storage inlet / outlet temperatures
-    s_storage.s_warm.To = s_cycle.T_phx_i;
-    s_storage.s_cold.Ti = s_cycle.T_phx_o;
-    s_storage.s_warm.Ti = s_storage.s_warm.To + 15;
-    s_storage.s_cold.To = s_storage.s_cold.Ti - 15; 
+    s_storage.s_warm.To = s_cycle.T_phx_i; 
+    s_storage.s_cold.Ti = s_cycle.T_phx_o; 
+    s_storage.s_warm.Ti = s_storage.s_warm.To + dT; 
+    s_storage.s_cold.To = s_storage.s_cold.Ti - dT; 
     s_storage.s_warm.T_avg = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
     s_storage.s_cold.T_avg = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
 
     // receiver particle inlet / outlet and body temperatures
-    s_receiver.T_htf_i = s_storage.s_cold.To;
-    s_receiver.T_htf_o = s_storage.s_warm.Ti;
-    s_receiver.T_htf_avg = (s_receiver.T_htf_i + s_receiver.T_htf_o) / 2; 
-    s_receiver.T_body = s_receiver.T_htf_avg + 50; 
+    s_receiver.Ti = s_storage.s_cold.To; 
+    s_receiver.To = s_storage.s_warm.Ti; 
+    s_receiver.T_avg = (s_receiver.Ti + s_receiver.To + s_receiver.To + s_receiver.To) / 4; // taking a three-quarters average to estimate receiver temperature
 
 }
 

@@ -2272,8 +2272,6 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // Collecting CSP equipment costs
         // ********************************
 
-        double solar_multiple = 2;  // optional decision variable - not yet optimized
-
         /*
         This penalty function steers the optimizer away from designing massive recuperators
         with very aggressive approach temperatures.
@@ -2281,9 +2279,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
         penalty = C2^(dT_min - C3*dT)
         */
         double penalty = 0;    // single penalty term for all constraint violations
-        const double C1 = 1.5; // buffer determines when the penalty is triggered
-        const double C2 = 6.0; // base value in exponential penalty function determines aggressiveness
-        const double C3 = 2.0; // fine-tuning parameter for x-positioning
+        const double C1 = 5.0; // buffer determines when the penalty is triggered
+        const double C2 = 3.6; // base value in exponential penalty function determines aggressiveness
+        const double C3 = 2.8; // fine-tuning parameter
         if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT)) {
             penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
         } else {penalty += 0;} 
@@ -2299,15 +2297,15 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_costs.recompressor_capital_cost = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
         csp_cost_model.s_costs.turbine_capital_cost = 1E6 * ms_des_solved.ms_t_des_solved.m_equipment_cost;           // turbine cost
 
-        csp_cost_model.s_parasitics.cooler = 1E-3 * ms_des_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
+        csp_cost_model.s_parasitics.cooler = ms_des_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
 
-        csp_cost_model.s_cycle.W_dot_net = m_W_dot_net_last * 1E-3;     // [MWe]
-        csp_cost_model.s_cycle.efficiency = m_eta_thermal_calc_last;    // [-]
-        csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;       // [K]
+        csp_cost_model.s_cycle.W_dot_net = m_W_dot_net_last * 1E-3;      // [MWe]
+        csp_cost_model.s_cycle.efficiency = ms_des_solved.m_eta_thermal; // [-]
+        csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;        // [K]
         csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; // [K]
         csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
 
-        csp_cost_model.designRoutine(solar_multiple); 
+        csp_cost_model.designRoutine(); 
         m_objective_metric_last = 1 / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
 
     }
