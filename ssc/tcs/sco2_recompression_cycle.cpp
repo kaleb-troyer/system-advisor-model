@@ -2252,10 +2252,10 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // Design the PHX
         double q_dot_des_phx = ms_des_solved.m_W_dot_net / ms_des_solved.m_eta_thermal;
         // ms_phx_des_par.m_Q_dot_design = ms_des_solved.ms_rc_cycle_solved.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;		//[kWt]
-        ms_phx_des_par.m_T_h_in = ms_auto_opt_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature 
+        ms_phx_des_par.m_T_h_in = ms_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature 
         // Okay, but CO2-HTF HX is assumed here. How does "structure inheritance" work?
-        ms_phx_des_par.m_P_h_in = 1.0;						// Assuming HTF is incompressible...
-        ms_phx_des_par.m_P_h_out = 1.0;						// Assuming HTF is incompressible...
+        ms_phx_des_par.m_P_h_in = 1.0;						    // Assuming HTF is incompressible...
+        ms_phx_des_par.m_P_h_out = 1.0;						    // Assuming HTF is incompressible...
         // .................................................................................
         ms_phx_des_par.m_T_c_in = ms_des_solved.m_temp[C_sco2_cycle_core::HTR_HP_OUT];		//[K]
         ms_phx_des_par.m_P_c_in = ms_des_solved.m_pres[C_sco2_cycle_core::HTR_HP_OUT];		//[K]
@@ -2269,9 +2269,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
         mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_auto_opt_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
         // ********************************
-        // Collecting CSP equipment costs
+        // Collecting CSP equipment costs  
         // ********************************
-
+        
         /*
         This penalty function steers the optimizer away from designing massive recuperators
         with very aggressive approach temperatures.
@@ -2282,12 +2282,14 @@ void C_RecompCycle::design_core_standard(int & error_code)
         const double C1 = 5.0; // buffer determines when the penalty is triggered
         const double C2 = 3.6; // base value in exponential penalty function determines aggressiveness
         const double C3 = 2.8; // fine-tuning parameter
-        if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT)) {
-            penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
-        } else {penalty += 0;} 
-        if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT)) {
-            penalty += pow(C2, ms_des_par.m_HTR_min_dT - (C3 + ms_des_solved.ms_HTR_des_solved.m_min_DT_design));
-        } else {penalty += 0;} 
+        if (!ms_des_par.m_fixed_UA_frac) { // optimizer gets stuck here if total UA is not a decision variable
+            if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT)) {
+                penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
+            } else { penalty += 0; }
+            if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT)) {
+                penalty += pow(C2, ms_des_par.m_HTR_min_dT - (C3 + ms_des_solved.ms_HTR_des_solved.m_min_DT_design));
+            } else { penalty += 0; }
+        }
 
         csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_HTR_des_solved.m_cost_equipment;             // high-temp recuperator cost
         csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_LTR_des_solved.m_cost_equipment;             // low-temp recuperator cost
@@ -2587,6 +2589,7 @@ void C_RecompCycle::opt_design_core(int & error_code)
 {
 	// Map ms_opt_des_par to ms_des_par
         // LTR thermal design
+    ms_des_par.m_fixed_UA_frac = ms_opt_des_par.m_fixed_UA_frac; 
     ms_des_par.m_LTR_target_code = ms_opt_des_par.m_LTR_target_code;    //[-]
     ms_des_par.m_LTR_min_dT = ms_opt_des_par.m_LTR_min_dT;      //[K]
     ms_des_par.m_LTR_eff_target = ms_opt_des_par.m_LTR_eff_target;  //[-]
@@ -2670,16 +2673,16 @@ void C_RecompCycle::opt_design_core(int & error_code)
 
         index++;
     }
+    
+    if (!ms_opt_des_par.m_fixed_T_hot_i)
+    {
+        x.push_back(ms_opt_des_par.m_T_hot_i_guess);
+        lb.push_back(ms_opt_des_par.m_T_hot_i_min);
+        ub.push_back(ms_opt_des_par.m_T_hot_i_max);
+        scale.push_back(10);
 
-    //if (!ms_opt_des_par.m_fixed_T_htf_in)
-    //{
-    //    x.push_back(ms_opt_des_par.m_T_htf_in_guess);
-    //    lb.push_back(0.0);
-    //    ub.push_back(1.0);
-    //    scale.push_back(0.1);
-
-    //    index++;
-    //}
+        index++;
+    }
 
     error_code = 0;
 	if( index > 0 )
@@ -2818,6 +2821,19 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
     else
         UA_frac_local = ms_opt_des_par.m_UA_frac_guess;
 
+    if (!ms_opt_des_par.m_fixed_T_hot_i)
+    {
+        ms_des_par.m_T_htf_hot_in = x[index];
+        if (ms_des_par.m_T_htf_hot_in < ms_opt_des_par.m_T_hot_i_min
+            || ms_des_par.m_T_htf_hot_in > ms_opt_des_par.m_T_hot_i_max) {
+            return 0.0;
+        }
+
+        index++;
+    }
+    else
+        ms_des_par.m_T_htf_hot_in = ms_auto_opt_des_par.m_T_htf_hot_in;
+
 	// Recuperator split fraction
 	double LT_frac_local = -999.9;
 	if( !ms_opt_des_par.m_fixed_LT_frac )
@@ -2840,12 +2856,6 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
         ms_des_par.m_LTR_UA = ms_opt_des_par.m_LTR_UA;      //[kW/K]
         ms_des_par.m_HTR_UA = ms_opt_des_par.m_HTR_UA;      //[kW/K]
     }
-
-    // Constraining delta-h between Recompressor and LTR
-    //double deltaEntropy = 0.01; // [kJ/kg-K] 
-    //if ((abs(-m_entr_last[LTR_HP_OUT] + m_entr_last[RC_OUT])) > deltaEntropy) {
-    //    return 0.0; 
-    //}
 
 	int error_code = 0;
 
@@ -2891,33 +2901,27 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 	// map 'auto_opt_des_par_in' to 'ms_auto_opt_des_par'
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
-    ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                 //[kW/K]
-    ms_opt_des_par.m_LTR_min_dT = ms_auto_opt_des_par.m_LTR_min_dT;         //[K]
-    ms_opt_des_par.m_LTR_eff_target = ms_auto_opt_des_par.m_LTR_eff_target; //[-]
-	ms_opt_des_par.m_LTR_eff_max = ms_auto_opt_des_par.m_LTR_eff_max;    //[-]
+    ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                     //[kW/K]
+    ms_opt_des_par.m_LTR_min_dT = ms_auto_opt_des_par.m_LTR_min_dT;             //[K]
+    ms_opt_des_par.m_LTR_eff_target = ms_auto_opt_des_par.m_LTR_eff_target;     //[-]
+	ms_opt_des_par.m_LTR_eff_max = ms_auto_opt_des_par.m_LTR_eff_max;           //[-]
     ms_opt_des_par.m_LTR_od_UA_target_type = ms_auto_opt_des_par.m_LTR_od_UA_target_type;
         // HTR thermal design
     ms_opt_des_par.m_HTR_target_code = ms_auto_opt_des_par.m_HTR_target_code;   //[-]
-    ms_opt_des_par.m_HTR_UA = ms_auto_opt_des_par.m_HTR_UA;             //[kW/K]
-    ms_opt_des_par.m_HTR_min_dT = ms_auto_opt_des_par.m_HTR_min_dT;     //[K]
-    ms_opt_des_par.m_HTR_eff_target = ms_auto_opt_des_par.m_HTR_eff_target; //[-]
+    ms_opt_des_par.m_HTR_UA = ms_auto_opt_des_par.m_HTR_UA;                     //[kW/K]
+    ms_opt_des_par.m_HTR_min_dT = ms_auto_opt_des_par.m_HTR_min_dT;             //[K]
+    ms_opt_des_par.m_HTR_eff_target = ms_auto_opt_des_par.m_HTR_eff_target;     //[-]
 	ms_opt_des_par.m_HTR_eff_max = ms_auto_opt_des_par.m_HTR_eff_max;
     ms_opt_des_par.m_HTR_od_UA_target_type = ms_auto_opt_des_par.m_HTR_od_UA_target_type;
 
-    //
     ms_opt_des_par.m_UA_rec_total = ms_auto_opt_des_par.m_UA_rec_total;
-
 	ms_opt_des_par.m_des_tol = ms_auto_opt_des_par.m_des_tol;
 	ms_opt_des_par.m_des_opt_tol = ms_auto_opt_des_par.m_des_opt_tol;
-
 	ms_opt_des_par.m_is_des_air_cooler = ms_auto_opt_des_par.m_is_des_air_cooler;	//[-]
-
 	ms_opt_des_par.m_des_objective_type = ms_auto_opt_des_par.m_des_objective_type;	//[-]
 	ms_opt_des_par.m_min_phx_deltaT = ms_auto_opt_des_par.m_min_phx_deltaT;			//[C]
-
-	ms_opt_des_par.m_fixed_P_mc_out = ms_auto_opt_des_par.m_fixed_P_mc_out;		//[-]
-	
-	ms_opt_des_par.m_fixed_PR_HP_to_LP = ms_auto_opt_des_par.m_fixed_PR_HP_to_LP;			//[-]
+	ms_opt_des_par.m_fixed_P_mc_out = ms_auto_opt_des_par.m_fixed_P_mc_out;		    //[-]
+	ms_opt_des_par.m_fixed_PR_HP_to_LP = ms_auto_opt_des_par.m_fixed_PR_HP_to_LP;	//[-]
 
 	// Outer optimization loop
 	m_objective_metric_auto_opt = 0.0;
@@ -2983,9 +2987,26 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
             ms_opt_des_par.m_fixed_UA_frac = false;
             ms_opt_des_par.m_UA_frac_guess = 0.2;
         }
-
         ms_opt_des_par.m_LT_frac_guess = 0.5;
 		ms_opt_des_par.m_fixed_LT_frac = false;
+
+        // Is primary heat exchanger T_hot_in fixed or optimized?
+        // ... decided in sco2_pc_csp_int.cpp. Decision passed into ms_auto_opt_des_par.
+        if (ms_auto_opt_des_par.m_fixed_T_hot_i)
+        {   // fixed
+            ms_opt_des_par.m_fixed_T_hot_i = true;
+            ms_opt_des_par.m_T_hot_i_guess = ms_auto_opt_des_par.m_T_hot_i_guess;
+        }
+        else
+        {   // optimized
+            ms_opt_des_par.m_fixed_T_hot_i = false;
+            ms_opt_des_par.m_T_hot_i_guess = ms_auto_opt_des_par.m_T_hot_i_guess;
+
+            ms_opt_des_par.m_T_hot_i_max = ms_auto_opt_des_par.m_T_htf_hot_in;
+            if (ms_auto_opt_des_par.m_T_htf_hot_in > 673.15) {
+                ms_opt_des_par.m_T_hot_i_min = 673.15; //[K] 
+            } else { ms_opt_des_par.m_T_hot_i_min = 0.5 * ms_auto_opt_des_par.m_T_htf_hot_in; } //[K]
+        }
 
         if (ms_opt_des_par.m_LTR_target_code != NS_HX_counterflow_eqs::OPTIMIZE_UA || ms_opt_des_par.m_HTR_target_code != NS_HX_counterflow_eqs::OPTIMIZE_UA)
         {

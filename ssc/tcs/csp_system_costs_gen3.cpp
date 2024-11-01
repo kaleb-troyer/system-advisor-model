@@ -97,10 +97,11 @@ void cspGen3CostModel::designRoutine() {
     W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h / year]
     
     // calculating levelized cost of energy
+    s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_net; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
     s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.2; 
     s_costs.cycle_capital += s_costs.piping_inventory_etc; 
-    s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land;
+    s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
     s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
     s_costs.total_adjusted_cost = (1 + s_financing.construction) * (1 + s_financing.indirect) * (1 + s_financing.contingency) * s_costs.total_capital; 

@@ -83,6 +83,7 @@ public:
         double m_LTR_eff_target;            //[-] target LTR effectiveness
 		double m_LTR_eff_max;				//[-] Maximum allowable effectiveness in LT recuperator
         NS_HX_counterflow_eqs::E_UA_target_type m_LTR_od_UA_target_type;
+        bool m_fixed_UA_frac;               //[-] if true, UA_frac is fixed at UA_max_allowed
 
             // HTR thermal design
         int m_HTR_target_code;              //[-] 1 = UA, 2 = min dT, 3 = effectiveness
@@ -95,15 +96,18 @@ public:
         double m_recomp_frac;				//[-] Fraction of flow that bypasses the precooler and the main compressor at the design point
 		double m_des_tol;						//[-] Convergence tolerance
 
-		// Air cooler parameters
+		    // Air cooler parameters
 		bool m_is_des_air_cooler;		//[-] False will skip physical air cooler design. UA will not be available for cost models.
 
 		int m_des_objective_type;		//[2] = min phx deltat then max eta, [else] max eta
-		double m_min_phx_deltaT;		//[C]
+
+            // PHX design parameters
+        double m_min_phx_deltaT;		//[C]
+        double m_T_htf_hot_in; 
 
 		S_design_parameters()
 		{
-                m_P_mc_in = m_P_mc_out = 
+                m_P_mc_in = m_P_mc_out = m_T_htf_hot_in = 
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
                 m_recomp_frac = 
@@ -126,6 +130,7 @@ public:
             m_LTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
             m_HTR_target_code = 1;      // default to target conductance
             m_HTR_od_UA_target_type = NS_HX_counterflow_eqs::E_UA_target_type::E_calc_UA;
+            m_fixed_UA_frac = true; 
 
 			// Default to standard optimization to maximize cycle efficiency
 			m_des_objective_type = 1;
@@ -177,6 +182,10 @@ public:
         bool m_fixed_UA_frac;               //[-] if true, UA_frac is fixed at UA_max_allowed
         double m_LT_frac_guess;				//[-] Initial guess for fraction of UA_rec_total that is in the low-temperature recuperator
 		bool m_fixed_LT_frac;				//[-] if true, LT_frac is fixed at LT_frac_guess
+        double m_T_hot_i_guess;             //[K] Initial guess for PHX hot-side inlet temperature
+        bool m_fixed_T_hot_i;               //[-] if true, PHX hot-side inlet temperature is optimized
+        double m_T_hot_i_max;               //[K] Maximum PHX hot-side inlet temperature
+        double m_T_hot_i_min;               //[K] Minimum PHX hot-side inlet temperature
 
 		S_opt_design_parameters()
 		{
@@ -188,7 +197,9 @@ public:
                 std::numeric_limits<double>::quiet_NaN();
 
             m_fixed_UA_frac = true; 
-            m_UA_frac_guess = 0.5; 
+            m_UA_frac_guess = 0.5;
+            m_fixed_T_hot_i = true;
+            m_T_hot_i_guess = 973; 
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance

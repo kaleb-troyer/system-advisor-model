@@ -56,6 +56,7 @@ public:
         double recompressor_capital_cost;   // [$] recompressor capital cost
         double turbine_capital_cost;        // [$] turbine capital cost
         double piping_inventory_etc;        // [$] piping, inventory control, etc. 
+        double balance_of_plant;            // [$] transformers, inverters, controls, etc.
 
         // Total capital, maintenance, and LCOE
         double cycle_capital;               // [$]       Power block capital costs
@@ -87,6 +88,7 @@ public:
         double inflation = 0.025;       // [-] average rate of inflation
         double lifetime = 30.00;        // [years] total design lifetime
         double maintenance = 40000;     // [$/MWe-year] O&M costs        (Albrecht, 2019)
+        double balance_of_plant = 167E3;// [$/MWe] balance of plant rate (NREL, SAM) 
 
         // financing derived parameters
         double real_discount_rate;      // [-] calculated using discount rate and inflation

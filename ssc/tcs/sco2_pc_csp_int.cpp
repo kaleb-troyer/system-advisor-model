@@ -224,6 +224,17 @@ void C_sco2_phx_air_cooler::design_core()
                 //std::string ex_msg = "The " + s_cycle_config + " cycle and CSP integration design, design method 2, conductance must be > 0";
 				//throw(C_csp_exception(ex_msg.c_str()));
 			}
+
+            if (ms_des_par.m_T_htf_hot_in < 0.0)
+            {
+                // Negative T_htf_hot_i is now permissable. If T < 0, T is optimized, not fixed. abs(T_htf_hot_i) sets upper bounds. 
+                des_params.m_fixed_T_hot_i = false;
+                ms_des_par.m_T_htf_hot_in = abs(ms_des_par.m_T_htf_hot_in);
+
+                if (ms_des_par.m_T_htf_hot_in >= 973.15) {
+                    des_params.m_T_hot_i_guess = 973.15; 
+                } else { des_params.m_T_hot_i_guess = ms_des_par.m_T_htf_hot_in; }
+            }
 		}
 
         if (T_mc_in < m_T_mc_in_min)

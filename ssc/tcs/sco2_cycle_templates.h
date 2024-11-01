@@ -214,11 +214,14 @@ public:
 		double m_PR_HP_to_LP_guess;     //[-] Initial guess for ratio of P_mc_out to P_LP_in
 		bool m_fixed_PR_HP_to_LP;       //[-] if true, ratio of P_mc_out to P_LP_in is fixed at PR_mc_guess
 		
-        double m_f_PR_HP_to_IP_guess;     //[-] Initial guess fraction of HP-to-LP deltaP for HP-to-IP (partial cooling cycle)
-        bool m_fixed_f_PR_HP_to_IP;       //[-] if true, fix at guess
+        double m_f_PR_HP_to_IP_guess;   //[-] Initial guess fraction of HP-to-LP deltaP for HP-to-IP (partial cooling cycle)
+        bool m_fixed_f_PR_HP_to_IP;     //[-] if true, fix at guess
 
-        double m_UA_frac_guess;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
+        double m_UA_frac_guess;         //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
         bool m_fixed_UA_frac;
+
+        double m_T_hot_i_guess;         //[K] Initial guess for PHX hot-side inlet temperature
+        bool m_fixed_T_hot_i;           //[-] if true, PHX hot-side inlet temperature is optimized
 
 		int m_des_objective_type;		//[2] = min phx deltat then max eta, [else] max eta
 		double m_min_phx_deltaT;		//[C]
@@ -247,8 +250,10 @@ public:
                 m_is_recomp_ok =
 				m_PR_HP_to_LP_guess = m_f_PR_HP_to_IP_guess = std::numeric_limits<double>::quiet_NaN();
 
-            m_UA_frac_guess = 1.0;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
             m_fixed_UA_frac = true;
+            m_UA_frac_guess = 1.0;             //[-] Initial guess for fraction of UA_max_allowed that is used in the LTR and HTR
+            m_fixed_T_hot_i = true;
+            m_T_hot_i_guess = 973;
 
             // Recuperator design target codes
             m_LTR_target_code = 1;      // default to target conductance
