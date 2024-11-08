@@ -207,7 +207,7 @@ void cspGen3CostModel::temperatures() {
     is a decision variable in the optimization process. 
     */
 
-    double dT = 5; // TES temperature drop
+    double dT = 1; // TES temperature drop
     // thermal energy storage inlet / outlet temperatures
     s_storage.s_warm.To = s_cycle.T_phx_i; 
     s_storage.s_cold.Ti = s_cycle.T_phx_o; 

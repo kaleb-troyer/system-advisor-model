@@ -827,42 +827,33 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
 
-    
-    { SSC_OUTPUT, SSC_NUMBER,  "receiver_cost",        "Receiver cost bare erected",                             "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "HTF_cost",             "Heat transfer fluid bulk cost",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "TES_cost",             "Energy storage cost bare erected",                       "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "tower_cost",           "Tower cost bare erected",                                "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",     "Solar field cost bare erected",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "CSP_equip_cost",       "Total CSP equipment cost",                               "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_cost",           "Total cost of CSP and power cycle",                      "M$",         "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",      "Total specific cost bare erected",                       "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal", "Total specific (thermal) cost bare erected",          "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "LCOE",                 "Levelized cost of energy",                               "$/kWe-h",    "System Design Solution",    "",      "*",     "",       "" },
-    
-
-    { SSC_OUTPUT, SSC_NUMBER,  "solar_tower_cost",            "CSP Gen3 Solar Tower capital cost",                       "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",            "CSP Gen3 Solar Field capital cost",                       "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "falling_particle_receiver",   "CSP Gen3 Falling Particle Receiver capital cost",         "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "particles_cost",              "bulk cost of particles",                                  "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "particle_losses_cost",        "incurred cost due to particle loss / attrition",          "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "particle_storage_cost",       "particle storage bins and insulation capital cost",       "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "particle_lifts_cost",         "particle transportation capital cost",                    "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "land_cost",                   "bulk cost of land required for power plant",              "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "HTR_capital_cost",            "high temperature recuperator capital cost",               "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "LTR_capital_cost",            "low temperature recuperator capital cost",                "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "PHX_capital_cost",            "primary heat exchanger capital cost",                     "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "air_cooler_capital_cost",     "air cooler capital cost",                                 "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "compressor_capital_cost",     "primary compressor capital cost",                         "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "recompressor_capital_cost",   "recompressor capital cost",                               "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "turbine_capital_cost",        "turbine capital cost",                                    "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "piping_inventory_etc_cost",   "piping, inventory control, etc. ",                        "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "balance_of_plant_cost",       "transformers, inverters, controls, etc.,"                 "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "cycle_capital_cost",          "Power block capital costs",                               "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "plant_capital_cost",          "CSP equipment capital costs",                             "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_capital_cost",          "total expected capital cost of plant",                    "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "annual_maintenance_cost",     "expected O&M annual costs",                               "M$/year", "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_adjusted_cost",         "total cost of capital, construction, and contingencies ", "M$",      "System Design Solution", "",    "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "levelized_cost_of_energy",    "CSP Gen3 levelized cost of energy",                       "$/MWe-h", "System Design Solution", "",    "*",     "",       "" },
+    // System Cost Aggregation (distinct from other cost design parameters) 
+    { SSC_OUTPUT, SSC_NUMBER,  "total_cost",                "Total cost of CSP and power cycle",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",           "Total specific cost bare erected",                        "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal",   "Total specific (thermal) cost bare erected",              "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "solar_tower_cost",          "CSP Gen3 Solar Tower capital cost",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",          "CSP Gen3 Solar Field capital cost",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "falling_particle_receiver", "CSP Gen3 Falling Particle Receiver capital cost",         "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particles_cost",            "bulk cost of particles",                                  "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_losses_cost",      "incurred cost due to particle loss / attrition",          "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_storage_cost",     "particle storage bins and insulation capital cost",       "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_lifts_cost",       "particle transportation capital cost",                    "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "land_cost",                 "bulk cost of land required for power plant",              "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "HTR_capital_cost",          "high temperature recuperator capital cost",               "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "LTR_capital_cost",          "low temperature recuperator capital cost",                "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "PHX_capital_cost",          "primary heat exchanger capital cost",                     "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "air_cooler_capital_cost",   "air cooler capital cost",                                 "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "compressor_capital_cost",   "primary compressor capital cost",                         "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "recompressor_capital_cost", "recompressor capital cost",                               "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "turbine_capital_cost",      "turbine capital cost",                                    "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "piping_inventory_etc_cost", "piping, inventory control, etc. ",                        "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "balance_of_plant_cost",     "transformers, inverters, controls, etc.,"                 "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "cycle_capital_cost",        "Power block capital costs",                               "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "plant_capital_cost",        "CSP equipment capital costs",                             "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_capital_cost",        "total expected capital cost of plant",                    "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "annual_maintenance_cost",   "expected O&M annual costs",                               "M$/year", "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_adjusted_cost",       "total cost of capital, construction, and contingencies ", "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "levelized_cost_of_energy",  "CSP Gen3 levelized cost of energy",                       "$/MWe-h", "System Design Solution", "",      "*",     "",       "" },
 
     // Compressor
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_comp_in",            "Compressor inlet temperature",                           "C",          "Compressor",    "",      "*",     "",       "" },
@@ -1818,25 +1809,53 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     cost_bare_erected_sum += piping_inventory_etc_cost;     //[M$]
 
     // Report total CSP equipment costs
-    cm->assign("receiver_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_receiver)); //[M$]
-    cm->assign("HTF_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_HTF)); //[M$]
-    cm->assign("TES_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_TES)); //[M$]
-    cm->assign("tower_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_tower)); //[M$]
-    cm->assign("solar_field_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_solar_field)); //[M$]
-    cm->assign("CSP_equip_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_CSP_equip)); //[M$]
-    cost_CSP_bare_erected_sum = c_sco2_cycle.get_design_solved()->m_cost_CSP_equip; 
+    //cm->assign("receiver_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_receiver)); //[M$]
+    //cm->assign("HTF_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_HTF)); //[M$]
+    //cm->assign("TES_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_TES)); //[M$]
+    //cm->assign("tower_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_tower)); //[M$]
+    //cm->assign("solar_field_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_solar_field)); //[M$]
+    //cm->assign("CSP_equip_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_CSP_equip)); //[M$]
+    //cost_CSP_bare_erected_sum = c_sco2_cycle.get_design_solved()->m_cost_CSP_equip; 
+
+    cm->assign("solar_tower_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.solar_tower * 1.0E-6));
+    cm->assign("solar_field_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.solar_field * 1.0E-6));
+    cm->assign("falling_particle_receiver", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.falling_particle_receiver * 1.0E-6));
+    cm->assign("particles_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.particles * 1.0E-6));
+    cm->assign("particle_losses_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.particle_losses * 1.0E-6));
+    cm->assign("particle_storage_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.particle_storage * 1.0E-6));
+    cm->assign("particle_lifts_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.particle_lifts * 1.0E-6));
+    cm->assign("land_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.land * 1.0E-6));
+
+    cm->assign("HTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.HTR_capital_cost * 1.0E-6));
+    cm->assign("LTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.LTR_capital_cost * 1.0E-6));
+    cm->assign("PHX_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.PHX_capital_cost * 1.0E-6));
+    cm->assign("air_cooler_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.air_cooler_capital_cost * 1.0E-6));
+    cm->assign("compressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.compressor_capital_cost * 1.0E-6));
+    cm->assign("recompressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.recompressor_capital_cost * 1.0E-6));
+    cm->assign("turbine_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.turbine_capital_cost * 1.0E-6));
+    cm->assign("piping_inventory_etc", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc * 1.0E-6));
+    cm->assign("balance_of_plant_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.balance_of_plant * 1.0E-6));
+
+    cm->assign("cycle_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.cycle_capital * 1.0E-6));
+    cm->assign("plant_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.plant_capital * 1.0E-6));
+    cm->assign("total_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.total_capital * 1.0E-6));
+    cm->assign("annual_maintenance_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.annual_maintenance * 1.0E-6));
+    cm->assign("total_adjusted_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.total_adjusted_cost * 1.0E-6));
+    cm->assign("levelized_cost_of_energy", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.levelized_cost_of_energy));
 
     // Report total cycle cost metrics as BEC basis
-	cm->assign("cycle_cost", (ssc_number_t)cost_bare_erected_sum);		    //[M$]
+    cost_bare_erected_sum = c_sco2_cycle.get_design_solved()->s_costs.cycle_capital * 1.0E-6; 
+    cost_CSP_bare_erected_sum = c_sco2_cycle.get_design_solved()->s_costs.plant_capital * 1.0E-6; 
+    cm->assign("cycle_cost", (ssc_number_t)cost_bare_erected_sum);		    //[M$]
     cm->assign("cycle_spec_cost", (ssc_number_t)(cost_bare_erected_sum*1.E6 / s_sco2_des_par.m_W_dot_net));	//[$/kWe]
 	cm->assign("cycle_spec_cost_thermal", (ssc_number_t)(cost_bare_erected_sum*1.E6 / (s_sco2_des_par.m_W_dot_net / c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal)));	//[$/kWt]
 
     // Report total plant cost
-    double total_plant_cost = cost_bare_erected_sum + cost_CSP_bare_erected_sum; 
+    double total_plant_cost = c_sco2_cycle.get_design_solved()->s_costs.total_adjusted_cost * 1.0E-6;
     cm->assign("total_cost", (ssc_number_t)(total_plant_cost)); //[M$]
     cm->assign("total_spec_cost", (ssc_number_t)(total_plant_cost * 1.E6 / s_sco2_des_par.m_W_dot_net));	//[$/kWe]
     cm->assign("total_spec_cost_thermal", (ssc_number_t)(total_plant_cost * 1.E6 / (s_sco2_des_par.m_W_dot_net / c_sco2_cycle.get_design_solved()->ms_rc_cycle_solved.m_eta_thermal)));	//[$/kWt]
-    cm->assign("LCOE", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_LCOE)); //[$/kWe-h]
+    //cm->assign("LCOE", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_LCOE)); //[$/kWe-h]
 
     double W_dot_net_less_cooling = (1.0 - s_sco2_des_par.m_frac_fan_power) * s_sco2_des_par.m_W_dot_net * 1.E-3;   //[MWe]
     cm->assign("W_dot_net_less_cooling", (ssc_number_t)W_dot_net_less_cooling);     //[MWe]

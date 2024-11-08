@@ -361,24 +361,13 @@ void C_sco2_phx_air_cooler::design_core()
     csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des; 
 
     csp_cost_model.designRoutine();
-
-    ms_des_solved.m_cost_receiver = 1E-6 * csp_cost_model.s_costs.falling_particle_receiver;
-    ms_des_solved.m_cost_HTF = 1E-6 * (csp_cost_model.s_costs.particles + csp_cost_model.s_costs.particle_losses);
-    ms_des_solved.m_cost_TES = 1E-6 * csp_cost_model.s_costs.particle_storage;
-    ms_des_solved.m_cost_tower = 1E-6 * csp_cost_model.s_costs.solar_tower;
-    ms_des_solved.m_cost_solar_field = 1E-6 * csp_cost_model.s_costs.solar_field;
-    ms_des_solved.m_cost_CSP_equip = 1E-6 * csp_cost_model.s_costs.plant_capital; 
-
-    ms_des_solved.m_LCOE = csp_cost_model.s_costs.levelized_cost_of_energy;
-
+    ms_des_solved.s_costs = csp_cost_model.s_costs; 
 
 	//*************************************************************************************
 	//*************************************************************************************
 
 	return;
 }
-
-
 
 int C_sco2_phx_air_cooler::off_design_fix_P_mc_in(S_od_par od_par,
                                 double P_mc_in /*MPa*/, double T_mc_in /*K*/, double T_pc_in /*K*/,

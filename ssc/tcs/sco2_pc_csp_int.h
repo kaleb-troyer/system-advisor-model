@@ -188,15 +188,7 @@ public:
 	{
 		C_HX_counterflow_CRM::S_des_solved ms_phx_des_solved;
 		C_sco2_cycle_core::S_design_solved ms_rc_cycle_solved;
-
-        double m_cost_receiver;     //[M$]
-        double m_cost_HTF;          //[M$]
-        double m_cost_TES;          //[M$]
-        double m_cost_tower;        //[M$]
-        double m_cost_solar_field;  //[M$]
-        double m_cost_CSP_equip;    //[M$]
-        double m_LCOE;              //[$/kWe-h]
-
+        cspGen3CostModel::costs s_costs; 
     };
 
 	struct S_od_par
