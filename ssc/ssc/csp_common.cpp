@@ -827,6 +827,7 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
 
+    
     { SSC_OUTPUT, SSC_NUMBER,  "receiver_cost",        "Receiver cost bare erected",                             "M$",         "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "HTF_cost",             "Heat transfer fluid bulk cost",                          "M$",         "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "TES_cost",             "Energy storage cost bare erected",                       "M$",         "System Design Solution",    "",      "*",     "",       "" },
@@ -837,6 +838,31 @@ var_info vtab_sco2_design[] = {
     { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",      "Total specific cost bare erected",                       "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal", "Total specific (thermal) cost bare erected",          "M$/kWe",     "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "LCOE",                 "Levelized cost of energy",                               "$/kWe-h",    "System Design Solution",    "",      "*",     "",       "" },
+    
+
+    { SSC_OUTPUT, SSC_NUMBER,  "solar_tower_cost",            "CSP Gen3 Solar Tower capital cost",                       "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",            "CSP Gen3 Solar Field capital cost",                       "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "falling_particle_receiver",   "CSP Gen3 Falling Particle Receiver capital cost",         "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particles_cost",              "bulk cost of particles",                                  "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_losses_cost",        "incurred cost due to particle loss / attrition",          "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_storage_cost",       "particle storage bins and insulation capital cost",       "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "particle_lifts_cost",         "particle transportation capital cost",                    "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "land_cost",                   "bulk cost of land required for power plant",              "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "HTR_capital_cost",            "high temperature recuperator capital cost",               "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "LTR_capital_cost",            "low temperature recuperator capital cost",                "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "PHX_capital_cost",            "primary heat exchanger capital cost",                     "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "air_cooler_capital_cost",     "air cooler capital cost",                                 "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "compressor_capital_cost",     "primary compressor capital cost",                         "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "recompressor_capital_cost",   "recompressor capital cost",                               "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "turbine_capital_cost",        "turbine capital cost",                                    "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "piping_inventory_etc_cost",   "piping, inventory control, etc. ",                        "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "balance_of_plant_cost",       "transformers, inverters, controls, etc.,"                 "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "cycle_capital_cost",          "Power block capital costs",                               "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "plant_capital_cost",          "CSP equipment capital costs",                             "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_capital_cost",          "total expected capital cost of plant",                    "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "annual_maintenance_cost",     "expected O&M annual costs",                               "M$/year", "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_adjusted_cost",         "total cost of capital, construction, and contingencies ", "M$",      "System Design Solution", "",    "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "levelized_cost_of_energy",    "CSP Gen3 levelized cost of energy",                       "$/MWe-h", "System Design Solution", "",    "*",     "",       "" },
 
     // Compressor
 	{ SSC_OUTPUT, SSC_NUMBER,  "T_comp_in",            "Compressor inlet temperature",                           "C",          "Compressor",    "",      "*",     "",       "" },

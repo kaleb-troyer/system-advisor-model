@@ -24,11 +24,11 @@ public:
     struct cycle { // power block data structure
 
         // power block parameters
-        double T_phx_i;         // [K]   pHX particle inlet temperature
-        double T_phx_o;         // [K]   pHX particle outlet temperature
-        double efficiency;      // [-]   cycle efficiency
-        double W_dot_net;       // [MWe] cycle design power output
-        double phx_height;      // [m]   primary heat exchanger height
+        double T_phx_i;     // [K]   pHX particle inlet temperature
+        double T_phx_o;     // [K]   pHX particle outlet temperature
+        double efficiency;  // [-]   cycle efficiency
+        double W_dot_net;   // [MWe] cycle design power output
+        double phx_height;  // [m]   primary heat exchanger height
 
         cycle() {
             T_phx_i = T_phx_o = efficiency = W_dot_net = phx_height = 0;

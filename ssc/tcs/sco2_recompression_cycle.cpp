@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "csp_solver_util.h"
 
+#include <iostream>
+#include <fstream>
+
 using namespace std;
 
 //void C_RecompCycle::design_core_bypass(int & error_code)
@@ -2277,17 +2280,28 @@ void C_RecompCycle::design_core_standard(int & error_code)
         with very aggressive approach temperatures.
 
         penalty = C2^(dT_min - C3*dT)
+        OR, if dT < E1
+        penalty = E2 - E3*x^2
         */
-        double penalty = 0;    // single penalty term for all constraint violations
-        const double C1 = 5.0; // buffer determines when the penalty is triggered
-        const double C2 = 3.6; // base value in exponential penalty function determines aggressiveness
-        const double C3 = 2.8; // fine-tuning parameter
+        double penalty = 0;     // single penalty term for all constraint violations
+        const double C1 = 5.00; // buffer determines when the penalty is triggered
+        const double C2 = 3.60; // base value in exponential penalty function determines aggressiveness
+        const double C3 = 2.80; // fine-tuning parameter
+        const double E1 = 1.30; // if dT < E1, use quadratic penalty 
+        const double E2 = 5.80; // maximum penalty per rule
+        const double E3 = 1.56; // quadratic penalty factor
         if (!ms_des_par.m_fixed_UA_frac) { // optimizer gets stuck here if total UA is not a decision variable
-            if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT)) {
+            // calculating penalty for LTR approach
+            if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT) && ms_des_solved.ms_LTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
+            } else if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design <= E1) {
+                penalty += E2 - E3 * pow(ms_des_solved.ms_LTR_des_solved.m_min_DT_design, 2); 
             } else { penalty += 0; }
-            if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT)) {
+            // calculating penalty for HTR approach
+            if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT) && ms_des_solved.ms_HTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_HTR_min_dT - (C3 + ms_des_solved.ms_HTR_des_solved.m_min_DT_design));
+            } else if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design <= E1) {
+                penalty += E2 - E3 * pow(ms_des_solved.ms_HTR_des_solved.m_min_DT_design, 2);
             } else { penalty += 0; }
         }
 
@@ -2307,13 +2321,25 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; // [K]
         csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
 
-        csp_cost_model.designRoutine(); 
-        m_objective_metric_last = 1 / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
+        csp_cost_model.designRoutine();
+        const double objective_scalar = 100; 
+        m_objective_metric_last = objective_scalar / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
 
     }
     else
     {
         m_objective_metric_last = m_eta_thermal_calc_last;
+    }
+
+    // objective metric logging
+    if (true) {
+        std::ofstream file("objective.csv", std::ios::app);
+        if (file.is_open()) {
+            file << m_objective_metric_last << ",\n";
+        }
+        else {
+            std::cerr << "Failed to open file." << std::endl;
+        }
     }
 
 }
