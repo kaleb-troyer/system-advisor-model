@@ -743,6 +743,9 @@ var_info vtab_sco2_design[] = {
 
 	/*  VARTYPE   DATATYPE     NAME                    LABEL                                                  UNITS          META        GROUP     REQUIRED_IF   CONSTRAINTS   UI_HINTS*/
     { SSC_INPUT,  SSC_NUMBER,  "quiet",                "if !=0, silence status=successful log notices.",         "",           "",    "Meta",               "?=0",   "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "opt_logging",          "if !=0, save each opt loop result to objective.csv.",    "",           "",    "Meta",               "?=0",   "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "opt_penalty",          "if !=0, allow addition of penalty terms to objective.",  "",           "",    "Meta",               "?=1",   "",       "" },
+
     // ** Design Parameters **
 		// System Design
 	{ SSC_INPUT,  SSC_NUMBER,  "htf",                  "Integer code for HTF used in PHX",                       "",           "",    "System Design",      "*",     "",       "" },
@@ -1032,7 +1035,9 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 {
 	C_sco2_phx_air_cooler::S_des_par s_sco2_des_par;
     // Meta
-    s_sco2_des_par.m_quiet = cm->as_integer("quiet"); 
+    s_sco2_des_par.m_quiet = cm->as_integer("quiet");
+    s_sco2_des_par.m_opt_logging = cm->as_integer("opt_logging");
+    s_sco2_des_par.m_opt_penalty = cm->as_integer("opt_penalty");
     // System design parameters
 	s_sco2_des_par.m_hot_fl_code = cm->as_integer("htf");							//[-] Integer code for HTF
 	s_sco2_des_par.mc_hot_fl_props = cm->as_matrix("htf_props");					//[-] Custom HTF properties

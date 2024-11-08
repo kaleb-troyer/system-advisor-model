@@ -244,6 +244,10 @@ void C_sco2_phx_air_cooler::design_core()
 				T_mc_in - 273.15,
 				m_T_mc_in_min - 273.15);
 		}
+            // meta
+        des_params.m_opt_logging = ms_des_par.m_opt_logging; 
+        des_params.m_opt_penalty = ms_des_par.m_opt_penalty; 
+
 		des_params.m_T_pc_in = T_mc_in;		//[K]
 		des_params.m_DP_PC_pre = ms_des_par.m_DP_PC;
 		des_params.m_UA_rec_total = ms_des_par.m_UA_recup_tot_des;	//[kW/K]

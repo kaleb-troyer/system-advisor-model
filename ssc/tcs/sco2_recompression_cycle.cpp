@@ -2290,7 +2290,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         const double E1 = 1.30; // if dT < E1, use quadratic penalty 
         const double E2 = 5.80; // maximum penalty per rule
         const double E3 = 1.56; // quadratic penalty factor
-        if (!ms_des_par.m_fixed_UA_frac) { // optimizer gets stuck here if total UA is not a decision variable
+        if (ms_opt_des_par.m_opt_penalty) { // optimizer gets stuck here if total UA is not a decision variable
             // calculating penalty for LTR approach
             if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT) && ms_des_solved.ms_LTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
@@ -2332,16 +2332,14 @@ void C_RecompCycle::design_core_standard(int & error_code)
     }
 
     // objective metric logging
-    if (true) {
+    if (ms_opt_des_par.m_opt_logging) {
         std::ofstream file("objective.csv", std::ios::app);
         if (file.is_open()) {
             file << m_objective_metric_last << ",\n";
-        }
-        else {
+        } else {
             std::cerr << "Failed to open file." << std::endl;
         }
     }
-
 }
 
 int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, double *diff_T_LTR_LP_out /*K*/)
@@ -2925,6 +2923,9 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 	}
 
 	// map 'auto_opt_des_par_in' to 'ms_auto_opt_des_par'
+        // meta
+    ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging; 
+    ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty; 
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
     ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                     //[kW/K]

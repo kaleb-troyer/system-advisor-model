@@ -73,7 +73,9 @@ public:
 
 	struct S_design_parameters
 	{
-		double m_P_mc_in;					//[kPa] Compressor inlet pressure
+
+            // Compressor
+        double m_P_mc_in;					//[kPa] Compressor inlet pressure
 		double m_P_mc_out;					//[kPa] Compressor outlet pressure
 		
             // LTR thermal design
@@ -111,8 +113,7 @@ public:
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
                 m_recomp_frac = 
-                m_des_tol = 
-                std::numeric_limits<double>::quiet_NaN();
+                m_des_tol = std::numeric_limits<double>::quiet_NaN();
 
             // Compressor model codes
             //m_mc_comp_model_code = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
@@ -144,6 +145,10 @@ public:
 
 	struct S_opt_design_parameters
 	{
+            // meta
+        int m_opt_logging;                  //[-] if !=0, save each opt loop result to objective.csv.
+        int m_opt_penalty;                  //[-] if !=0, allow addition of penalty terms to objective.
+
 		double m_UA_rec_total;				//[kW/K] Total design-point recuperator UA
 		    // LTR thermal design
         int m_LTR_target_code;              //[-] 1 = UA, 2 = min dT, 3 = effectiveness
@@ -192,7 +197,7 @@ public:
                 m_UA_rec_total = 
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
-                m_des_tol = m_des_opt_tol = 
+                m_des_tol = m_des_opt_tol = m_opt_logging = m_opt_penalty = 
 				m_P_mc_out_guess = m_PR_HP_to_LP_guess = m_recomp_frac_guess = m_LT_frac_guess =
                 std::numeric_limits<double>::quiet_NaN();
 
