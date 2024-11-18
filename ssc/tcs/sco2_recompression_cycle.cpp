@@ -2333,14 +2333,24 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
     // objective metric logging
     if (ms_opt_des_par.m_opt_logging) {
+
+        ms_opt_des_par.m_opt_iters++;
         std::ofstream file("objective.csv", std::ios::app);
         if (file.is_open()) {
-            file << m_objective_metric_last << ",\n";
+            if (ms_opt_des_par.m_opt_iters == 1) { file << "iter, objective, P high, PR, recomp frac, UA ratio, UA total, PHX Hot In, \n"; }
+            file << ms_opt_des_par.m_opt_iters
+                << "," << m_objective_metric_last                       // Objective
+                << "," << ms_des_par.m_P_mc_out                         // P_high
+                << "," << ms_des_par.m_P_mc_in / ms_des_par.m_P_mc_out  // PR
+                << "," << ms_des_par.m_recomp_frac                      // RF
+                << "," << ms_des_par.m_LTR_UA / (ms_des_par.m_LTR_UA + ms_des_par.m_HTR_UA) // UA_ratio
+                << "," << ms_des_par.m_LTR_UA + ms_des_par.m_HTR_UA     // UA_total
+                << "," << ms_des_par.m_T_htf_hot_in << ",\n";           // T_htf_h_i
         } else {
             std::cerr << "Failed to open file." << std::endl;
         }
     }
-}
+} 
 
 int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, double *diff_T_LTR_LP_out /*K*/)
 {
@@ -2815,7 +2825,6 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
 		}
 	}
 	
-
 	if( P_mc_in >= ms_des_par.m_P_mc_out )
 		return 0.0;
 	if( P_mc_in <= 100.0 )
@@ -2925,7 +2934,8 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 	// map 'auto_opt_des_par_in' to 'ms_auto_opt_des_par'
         // meta
     ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging; 
-    ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty; 
+    ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty;
+    ms_opt_des_par.m_opt_iters = 0; 
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
     ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                     //[kW/K]

@@ -67,7 +67,7 @@ public:
         double levelized_cost_of_energy;    // [$/MWe-h] CSP Gen3 levelized cost of energy
 
         costs() {
-            solar_tower = solar_field = falling_particle_receiver = land =
+            solar_tower = solar_field = falling_particle_receiver = land = balance_of_plant = 
                 particles = particle_storage = particle_lifts = particle_losses = 0;
 
             HTR_capital_cost = LTR_capital_cost = PHX_capital_cost = air_cooler_capital_cost =
@@ -81,18 +81,18 @@ public:
     struct financing { // financing data structure
 
         // assumed lifetime, maintenance, and financing rates
-        double discount_rate = 0.070;   // [-] cost of financing         (Albrecht, 2019)
-        double construction = 0.060;    // [-] construction costs        (Albrecht, 2019)
-        double contingency = 0.100;     // [-] unexpected costs          (Albrecht, 2019)
-        double indirect = 0.130;        // [-] indirect cost of capital  (Albrecht, 2019)
-        double inflation = 0.025;       // [-] average rate of inflation
-        double lifetime = 30.00;        // [years] total design lifetime
-        double maintenance = 40000;     // [$/MWe-year] O&M costs        (Albrecht, 2019)
-        double balance_of_plant = 167E3;// [$/MWe] balance of plant rate (NREL, SAM) 
+        double discount_rate = 0.070;    // [-] cost of financing         (Albrecht, 2019)
+        double construction = 0.060;     // [-] construction costs        (Albrecht, 2019)
+        double contingency = 0.100;      // [-] unexpected costs          (Albrecht, 2019)
+        double indirect = 0.130;         // [-] indirect cost of capital  (Albrecht, 2019)
+        double inflation = 0.025;        // [-] average rate of inflation
+        double lifetime = 30.00;         // [years] total design lifetime
+        double maintenance = 40000;      // [$/MWe-year] O&M costs        (Albrecht, 2019)
+        double balance_of_plant = 167E3; // [$/MWe] balance of plant rate (NREL, SAM) 
 
         // financing derived parameters
-        double real_discount_rate;      // [-] calculated using discount rate and inflation
-        double capital_recovery_factor; // [-] calculated using real discount rate and assumed lifetime
+        double real_discount_rate;       // [-] calculated using discount rate and inflation
+        double capital_recovery_factor;  // [-] calculated using real discount rate and assumed lifetime
 
         financing() {
             real_discount_rate = ((1 + discount_rate) / (1 + inflation)) - 1; // [-]
@@ -126,14 +126,14 @@ public:
             double height;      // [m]
             double radius;      // [m]
             double volume;      // [m2]
-            double T_avg;       // [K] 
             double efficiency;  // [-]
-            double Ti;          // [K] 
-            double To;          // [K] 
+            double Tm;          // [K] mean temperature
+            double Ti;          // [K] inlet temperature
+            double To;          // [K] outlet temperature
 
             warm() {
                 height = radius = volume = efficiency = 0;
-                T_avg = Ti = To = 0; 
+                Tm = Ti = To = 0; 
             }
         } s_warm;
 
@@ -143,14 +143,14 @@ public:
             double height;      // [m]
             double radius;      // [m]
             double volume;      // [m2]
-            double T_avg;       // [K] 
             double efficiency;  // [-]
-            double Ti;          // [K] 
-            double To;          // [K] 
+            double Tm;          // [K] mean temperature
+            double Ti;          // [K] inlet temperature
+            double To;          // [K] outlet temperature
 
             cold() {
                 height = radius = volume = efficiency = 0;
-                T_avg = Ti = To = 0;
+                Tm = Ti = To = 0;
             }
         } s_cold;
 
@@ -190,6 +190,8 @@ public:
         double prep_cost_per_area = 10.0;    // [$/m2]  cost per unit area of land preparation    (US DOE, 2012)
         double land_cost_per_area = 2.47;    // [$/m2]  cost per unit area of land                (Mehos, 2016)
         double tracking_power = 0.0055;      // [kW/kW] heliostat tracking power gross fraction   (NREL SAM, 2024)
+        double heliostat_x = 12.0;           // [m]     heliostat height
+        double heliostat_y = 12.0;           // [m]     heliostat width
 
         // derived solar field parameters
         double area_heliostats; // [m2] total heliostat surface area required
@@ -203,30 +205,33 @@ public:
     struct tower { // solar tower data structure
 
         // solar tower dimensions
-        double height; // [m] tower height
-        double radius; // [m] tower radius
+        double height; // [m]   tower height
+        double radius; // [m]   tower radius
+        double Vb;     // [m/s] wind velocity at base of tower
+        double Vt;     // [m/s] wind velocity at top of tower
 
         tower() {
-            height = radius = 0;
+            height = radius = Vt = Vb = 0;
         };
     } s_tower;
 
     struct receiver { // falling particle receiver data structure
 
         // falling particle receiver dimensions and performance
-        double height;               // [m]  flat plate receiver height 
-        double width;                // [m]  flat plate receiver width
-        double area_aperature;       // [m2] aperature area = receiver area
-        double aspect_ratio;         // [-]  receiver height / receiver width
-        double particle_loss_factor; // [-]  particle loss from open air receiver
-        double efficiency;           // [-]  receiver efficiency
-        double T_avg;                // [K]  particle average temperature in receiver 
-        double Ti;                   // [K]  particle temperature at receiver inlet
-        double To;                   // [K]  particle temperature at receiver outlet 
+        double height;               // [m]   flat plate receiver height 
+        double width;                // [m]   flat plate receiver width
+        double wind_direction;       // [deg] wind direction (North=0, North-facing receiver)
+        double area_aperature;       // [m2]  aperature area = receiver area
+        double aspect_ratio;         // [-]   receiver height / receiver width
+        double particle_loss_factor; // [-]   particle loss from open air receiver
+        double efficiency;           // [-]   receiver efficiency
+        double Tm;                   // [K]   particle mean temperature in receiver 
+        double Ti;                   // [K]   particle temperature at receiver inlet
+        double To;                   // [K]   particle temperature at receiver outlet 
 
         receiver() {
-            height = width = area_aperature = aspect_ratio = 0;
-            particle_loss_factor = efficiency = T_avg = Ti = To = 0;
+            height = width = area_aperature = aspect_ratio = wind_direction = 0;
+            particle_loss_factor = efficiency = Tm = Ti = To = 0;
         };
     } s_receiver;
 
@@ -243,7 +248,7 @@ public:
 
 private:
 
-    void temperatures();      // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
+    void temperatures();            // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
     void receiverLosses();          // Calculates estimated receiver losses
     void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc). 
     double costLand();              // Calculates cost of the total land required.

@@ -51,10 +51,9 @@ void cspGen3CostModel::designRoutine() {
     s_storage.hours_of_capacity = 14;   // [h] (Albrecht, 2019) 
     s_storage.capacity_factor = 0.71;   // [-] (Albrecht, 2019) 
 
-    // estimate efficiencies here
-    s_storage.s_warm.efficiency = 0.98;     // assumed
-    s_storage.s_cold.efficiency = 0.98;     // assumed
-    s_receiver.efficiency = 0.9;            // assumed
+    // assume efficiencies here
+    s_storage.s_warm.efficiency = 0.98;     // assumed (unused)
+    s_storage.s_cold.efficiency = 0.98;     // assumed (unused)
     s_lifts.efficiency = 0.8;               // assumed
 
     // calculating power required at the receiver, according to cycle efficiency
@@ -113,33 +112,62 @@ void cspGen3CostModel::designRoutine() {
 
 void cspGen3CostModel::receiverLosses() {
     /*
-    Falling-particle receiver thermal losses are estimated using the receiver
-    temperature, aperature area, and power delivered to the receiver. Work done
-    by Gonzales-Portillo (2020) is extended to cover solar field powers greater
-    than 700MW and less than 375MW.
+    Falling-particle receiver thermal losses are estimated using the
+    receiver temperature, aperature area, wind velocity, and power
+    delivered to the receiver. The correlations are taken from work
+    done by Sandia (https://www.osti.gov/biblio/1890267, page 43).
 
-    Losses are then scaled to cover receiver temperatures above and below 700C.
+    Losses are then scaled to cover receiver temperatures above and below 775C.
     */
 
     const double sigma = 5.670374419E-8;              // Stefan-Boltzmann Constant 
-    const double epsilon = 0.80;                      // receiver emissivity (Gonzales-Portillo, 2020) (assumed)
-    const double heat_transfer_coefficient = 95;      // (Gonzales-Portillo, 2020) (assumed)
-    const double T_baseline = 1073.15;                // (Gonzales-Portillo, 2020) (assumed)
-    const double T_ambient = 308.15;                  // (Gonzales-Portillo, 2020) (assumed)
+    const double epsilon = 0.80;                      // receiver emissivity (Gonzales-Portillo, 2021) (assumed)
+    const double heat_transfer_coefficient = 95.0;    // (Gonzales-Portillo, 2021) (assumed)
+    const double T_baseline = 1048.15;                // (Gonzales-Portillo, 2021) (assumed)
+    const double T_ambient = 308.15;                  // (Gonzales-Portillo, 2021) (assumed)
 
     // losses are scaled by receiver temperature
-    double E1 = sigma * epsilon * (pow(s_receiver.T_avg, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (s_receiver.T_avg - T_ambient);
-    double E2 = sigma * epsilon * (pow(T_baseline, 4) - pow(T_ambient, 4)) + heat_transfer_coefficient * (T_baseline - T_ambient);
+    double E1 = sigma * epsilon * (pow(s_receiver.Tm, 4.0) - pow(T_ambient, 4.0)) + heat_transfer_coefficient * (s_receiver.Tm - T_ambient);
+    double E2 = sigma * epsilon * (pow(T_baseline, 4.0) - pow(T_ambient, 4.0)) + heat_transfer_coefficient * (T_baseline - T_ambient);
     double scale = E1 / E2; 
 
-    // model developed from work done by Gonzales-Portillo, 2020. 
-    double C1 = 2.771e-02; 
-    double C2 = 5.245e-04; 
-    double C3 = 6.403e-08; 
-    double C4 = -5.735e-07; 
-    W_dot_losses = (C1 + C2 * s_receiver.area_aperature
-        + C3 * pow(s_receiver.area_aperature, 2)
-        + C4 * s_receiver.area_aperature * W_dot_field) * W_dot_field * scale;
+    // wind velocity is scaled by tower height
+    double roughness = 0.0030; 
+    double base_height = 10.0; 
+    double E3 = log((s_tower.height + s_receiver.height / 2.0) / roughness);
+    double E4 = log(base_height / roughness);
+    s_tower.Vb = 10.0; // assumed
+    s_tower.Vt = s_tower.Vb * (E3 / E4);
+
+    // model developed from work done by Gonzales-Portillo, 2021. (outdated)
+    //const double C1 = 2.771e-02; 
+    //const double C2 = 5.245e-04; 
+    //const double C3 = 6.403e-08; 
+    //const double C4 = -5.735e-07; 
+    //W_dot_losses = (C1 + C2 * s_receiver.area_aperature
+    //    + C3 * pow(s_receiver.area_aperature, 2.0)
+    //    + C4 * s_receiver.area_aperature * W_dot_field) * W_dot_field * scale;
+
+    // receiver efficiency correlations from Sandia (https://www.osti.gov/biblio/1890267, page 43)
+    const double A = 0.848109;
+    const double B = 0.249759;
+    const double C = -1.0115660;
+    const double D = -7.9428690E-5;
+    const double E = -1.4575091E-7;
+    const double F = 5.50;
+    const double G = 7.50;
+    const double H = 5000.0;
+
+    s_receiver.wind_direction = 90.0; 
+    double E5 = 180.0 - fabs(180.0 - s_receiver.wind_direction);
+    double E6 = exp(-E5 / G) / H;
+    double TH = E6 * pow(E5, F); 
+    double qs = exp(-W_dot_field / s_receiver.area_aperature);
+    s_receiver.efficiency = A + (B * qs) + (C * qs * qs)
+        + (D * qs * TH * s_tower.Vt)
+        + (E * TH * pow(s_tower.Vt, 2.0));
+    W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency) * scale;
+    s_receiver.efficiency = 1.0 - (W_dot_losses / W_dot_field);
 
 }; 
 
@@ -147,7 +175,7 @@ void cspGen3CostModel::sizeEquipment() {
     /*
     Linear regression models for CSP plant sizing were developed
     using SolarPILOT and scipy.optimize, by minimizing the total energy
-    specific cost and fitting the regression to the top 10% of results.
+    specific cost and fitting the regression to the top 5% of results.
 
     Input:
     -> Power delivered to Receiver [MW] (100 to 600)
@@ -207,19 +235,20 @@ void cspGen3CostModel::temperatures() {
     is a decision variable in the optimization process. 
     */
 
-    double dT = 1; // TES temperature drop
+    double dT_bins = 2; // TES temperature drop
     // thermal energy storage inlet / outlet temperatures
     s_storage.s_warm.To = s_cycle.T_phx_i; 
     s_storage.s_cold.Ti = s_cycle.T_phx_o; 
-    s_storage.s_warm.Ti = s_storage.s_warm.To + dT; 
-    s_storage.s_cold.To = s_storage.s_cold.Ti - dT; 
-    s_storage.s_warm.T_avg = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
-    s_storage.s_cold.T_avg = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
+    s_storage.s_warm.Ti = s_storage.s_warm.To + dT_bins; 
+    s_storage.s_cold.To = s_storage.s_cold.Ti - dT_bins; 
+    s_storage.s_warm.Tm = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
+    s_storage.s_cold.Tm = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
 
+    double dT_lift = 5; // Lift temperature drop
     // receiver particle inlet / outlet and body temperatures
-    s_receiver.Ti = s_storage.s_cold.To; 
+    s_receiver.Ti = s_storage.s_cold.To - dT_lift; 
     s_receiver.To = s_storage.s_warm.Ti; 
-    s_receiver.T_avg = (s_receiver.Ti + s_receiver.To + s_receiver.To + s_receiver.To) / 4; // taking a three-quarters average to estimate receiver temperature
+    s_receiver.Tm = (s_receiver.Ti + s_receiver.To + s_receiver.To + s_receiver.To) / 4; // taking a three-quarters average to estimate receiver temperature
 
 }
 
@@ -229,9 +258,13 @@ double cspGen3CostModel::costTower() {
     Parameters on sCO2-Based Solar Tower Plants," in 2nd
     European Supercritical CO2 Conference, Essen, 2018.
     */
-    const double C1 = 157.440;  // [$/m^C2]
-    const double C2 = 1.91744;  // [-]
-    return C1 * pow(s_tower.height, C2);
+    //const double C1 = 157.440;  // [$/m^C2]
+    //const double C2 = 1.91744;  // [-]
+    //return C1 * pow(s_tower.height, C2);
+
+    const double A = 3000000;   // [$]
+    const double B = 0.01130;   // [1/m]
+    return A * exp(B * (s_tower.height - s_receiver.height / 2.0 - s_field.heliostat_x / 2.0)); 
 };
 
 double cspGen3CostModel::costField() {
@@ -271,8 +304,8 @@ double cspGen3CostModel::costStorage() {
     const double C2 = 0.37; // [$/m^2] 
     const double C3 = 600;  // [K] 
     const double C4 = 400;  // [K]
-    double C_bin_warm = C1 + C2 * ((s_storage.s_warm.T_avg - C3) / C4); // [$/m2] cost of bin insulation
-    double C_bin_cold = C1 + C2 * ((s_storage.s_cold.T_avg - C3) / C4); // [$/m2] cost of bin insulation
+    double C_bin_warm = C1 + C2 * ((s_storage.s_warm.Tm - C3) / C4); // [$/m2] cost of bin insulation
+    double C_bin_cold = C1 + C2 * ((s_storage.s_cold.Tm - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
     double A_bin_cold = 2 * pi * s_storage.s_cold.radius * s_storage.s_cold.height + pi * s_storage.s_cold.radius * pow(pow(s_storage.s_cold.height, 2) + pow(s_storage.s_cold.radius, 2), 0.5);
     return (C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold);

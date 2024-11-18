@@ -148,6 +148,7 @@ public:
             // meta
         int m_opt_logging;                  //[-] if !=0, save each opt loop result to objective.csv.
         int m_opt_penalty;                  //[-] if !=0, allow addition of penalty terms to objective.
+        double m_opt_iters;                 //[-] optimization iterations counter
 
 		double m_UA_rec_total;				//[kW/K] Total design-point recuperator UA
 		    // LTR thermal design
@@ -194,7 +195,7 @@ public:
 
 		S_opt_design_parameters()
 		{
-                m_UA_rec_total = 
+                m_UA_rec_total = m_opt_iters = 
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max = 
                 m_des_tol = m_des_opt_tol = m_opt_logging = m_opt_penalty = 

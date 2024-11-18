@@ -76,6 +76,8 @@ public:
 		int m_cycle_config;				//[-] 2 = partial cooling, [else] = recompression
         double m_TES_capacity;          //[h] Thermal energy storage capacity in hours
 
+        bool m_fixed_T_hot_i;           //[t/f] if true, use given value
+
 		// Cycle design parameters
 		std::vector<double> m_DP_LT;		//(cold, hot) positive values are absolute [kPa], negative values are relative (-)
 		std::vector<double> m_DP_HT;		//(cold, hot) positive values are absolute [kPa], negative values are relative (-)
@@ -138,6 +140,7 @@ public:
 		{
 			m_hot_fl_code = m_design_method = m_LTR_N_sub_hxrs = m_LTR_N_sub_hxrs = m_phx_N_sub_hx = -1;
             m_TES_capacity = 8; 
+            m_fixed_T_hot_i = true; 
 
 			// Default cycle config to recompression
 			m_cycle_config = 1;	      

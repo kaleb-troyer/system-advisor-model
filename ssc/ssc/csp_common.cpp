@@ -1041,8 +1041,15 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     // System design parameters
 	s_sco2_des_par.m_hot_fl_code = cm->as_integer("htf");							//[-] Integer code for HTF
 	s_sco2_des_par.mc_hot_fl_props = cm->as_matrix("htf_props");					//[-] Custom HTF properties
-	s_sco2_des_par.m_T_htf_hot_in = cm->as_double("T_htf_hot_des") + 273.15;		//[K] Convert from C
-	s_sco2_des_par.m_phx_dt_hot_approach = cm->as_double("dT_PHX_hot_approach");	//[K/C] Temperature difference between hot HTF and turbine CO2 inlet
+
+    double T_htf_hot_temp = cm->as_double("T_htf_hot_des");
+    if (T_htf_hot_temp < 0.0) {
+        s_sco2_des_par.m_fixed_T_hot_i = false;
+        T_htf_hot_temp = abs(T_htf_hot_temp); 
+    }
+    s_sco2_des_par.m_T_htf_hot_in = T_htf_hot_temp + 273.15;		//[K] Convert from C
+
+    s_sco2_des_par.m_phx_dt_hot_approach = cm->as_double("dT_PHX_hot_approach");	//[K/C] Temperature difference between hot HTF and turbine CO2 inlet
 	s_sco2_des_par.m_T_amb_des = cm->as_double("T_amb_des") + 273.15;				//[K] Convert from C
 	s_sco2_des_par.m_dt_mc_approach = cm->as_double("dT_mc_approach");				//[K/C] Temperature difference between ambient air and main compressor inlet
 	s_sco2_des_par.m_elevation = cm->as_double("site_elevation");					//[m] Site elevation

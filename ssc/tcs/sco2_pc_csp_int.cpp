@@ -224,18 +224,14 @@ void C_sco2_phx_air_cooler::design_core()
                 //std::string ex_msg = "The " + s_cycle_config + " cycle and CSP integration design, design method 2, conductance must be > 0";
 				//throw(C_csp_exception(ex_msg.c_str()));
 			}
-
-            if (ms_des_par.m_T_htf_hot_in < 0.0)
-            {
-                // Negative T_htf_hot_i is now permissable. If T < 0, T is optimized, not fixed. abs(T_htf_hot_i) sets upper bounds. 
-                des_params.m_fixed_T_hot_i = false;
-                ms_des_par.m_T_htf_hot_in = abs(ms_des_par.m_T_htf_hot_in);
-
-                if (ms_des_par.m_T_htf_hot_in >= 973.15) {
-                    des_params.m_T_hot_i_guess = 973.15; 
-                } else { des_params.m_T_hot_i_guess = ms_des_par.m_T_htf_hot_in; }
-            }
 		}
+
+        if (!ms_des_par.m_fixed_T_hot_i)
+        {
+            if (ms_des_par.m_T_htf_hot_in >= 973.15) {
+                des_params.m_T_hot_i_guess = 973.15; 
+            } else { des_params.m_T_hot_i_guess = ms_des_par.m_T_htf_hot_in; }
+        }
 
         if (T_mc_in < m_T_mc_in_min)
 		{
@@ -246,7 +242,7 @@ void C_sco2_phx_air_cooler::design_core()
 		}
             // meta
         des_params.m_opt_logging = ms_des_par.m_opt_logging; 
-        des_params.m_opt_penalty = ms_des_par.m_opt_penalty; 
+        des_params.m_opt_penalty = ms_des_par.m_opt_penalty;
 
 		des_params.m_T_pc_in = T_mc_in;		//[K]
 		des_params.m_DP_PC_pre = ms_des_par.m_DP_PC;
@@ -293,6 +289,7 @@ void C_sco2_phx_air_cooler::design_core()
         des_params.m_phx_cost_model = ms_des_par.m_phx_cost_model;
         des_params.m_phx_od_UA_target_type = ms_des_par.m_phx_od_UA_target_type;
         des_params.m_T_htf_hot_in = ms_des_par.m_T_htf_hot_in;
+        des_params.m_fixed_T_hot_i = ms_des_par.m_fixed_T_hot_i;
 
 		auto_err_code = mpc_sco2_cycle->auto_opt_design(des_params);
 
