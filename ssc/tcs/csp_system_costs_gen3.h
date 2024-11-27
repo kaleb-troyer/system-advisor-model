@@ -117,8 +117,9 @@ public:
     struct storage { // thermal energy storage data structure
 
         // thermal energy storage capacity
-        double hours_of_capacity;   // [hours] 
-        double capacity_factor;     // [-]
+        double hours_of_capacity;   // [hours]  hours of energy storage
+        double capacity_factor;     // [-]      actual energy delivered / nameplate
+        double dT;                  // [K]      storage losses
 
         struct warm { // warm storage
 
@@ -155,7 +156,7 @@ public:
         } s_cold;
 
         storage() {
-            hours_of_capacity = capacity_factor = 0;
+            hours_of_capacity = capacity_factor = dT = 0;
         };
     } s_storage;
 
@@ -240,9 +241,10 @@ public:
         // particle transportation / lift parameters
         double height;      // [m] total combined lift height
         double efficiency;  // [-] lift electrical efficiency
+        double dT;          // [K] losses in lift
 
         lifts() {
-            height = efficiency = 0;
+            height = efficiency = dT = 0;
         };
     } s_lifts;
 

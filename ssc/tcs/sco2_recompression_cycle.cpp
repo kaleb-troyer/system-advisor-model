@@ -2725,7 +2725,8 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		m_objective_metric_opt = 0.0;
 
 		// Set up instance of nlopt class and set optimization parameters
-        nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
+        //nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
+        nlopt::opt		opt_des_cycle(nlopt::GN_CRS2_LM, index);
         opt_des_cycle.set_lower_bounds(lb);
 		opt_des_cycle.set_upper_bounds(ub);
 		opt_des_cycle.set_initial_step(scale);

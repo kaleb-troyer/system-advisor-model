@@ -136,7 +136,7 @@ void cspGen3CostModel::receiverLosses() {
     double base_height = 10.0; 
     double E3 = log((s_tower.height + s_receiver.height / 2.0) / roughness);
     double E4 = log(base_height / roughness);
-    s_tower.Vb = 10.0; // assumed
+    s_tower.Vb = 2.916; // [m/s] DNI-weighted average at Daggett, CA (TMY)
     s_tower.Vt = s_tower.Vb * (E3 / E4);
 
     // model developed from work done by Gonzales-Portillo, 2021. (outdated)
@@ -158,7 +158,7 @@ void cspGen3CostModel::receiverLosses() {
     const double G = 7.50;
     const double H = 5000.0;
 
-    s_receiver.wind_direction = 90.0; 
+    s_receiver.wind_direction = 153.715; // [Degrees] DNI-weighted average at Daggett, CA (TMY)
     double E5 = 180.0 - fabs(180.0 - s_receiver.wind_direction);
     double E6 = exp(-E5 / G) / H;
     double TH = E6 * pow(E5, F); 
@@ -181,45 +181,54 @@ void cspGen3CostModel::sizeEquipment() {
     -> Power delivered to Receiver [MW] (100 to 600)
 
     Output:
-    -> Solar Tower [m]; RMSE = 12.980
-    -> Solar Field [m^2]; RMSE = 32e3
-    -> Receiver Width [m]; RMSE = 2.528
+    -> Solar Tower [m];    RMSE = 6.4893
+    -> Solar Field [m^2];  RMSE = 39.9e3
+    -> Receiver Width [m]; RMSE = 2.2356
     */
 
     // Solar tower sizing
-    s_tower.height = 4.821e+01 + (W_dot_field * 4.665e-01);
-    s_tower.radius = 15;
+    double T1 = 6.477e+01;
+    double T2 = 3.177e-01;
+    s_tower.height = T1 + (W_dot_field * T2);
+    s_tower.radius = 15.0;
 
     // Solar field sizing
-    s_field.area_heliostats = -6.272e+04 + (W_dot_field * 2.174e+03);
-    s_field.area_total_land = s_field.area_heliostats * 6 + 45000;
+    double F1 = -1.434e+05; // RO model, first coefficient. 
+    double F2 = 2.531e+03;  // RO model, second coefficient. 
+    double F3 = 6.0;        // (assumed) 6 units of land per unit of heliostat.
+    double F4 = 45000.0;    // (assumed) base land required
+    s_field.area_heliostats = F1 + (W_dot_field * F2);
+    s_field.area_total_land = s_field.area_heliostats * F3 + F4;
 
     // Receiver sizing
-    s_receiver.height = 15;     // assumed in SolarPILOT study
-    s_receiver.width = 9.113 + (3.274e-02 * W_dot_field);
+    double R1 = 1.227e+01;  // RO model, first coefficient. 
+    double R2 = 3.261e-02;  // RO model, second coefficient. 
+    s_receiver.height = 15; // assumed in SolarPILOT study
+    s_receiver.width = R1 + (R2 * W_dot_field);
     s_receiver.area_aperature = s_receiver.height * s_receiver.width;
     s_receiver.aspect_ratio = s_receiver.height / s_receiver.width;
     s_receiver.particle_loss_factor = 0.000001;     // assumed
     
     // Particle bulk calculations
-    s_particles.m_particles = s_particles.m_dot_phx * s_storage.hours_of_capacity * 3600;
+    s_particles.m_particles = s_particles.m_dot_phx * s_storage.hours_of_capacity * 3600.0;
     s_particles.m_dot_rec = s_particles.m_dot_phx * s_field.solar_multiple; 
 
     // particle storage sizing
-    double height_buffer = 2;       // [m] assumed
-    s_storage.s_warm.radius = 12;   // [m] assumed
-    s_storage.s_cold.radius = 12;   // [m] assumed
+    double height_buffer = 2.0;     // [m] assumed
+    s_storage.s_warm.radius = 12.0; // [m] assumed
+    s_storage.s_cold.radius = 12.0; // [m] assumed
     s_storage.s_warm.volume = s_particles.m_particles / s_particles.bulk_density;
     s_storage.s_cold.volume = s_particles.m_particles / s_particles.bulk_density;
-    s_storage.s_warm.height = height_buffer + (s_storage.s_warm.volume - (pi / 3) * pow(s_storage.s_warm.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2));   // height from required volume of cylinder + cone, calculated with angle of repose
-    s_storage.s_cold.height = height_buffer + (s_storage.s_cold.volume - (pi / 3) * pow(s_storage.s_cold.radius, 3) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_cold.radius, 2));   // height from required volume of cylinder + cone, calculated with angle of repose
+    s_storage.s_warm.height = height_buffer + (s_storage.s_warm.volume - (pi / 3.0) * pow(s_storage.s_warm.radius, 3.0) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2.0));   // height from required volume of cylinder + cone, calculated with angle of repose
+    s_storage.s_cold.height = height_buffer + (s_storage.s_cold.volume - (pi / 3.0) * pow(s_storage.s_cold.radius, 3.0) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_cold.radius, 2.0));   // height from required volume of cylinder + cone, calculated with angle of repose
 
     // Determining if particle storage can fit inside tower to calculate total lift height
-    if (s_cycle.phx_height == 0) { s_cycle.phx_height = s_storage.s_warm.height; }
+    if (s_cycle.phx_height == 0.0) { s_cycle.phx_height = s_storage.s_warm.height; }
 
     double tower_free_space = s_tower.height * 0.1;    // [m] space left intentionally free in tower (assumed)
     double height_required = s_storage.s_warm.height + s_storage.s_cold.height + s_cycle.phx_height + s_receiver.height;
-    if (height_required < s_tower.height - tower_free_space) {
+    /*if (height_required < s_tower.height - tower_free_space) {*/
+    if (true) {
         s_lifts.height = height_required;
     }
     else {
@@ -235,18 +244,18 @@ void cspGen3CostModel::temperatures() {
     is a decision variable in the optimization process. 
     */
 
-    double dT_bins = 2; // TES temperature drop
+    s_storage.dT = 2; // TES temperature drop
     // thermal energy storage inlet / outlet temperatures
     s_storage.s_warm.To = s_cycle.T_phx_i; 
     s_storage.s_cold.Ti = s_cycle.T_phx_o; 
-    s_storage.s_warm.Ti = s_storage.s_warm.To + dT_bins; 
-    s_storage.s_cold.To = s_storage.s_cold.Ti - dT_bins; 
+    s_storage.s_warm.Ti = s_storage.s_warm.To + s_storage.dT;
+    s_storage.s_cold.To = s_storage.s_cold.Ti - s_storage.dT;
     s_storage.s_warm.Tm = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
     s_storage.s_cold.Tm = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
 
-    double dT_lift = 5; // Lift temperature drop
+    s_lifts.dT = 5; // Lift temperature drop
     // receiver particle inlet / outlet and body temperatures
-    s_receiver.Ti = s_storage.s_cold.To - dT_lift; 
+    s_receiver.Ti = s_storage.s_cold.To - s_lifts.dT;
     s_receiver.To = s_storage.s_warm.Ti; 
     s_receiver.Tm = (s_receiver.Ti + s_receiver.To + s_receiver.To + s_receiver.To) / 4; // taking a three-quarters average to estimate receiver temperature
 
