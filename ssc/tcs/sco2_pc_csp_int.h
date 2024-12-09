@@ -104,8 +104,9 @@ public:
         int m_mc_comp_type;                 //[-] Main compressor type 1: SNL 2: CompA
         double m_eta_rc;					//[-] design-point efficiency of the recompressor; isentropic if positive, polytropic if negative
 		double m_eta_pc;					//[-] design-point efficiency of the precompressor; isentropic if positive, polytropic if negative
-		double m_eta_t;						//[-] design-point efficiency of the turbine; isentropic if positive, polytropic if negative
-		double m_P_high_limit;				//[kPa] maximum allowable pressure in cycle
+        double m_eta_t;						//[-] design-point efficiency of the turbine; isentropic if positive, polytropic if negative
+        double m_eta_g;						//[-] gross-to-net power conversion factor from turbine to grid
+        double m_P_high_limit;				//[kPa] maximum allowable pressure in cycle
 		double m_des_tol;				    //[-] Design point convergence tolerance
 		double m_des_opt_tol;				//[-] Optimization tolerance
 		double m_N_turbine;					//[rpm] Turbine shaft speed (negative values link turbine to compressor)
@@ -171,7 +172,7 @@ public:
                 m_LTR_UA = m_LTR_min_dT = m_LTR_eff_target = m_LTR_eff_max =
                 m_HTR_UA = m_HTR_min_dT = m_HTR_eff_target = m_HTR_eff_max =
 	
-				m_eta_mc = m_eta_rc = m_eta_pc = m_eta_t =
+				m_eta_mc = m_eta_rc = m_eta_pc = m_eta_t = m_eta_g = 
 				m_P_high_limit = m_des_tol = m_des_opt_tol = m_N_turbine =
                 m_is_recomp_ok = 
 	

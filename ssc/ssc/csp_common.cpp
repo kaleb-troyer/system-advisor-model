@@ -794,11 +794,12 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "min_phx_deltaT",       "Minimum design temperature difference across PHX",       "C",          "High temperature recuperator",    "Heat Exchanger Design",      "?=0",   "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "rel_tol",              "Baseline solver and optimization relative tolerance exponent (10^-rel_tol)", "-", "High temperature recuperator", "Heat Exchanger Design", "?=3","",       "" },
 		// Cycle Design
-	{ SSC_INPUT,  SSC_NUMBER,  "eta_isen_mc",          "Design main compressor isentropic efficiency",           "-",          "",    "",      "*",     "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "eta_isen_mc",          "Design main compressor isentropic efficiency",           "-",          "",    "",      "*",     "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "mc_comp_type",         "Main compressor compressor type 1: SNL 2: CompA",        "-",          "",    "",      "?=1",   "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "eta_isen_rc",          "Design re-compressor isentropic efficiency",             "-",          "",    "",      "*",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "eta_isen_pc",          "Design precompressor isentropic efficiency",             "-",          "",    "",      "cycle_config=2",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "eta_isen_t",           "Design turbine isentropic efficiency",                   "-",          "",    "",      "*",     "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "gross_to_net",         "Turbine / generator gross-to-net conversion factor",     "-",          "",    "",      "*",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "PHX_co2_deltaP_des_in","PHX co2 side pressure drop as fraction of inlet pressure","-",         "",    "",      "",      "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "deltaP_counterHX_frac","Fraction of CO2 inlet pressure that is design point counterflow HX (recups & PHX) pressure drop", "-", "", "", "?=0", "", ""},
 	{ SSC_INPUT,  SSC_NUMBER,  "P_high_limit",         "High pressure limit in cycle",                           "MPa",        "",    "",      "*",     "",       "" },
@@ -1257,12 +1258,13 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
         s_sco2_des_par.m_mc_comp_type = C_comp__psi_eta_vs_phi::E_snl_radial_via_Dyreby;
     }
     
-    s_sco2_des_par.m_eta_rc = cm->as_double("eta_isen_rc");		   //[-]
+    s_sco2_des_par.m_eta_rc = cm->as_double("eta_isen_rc");		    //[-]
 	if (s_sco2_des_par.m_cycle_config == 2)
-        s_sco2_des_par.m_eta_pc = cm->as_double("eta_isen_pc");		   //[-]
+        s_sco2_des_par.m_eta_pc = cm->as_double("eta_isen_pc");		//[-]
 	else
         s_sco2_des_par.m_eta_pc = s_sco2_des_par.m_eta_mc;
-    s_sco2_des_par.m_eta_t = cm->as_double("eta_isen_t");			   //[-]
+    s_sco2_des_par.m_eta_t = cm->as_double("eta_isen_t");			//[-]
+    s_sco2_des_par.m_eta_g = cm->as_double("gross_to_net");         //[-]
 
 	// PHX design parameters
 	s_sco2_des_par.m_des_objective_type = cm->as_integer("des_objective");		//[-] 

@@ -99,7 +99,7 @@ void C_sco2_phx_air_cooler::design_core()
     int tgm_code = 0;
     C_sco2_cycle_core::E_turbo_gen_motor_config turbo_gen_motor_config = static_cast<C_sco2_cycle_core::E_turbo_gen_motor_config>(tgm_code);
 
-    double eta_generator = 1.0;
+    double eta_generator = ms_des_par.m_eta_g;
     // *************************************
 
     double T_mc_in = ms_des_par.m_T_amb_des + ms_des_par.m_dt_mc_approach;	//[K]
@@ -357,6 +357,7 @@ void C_sco2_phx_air_cooler::design_core()
 
     csp_cost_model.s_cycle.W_dot_net = ms_des_par.m_W_dot_net * 1E-3;                       // [MWe]
     csp_cost_model.s_cycle.efficiency = ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;     // [-]
+    csp_cost_model.s_cycle.eta_gen = ms_des_par.m_eta_g;                                    // [-]
     csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;                               // [K]
     csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;             // [K]
     csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des; 

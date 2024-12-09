@@ -26,12 +26,14 @@ public:
         // power block parameters
         double T_phx_i;     // [K]   pHX particle inlet temperature
         double T_phx_o;     // [K]   pHX particle outlet temperature
+        double eta_gen;     // [-]   electrical generator efficiency
         double efficiency;  // [-]   cycle efficiency
-        double W_dot_net;   // [MWe] cycle design power output
+        double W_dot_net;   // [MWt] cycle design power output (W_dot_t - W_dot_mc - W_dot_rc)
+        double W_dot_gen;   // [MWe] cycle net power generation (W_dot_net * eta_gen)
         double phx_height;  // [m]   primary heat exchanger height
 
         cycle() {
-            T_phx_i = T_phx_o = efficiency = W_dot_net = phx_height = 0;
+            T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = W_dot_gen = phx_height = 0;
         };
     } s_cycle;
 

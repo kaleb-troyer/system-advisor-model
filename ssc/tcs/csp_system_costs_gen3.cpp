@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <iostream>
 #include "csp_system_costs_gen3.h"
 
 const double pi = 3.14159265358979323846;
@@ -92,12 +93,14 @@ void cspGen3CostModel::designRoutine() {
     // calculating parasitics and annual electricity produced
     s_parasitics.field = s_field.tracking_power * W_dot_field;                                          // [MWe]
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
-    W_dot_less = s_cycle.W_dot_net - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
+    s_cycle.W_dot_gen = s_cycle.W_dot_net * s_cycle.eta_gen;                                                    // [MWe]
+    W_dot_less = s_cycle.W_dot_gen - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);           // [MWe]
     W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h / year]
     
     // calculating levelized cost of energy
-    s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_net; // [$]
+    s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
+
     s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.2; 
     s_costs.cycle_capital += s_costs.piping_inventory_etc; 
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
@@ -158,7 +161,7 @@ void cspGen3CostModel::receiverLosses() {
     const double G = 7.50;
     const double H = 5000.0;
 
-    s_receiver.wind_direction = 153.715; // [Degrees] DNI-weighted average at Daggett, CA (TMY)
+    s_receiver.wind_direction = 153.715; // [deg] DNI-weighted average at Daggett, CA (TMY)
     double E5 = 180.0 - fabs(180.0 - s_receiver.wind_direction);
     double E6 = exp(-E5 / G) / H;
     double TH = E6 * pow(E5, F); 
@@ -215,8 +218,8 @@ void cspGen3CostModel::sizeEquipment() {
 
     // particle storage sizing
     double height_buffer = 2.0;     // [m] assumed
-    s_storage.s_warm.radius = 12.0; // [m] assumed
-    s_storage.s_cold.radius = 12.0; // [m] assumed
+    s_storage.s_warm.radius = s_tower.radius * 0.80; // [m] assumed
+    s_storage.s_cold.radius = s_tower.radius * 0.80; // [m] assumed
     s_storage.s_warm.volume = s_particles.m_particles / s_particles.bulk_density;
     s_storage.s_cold.volume = s_particles.m_particles / s_particles.bulk_density;
     s_storage.s_warm.height = height_buffer + (s_storage.s_warm.volume - (pi / 3.0) * pow(s_storage.s_warm.radius, 3.0) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2.0));   // height from required volume of cylinder + cone, calculated with angle of repose
@@ -225,9 +228,9 @@ void cspGen3CostModel::sizeEquipment() {
     // Determining if particle storage can fit inside tower to calculate total lift height
     if (s_cycle.phx_height == 0.0) { s_cycle.phx_height = s_storage.s_warm.height; }
 
-    double tower_free_space = s_tower.height * 0.1;    // [m] space left intentionally free in tower (assumed)
+    double tower_free_space = s_tower.height * 0.02;    // [m] space left intentionally free in tower (assumed)
     double height_required = s_storage.s_warm.height + s_storage.s_cold.height + s_cycle.phx_height + s_receiver.height;
-    /*if (height_required < s_tower.height - tower_free_space) {*/
+    //if (height_required < s_tower.height - tower_free_space) {
     if (true) {
         s_lifts.height = height_required;
     }
@@ -271,6 +274,9 @@ double cspGen3CostModel::costTower() {
     //const double C2 = 1.91744;  // [-]
     //return C1 * pow(s_tower.height, C2);
 
+    /*
+    System Advisor Model. C++. NREL. 
+    */
     const double A = 3000000;   // [$]
     const double B = 0.01130;   // [1/m]
     return A * exp(B * (s_tower.height - s_receiver.height / 2.0 - s_field.heliostat_x / 2.0)); 

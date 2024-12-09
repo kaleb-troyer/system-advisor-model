@@ -2317,6 +2317,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
         csp_cost_model.s_cycle.W_dot_net = m_W_dot_net_last * 1E-3;      // [MWe]
         csp_cost_model.s_cycle.efficiency = ms_des_solved.m_eta_thermal; // [-]
+        csp_cost_model.s_cycle.eta_gen = m_eta_generator;                // [-]
         csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;        // [K]
         csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; // [K]
         csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
@@ -2725,8 +2726,8 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		m_objective_metric_opt = 0.0;
 
 		// Set up instance of nlopt class and set optimization parameters
-        //nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
-        nlopt::opt		opt_des_cycle(nlopt::GN_CRS2_LM, index);
+        nlopt::opt		opt_des_cycle(nlopt::LN_SBPLX, index);
+        //nlopt::opt		opt_des_cycle(nlopt::GN_CRS2_LM, index);
         opt_des_cycle.set_lower_bounds(lb);
 		opt_des_cycle.set_upper_bounds(ub);
 		opt_des_cycle.set_initial_step(scale);
