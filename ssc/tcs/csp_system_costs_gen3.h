@@ -26,10 +26,10 @@ public:
         // power block parameters
         double T_phx_i;     // [K]   pHX particle inlet temperature
         double T_phx_o;     // [K]   pHX particle outlet temperature
-        double T_HTR_i;     // [K]   HTR sCO2 inlet temperature (hot side)
-        double T_HTR_o;     // [K]   HTR sCO2 outlet temperature (hot side)
-        double T_LTR_i;     // [K]   LTR sCO2 inlet temperature (hot side)
-        double T_LTR_o;     // [K]   LTR sCO2 outlet temperature (hot side)
+        double T_HTR_i;     // [K]   HTR sCO2 inlet temperature (cold side)
+        double T_HTR_o;     // [K]   HTR sCO2 outlet temperature (cold side)
+        double T_LTR_i;     // [K]   LTR sCO2 inlet temperature (cold side)
+        double T_LTR_o;     // [K]   LTR sCO2 outlet temperature (cold side)
         double eta_gen;     // [-]   electrical generator efficiency
         double efficiency;  // [-]   cycle efficiency
         double W_dot_net;   // [MWt] cycle design power output (W_dot_t - W_dot_mc - W_dot_rc)

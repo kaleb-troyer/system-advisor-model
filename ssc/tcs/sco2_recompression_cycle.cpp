@@ -2295,14 +2295,14 @@ void C_RecompCycle::design_core_standard(int & error_code)
             if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT) && ms_des_solved.ms_LTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
             } else if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design <= E1) {
-                penalty += E2 - E3 * pow(ms_des_solved.ms_LTR_des_solved.m_min_DT_design, 2); 
-            } else { penalty += 0; }
+                penalty += E2 - E3 * pow(ms_des_solved.ms_LTR_des_solved.m_min_DT_design, 2.0); 
+            } else { penalty += 0.0; }
             // calculating penalty for HTR approach
             if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT) && ms_des_solved.ms_HTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_HTR_min_dT - (C3 + ms_des_solved.ms_HTR_des_solved.m_min_DT_design));
             } else if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design <= E1) {
-                penalty += E2 - E3 * pow(ms_des_solved.ms_HTR_des_solved.m_min_DT_design, 2);
-            } else { penalty += 0; }
+                penalty += E2 - E3 * pow(ms_des_solved.ms_HTR_des_solved.m_min_DT_design, 2.0);
+            } else { penalty += 0.0; }
         }
 
         csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_HTR_des_solved.m_cost_equipment;             // high-temp recuperator cost
@@ -2319,19 +2319,19 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.efficiency = ms_des_solved.m_eta_thermal; // [-]
         csp_cost_model.s_cycle.eta_gen = m_eta_generator;                // [-]
         csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;        // [K]
-        csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out; // [K] 
-        csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_LTR_des_solved.m_T_h_out; // [K] 
-        csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_HTR_des_solved.m_T_h_out; // [K] 
-        csp_cost_model.s_cycle.T_LTR_i = ms_des_solved.ms_mc_ms_des_solved.m_T_out; // [K] 
-        csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_LTR_des_solved.m_T_h_out; // [K] 
+        csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;  // [K] 
+        csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K] 
+        csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_HTR_des_solved.m_T_c_out;  // [K] 
+        csp_cost_model.s_cycle.T_LTR_i = ms_des_solved.ms_mc_ms_des_solved.m_T_out;  // [K] 
+        csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K] 
 
-        csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;      // [kg/s]
-        csp_cost_model.s_cycle.T_turb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out;// [K] turbine inlet temperature
-        csp_cost_model.s_cycle.P_max = ms_des_solved.ms_mc_ms_des_solved.m_P_out;   // [MPa] power cycle high pressure
-        csp_cost_model.s_cycle.P_min = ms_des_solved.ms_mc_ms_des_solved.m_P_in;    // [MPa] power cycle low pressure
+        csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;       // [kg/s]
+        csp_cost_model.s_cycle.T_turb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out; // [K] turbine inlet temperature
+        csp_cost_model.s_cycle.P_max = ms_des_solved.ms_mc_ms_des_solved.m_P_out / 1000.0; // [MPa] power cycle high pressure
+        csp_cost_model.s_cycle.P_min = ms_des_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
 
         csp_cost_model.designRoutine();
-        const double objective_scalar = 100; 
+        const double objective_scalar = 100.0; 
         m_objective_metric_last = objective_scalar / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
         
     }

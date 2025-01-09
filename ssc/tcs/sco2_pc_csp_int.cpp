@@ -360,15 +360,15 @@ void C_sco2_phx_air_cooler::design_core()
     csp_cost_model.s_cycle.eta_gen = ms_des_par.m_eta_g;                                            // [-]
     csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;                                       // [K]
     csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;                     // [K]
-    csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_T_h_out;  // [K]
-    csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_T_h_out;  // [K]
+    csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_T_c_out;  // [K]
+    csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_T_c_out;  // [K]
     csp_cost_model.s_cycle.T_LTR_i = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_T_out;  // [K]
-    csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_T_h_out;  // [K]
+    csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_T_c_out;  // [K]
 
     csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des; 
-    csp_cost_model.s_cycle.T_turb_i = ms_des_solved.ms_rc_cycle_solved.ms_phx_des_solved.m_T_c_out; // [K]   turbine inlet temperature
-    csp_cost_model.s_cycle.P_max = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_out;    // [MPa] power cycle high pressure
-    csp_cost_model.s_cycle.P_min = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_in;     // [MPa] power cycle low pressure
+    csp_cost_model.s_cycle.T_turb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out;                          // [K]   turbine inlet temperature
+    csp_cost_model.s_cycle.P_max = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_out / 1000.0; // [MPa] power cycle high pressure
+    csp_cost_model.s_cycle.P_min = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
 
     csp_cost_model.designRoutine();
     ms_des_solved.s_costs = csp_cost_model.s_costs; 
