@@ -49,23 +49,23 @@ void cspGen3CostModel::designRoutine() {
 
     // solar multiple, thermal energy storage
     s_field.solar_multiple = 2.5;       // [-] (Albrecht, 2019) 
-    s_storage.hours_of_capacity = 14;   // [h] (Albrecht, 2019) 
+    s_storage.hours_of_capacity = 14.0; // [h] (Albrecht, 2019) 
     s_storage.capacity_factor = 0.71;   // [-] (Albrecht, 2019) 
 
     // assume efficiencies here
-    s_storage.s_warm.efficiency = 0.98;     // assumed (unused)
-    s_storage.s_cold.efficiency = 0.98;     // assumed (unused)
-    s_lifts.efficiency = 0.8;               // assumed
+    s_storage.s_warm.efficiency = 0.98; // [-] assumed (unused)
+    s_storage.s_cold.efficiency = 0.98; // [-] assumed (unused)
+    s_lifts.efficiency = 0.8;           // [-] (Ho, 2016)
 
     // calculating power required at the receiver, according to cycle efficiency
     W_dot_therm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWt] power required at power block
     W_dot_rec = s_field.solar_multiple * W_dot_therm;     // [MWt] power absorbed by receiver
 
-    temperatures();
+    particleTemperatures();
 
     double tolerance = W_dot_rec * 1E-4;    // convergence criteria for receiver losses
-    double iterations = 0;                  // iteration count for convergence
-    double max_iters = 10;                  // maximum iterations allowed for convergence
+    double iterations = 0.0;                // iteration count for convergence
+    double max_iters = 10.0;                // maximum iterations allowed for convergence
 
     do {
         /*
@@ -93,20 +93,20 @@ void cspGen3CostModel::designRoutine() {
     // calculating parasitics and annual electricity produced
     s_parasitics.field = s_field.tracking_power * W_dot_field;                                          // [MWe]
     s_parasitics.lifts = 1E-6 * s_particles.m_dot_rec * s_lifts.height * 9.80665 / s_lifts.efficiency;  // [MWe]
-    s_cycle.W_dot_gen = s_cycle.W_dot_net * s_cycle.eta_gen;                                                    // [MWe]
-    W_dot_less = s_cycle.W_dot_gen - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);           // [MWe]
-    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24 * 365);                                // [MWe-h / year]
+    s_cycle.W_dot_gen = s_cycle.W_dot_net * s_cycle.eta_gen;                                            // [MWe]
+    W_dot_less = s_cycle.W_dot_gen - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
+    W_elec_annual = W_dot_less * s_storage.capacity_factor * (24.0 * 365.0);                            // [MWe-h / year]
     
     // calculating levelized cost of energy
     s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
 
-    s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.2; 
+    s_costs.piping_inventory_etc = s_costs.cycle_capital * costPipingFactor(); 
     s_costs.cycle_capital += s_costs.piping_inventory_etc; 
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
     s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
-    s_costs.total_adjusted_cost = (1 + s_financing.construction) * (1 + s_financing.indirect) * (1 + s_financing.contingency) * s_costs.total_capital; 
+    s_costs.total_adjusted_cost = (1.0 + s_financing.construction) * (1.0 + s_financing.indirect) * (1.0 + s_financing.contingency) * s_costs.total_capital; 
     s_costs.levelized_cost_of_energy =
         ((s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor) + (s_financing.lifetime * s_costs.annual_maintenance))
         / (s_financing.lifetime * W_elec_annual);
@@ -240,7 +240,7 @@ void cspGen3CostModel::sizeEquipment() {
 
 };
 
-void cspGen3CostModel::temperatures() {
+void cspGen3CostModel::particleTemperatures() {
     /*
     Estimating the receiver and TES inlet / outlet temperatures. These
     temperatures are derived from the PHX particle inlet temperature, which
@@ -263,6 +263,105 @@ void cspGen3CostModel::temperatures() {
     s_receiver.Tm = (s_receiver.Ti + s_receiver.To + s_receiver.To + s_receiver.To) / 4; // taking a three-quarters average to estimate receiver temperature
 
 }
+
+double cspGen3CostModel::costPipingFactor() {
+    /*
+    Estimates the fractional share of the cost of piping and inventory
+    using conventions described in the ASME Boiler and Pressure Vessel
+    Code and prior literature by White et al. (2017) and Weiland et al
+    (2019) on the cost of piping. 
+    */
+
+    s_piping.T_max = s_cycle.T_turb_i - 273.15;     // [C] turbine inlet temperature in celsius
+    s_piping.baseline = costPipingLength(700.0);    // [$/m] piping cost per length at 700C
+    s_piping.cost_per_length = costPipingLength(s_piping.T_max); 
+    s_piping.normalized_cost = s_piping.cost_per_length / s_piping.baseline;
+
+    /*
+    Calculating the percentage of the power block capital cost used to
+    determine the total cost of piping. This is approximated using the
+    normalized cost of piping, a fixed component, and a variable component.
+    The component values were selected to fit the calculation to data
+    provided by White et al. in 2017.
+
+    Dividing the calculation into a fixed and variable component aims to
+    account for piping not affected by the turbine inlet temperature. 
+    */
+    s_piping.cost_factor = s_piping.normalized_cost * s_piping.f_var + s_piping.f_fix; 
+    return s_piping.cost_factor; 
+}; 
+
+double cspGen3CostModel::costPipingLength(double T) {
+    /*
+    Helper function to calculate the piping cost factor. 
+    */
+
+    /*
+    Mendelson-Roberts-Manson (M-R-M) parametrization,
+    rearranged to calculate the stress to creep rupture
+    of each alloy after 30 years at the given temperature.
+    */
+    double b0 = 0.0;    // [-] M-R-M coefficients 0 through 3 
+    double b1 = 0.0;    // [-] M-R-M coefficients 0 through 3 
+    double b2 = 0.0;    // [-] M-R-M coefficients 0 through 3 
+    double b3 = 0.0;    // [-] M-R-M coefficients 0 through 3
+    if (T <= 784.5 /*[C]*/) {
+        /* M-R-M parameterization and specific cost of 316H,
+        optimal below 784.5C for the use-case. */
+        s_piping.s_alloy.specific_cost = 5.0;  // [$/kg] (Mtsco, 2020)
+        s_piping.s_alloy.density = 8.00;
+        s_piping.s_alloy.name = "Stainless Steel 316H";
+        b0 = -35.27;    // (Berman, 1979)
+        b1 = 47957.0;   // 
+        b2 = 9.940;     // 
+        b3 = -15175.0;  // 
+    }
+    else if (T <= 921.3 /*[C]*/) {
+        /* M-R-M parameterization and specific cost of Alloy 625,
+        optimal between 764.5 and 921.3C for the use-case. */
+        s_piping.s_alloy.specific_cost = 70.0; // [$/kg] (Mtsco, 2020)
+        s_piping.s_alloy.density = 8.44;
+        s_piping.s_alloy.name = "Inconel Alloy 625";
+        b0 = -44.2641;  // (Special Metals Corp, 2013)
+        b1 = 65825.0;   // 
+        b2 = 12.2;      // 
+        b3 = -20289.0;  // 
+    }
+    else {
+        /* M-R-M parameterization and specific cost of Incoloy 800H,
+        optimal above 921.3C for the use-case. */
+        s_piping.s_alloy.specific_cost = 23.0; // [$/kg] (Mtsco, 2020)
+        s_piping.s_alloy.density = 7.94;
+        s_piping.s_alloy.name = "Incoloy 800H";
+        b0 = -19.870;   // (Special Metals Corp, 2004)
+        b1 = 36566.0;   // 
+        b2 = -0.9252;   // 
+        b3 = -6197.0;   // 
+    }
+
+    s_piping.lifetime = s_financing.lifetime * s_storage.capacity_factor * 24.0 * 365.0;
+    s_piping.stress_creep_rupture = pow(s_piping.lifetime, T / (T * b2 + b3))
+        / pow(10.0, (T * b0 + b1) / (T * b2 + b3));
+
+    /*
+    Von-Mises stress of a pressurized pipe, rearranged to calculate
+    the ratio of the wall thickness to the outter radius, given the
+   stress to creep rupture and an internal pressure.
+    */
+    s_piping.dP = s_cycle.P_max - 0.101325; // [MPa] pressure difference across pipe wall
+    s_piping.thickness_ratio = 1 - ((sqrt(3 * pow(s_piping.dP, 2) + 4 * pow(s_piping.stress_creep_rupture, 2)) - sqrt(3) * s_piping.dP)
+        / (2 * s_piping.stress_creep_rupture));
+
+    /*
+    Using an assumed pipe inner radius which corresponds to an approximate
+    flow velocity of 150ft/s, the outer radius and cross-sectional area
+    are calculated, which are then used to calculate the cost of piping.
+    */
+    s_piping.ri = 0.235; // [m]   inner radius (approximated)
+    s_piping.ro = s_piping.ri / (1 - s_piping.thickness_ratio);
+    s_piping.Ac = pi * (s_piping.ro * s_piping.ro - s_piping.ri * s_piping.ri);
+    return s_piping.Ac * s_piping.s_alloy.density * s_piping.s_alloy.specific_cost;
+}; 
 
 double cspGen3CostModel::costTower() {
     /*
@@ -356,8 +455,8 @@ double cspGen3CostModel::costParticleLosses() {
     properties and operating conditions. In Proceedings of the 13th International Conference on Energy and Sustainability, Bellevue,
     WA, USA, 14–17 July 2019.
     */
-    const double C1 = 365;  // [days / year]
-    const double C2 = 3600; // [seconds / hour] 
+    const double C1 = 365.0;  // [days / year]
+    const double C2 = 3600.0; // [seconds / hour] 
     double annual_particle_losses = C1 * C2 * s_storage.hours_of_capacity * s_particles.m_dot_phx * s_receiver.particle_loss_factor;
     return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg;
 };

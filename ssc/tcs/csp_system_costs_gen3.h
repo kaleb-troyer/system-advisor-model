@@ -26,14 +26,22 @@ public:
         // power block parameters
         double T_phx_i;     // [K]   pHX particle inlet temperature
         double T_phx_o;     // [K]   pHX particle outlet temperature
+        double T_HTR_i;     // [K]   HTR sCO2 inlet temperature (hot side)
+        double T_HTR_o;     // [K]   HTR sCO2 outlet temperature (hot side)
+        double T_LTR_i;     // [K]   LTR sCO2 inlet temperature (hot side)
+        double T_LTR_o;     // [K]   LTR sCO2 outlet temperature (hot side)
         double eta_gen;     // [-]   electrical generator efficiency
         double efficiency;  // [-]   cycle efficiency
         double W_dot_net;   // [MWt] cycle design power output (W_dot_t - W_dot_mc - W_dot_rc)
         double W_dot_gen;   // [MWe] cycle net power generation (W_dot_net * eta_gen)
         double phx_height;  // [m]   primary heat exchanger height
+        double T_turb_i;    // [K]   turbine inlet temperature
+        double P_max;       // [MPa] power cycle high pressure
+        double P_min;       // [MPa] power cycle low pressure
 
         cycle() {
-            T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = W_dot_gen = phx_height = 0;
+            T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = T_HTR_i = T_HTR_o = 
+                T_LTR_i = T_LTR_o = W_dot_gen = phx_height = T_turb_i = P_max = P_min = 0.0;
         };
     } s_cycle;
 
@@ -87,8 +95,8 @@ public:
         double construction = 0.060;     // [-] construction costs        (Albrecht, 2019)
         double contingency = 0.100;      // [-] unexpected costs          (Albrecht, 2019)
         double indirect = 0.130;         // [-] indirect cost of capital  (Albrecht, 2019)
-        double inflation = 0.025;        // [-] average rate of inflation
-        double lifetime = 30.00;         // [years] total design lifetime
+        double inflation = 0.025;        // [-] average rate of inflation (DOE, SunShot Vision Study)
+        double lifetime = 30.00;         // [years] total design lifetime (DOE, SunShot Vision Study)
         double maintenance = 40000;      // [$/MWe-year] O&M costs        (Albrecht, 2019)
         double balance_of_plant = 167E3; // [$/MWe] balance of plant rate (NREL, SAM) 
 
@@ -250,25 +258,64 @@ public:
         };
     } s_lifts;
 
+    struct piping { // power block piping data structure
+
+        // piping design parameters and requirements
+        double lifetime;                // [hours]  total cumulative hours of operation before failure
+        double stress_creep_rupture;    // [MPa]    stress to creep rupture for the lifetime and temperature
+        double thickness_ratio;         // [-]      ratio of the pipe wall thickness to outer diameter (th / ro)
+        double baseline;                // [$/m]    cost per length of piping at 700C
+        double cost_per_length;         // [$/m]    calculated cost per length of piping using the M-R-M parameterization
+        double normalized_cost;         // [-]      normalized cost per length of piping
+        double dP;                      // [MPa]    pressure difference across the wall of the pipe
+        double ri;                      // [m]      pipe internal radius to meet mass flow / velocity assumptions
+        double ro;                      // [m]      pipe external radius to meet stress-to-creep-rupture requirement
+        double th;                      // [m]      pipe wall thickness
+        double Ac;                      // [m2]     cross-sectional area of the pipe
+        double T_max;                   // [C]      piping maximum temperature
+        double f_fix;                   // [-]      piping cost factor, fixed component
+        double f_var;                   // [-]      piping cost factor, variable component
+        double cost_factor;             // [-]      piping cost factor, piping cost = this * power block cost
+
+        struct alloy { // pipe alloy structure
+
+            // physical and economic properties of selected alloy
+            double specific_cost;   // [$/kg]   cost per kilogram of the selected alloy
+            double density;         // [kg/m3]  density of the selected alloy
+            string name;            // [-]      name of the selected alloy
+
+            alloy() {
+                specific_cost = density = 0.0;
+                name = "NA"; 
+            }
+        } s_alloy;
+        
+        piping() {
+            lifetime = dP = stress_creep_rupture = thickness_ratio = baseline = T_max = 
+                cost_per_length = normalized_cost = ri = ro = th = Ac = cost_factor = 0.0;
+            f_fix = 0.05; // [-] selected to fit data from White, et al. 2017. 
+            f_var = 0.07; // [-] selected to fit data from White, et al. 2017.  
+        }
+    } s_piping;
+
 private:
 
-    void temperatures();            // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
-    void receiverLosses();          // Calculates estimated receiver losses
-    void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc). 
-    double costLand();              // Calculates cost of the total land required.
-    double costTower();             // Calculates cost of the solar tower. 
-    double costField();             // Calculates cost of the solar field / heliostats. 
-    double costLifts();             // Calculates cost of the particle lifts. 
-    double costStorage();           // Calculates cost of the thermal energy storage. 
-    double costReceiver();          // Calculates cost of the falling particle receiver. 
-    double costParticles();         // Calculates cost of bulk particles required. 
-    double costParticleLosses();    // Calculates incurred cost of particle loss / attrition. 
-
+    void particleTemperatures();        // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
+    void receiverLosses();              // Calculates estimated receiver losses
+    void sizeEquipment();               // Sizes CSP Gen3 equipment (solar tower, etc). 
+    double costLand();                  // Calculates cost of the total land required.
+    double costTower();                 // Calculates cost of the solar tower. 
+    double costField();                 // Calculates cost of the solar field / heliostats. 
+    double costLifts();                 // Calculates cost of the particle lifts. 
+    double costStorage();               // Calculates cost of the thermal energy storage. 
+    double costReceiver();              // Calculates cost of the falling particle receiver. 
+    double costParticles();             // Calculates cost of bulk particles required. 
+    double costParticleLosses();        // Calculates incurred cost of particle loss / attrition. 
+    double costPipingFactor();          // Calculates piping % share of power block costs.
+    double costPipingLength(double T);  // Calculates the piping cost per length for a given temperature 
+    
 };
 
 
 #endif // _CSPGEN3
-
-
-
 
