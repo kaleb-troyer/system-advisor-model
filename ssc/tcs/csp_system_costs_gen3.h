@@ -30,18 +30,18 @@ public:
         double T_HTR_o;     // [K]   HTR sCO2 outlet temperature (cold side)
         double T_LTR_i;     // [K]   LTR sCO2 inlet temperature (cold side)
         double T_LTR_o;     // [K]   LTR sCO2 outlet temperature (cold side)
+        double T_trb_i;     // [K]   turbine inlet temperature
         double eta_gen;     // [-]   electrical generator efficiency
         double efficiency;  // [-]   cycle efficiency
         double W_dot_net;   // [MWt] cycle design power output (W_dot_t - W_dot_mc - W_dot_rc)
         double W_dot_gen;   // [MWe] cycle net power generation (W_dot_net * eta_gen)
         double phx_height;  // [m]   primary heat exchanger height
-        double T_turb_i;    // [K]   turbine inlet temperature
         double P_max;       // [MPa] power cycle high pressure
         double P_min;       // [MPa] power cycle low pressure
 
         cycle() {
             T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = T_HTR_i = T_HTR_o = 
-                T_LTR_i = T_LTR_o = W_dot_gen = phx_height = T_turb_i = P_max = P_min = 0.0;
+                T_LTR_i = T_LTR_o = W_dot_gen = phx_height = T_trb_i = P_max = P_min = 0.0;
         };
     } s_cycle;
 
@@ -58,15 +58,15 @@ public:
         double land;                        // [$] bulk cost of land required for power plant
 
         // Cycle capital costs
-        double HTR_capital_cost;            // [$] high temperature recuperator capital cost
-        double LTR_capital_cost;            // [$] low temperature recuperator capital cost
-        double PHX_capital_cost;            // [$] primary heat exchanger capital cost
-        double air_cooler_capital_cost;     // [$] air cooler capital cost
-        double compressor_capital_cost;     // [$] primary compressor capital cost
-        double recompressor_capital_cost;   // [$] recompressor capital cost
-        double turbine_capital_cost;        // [$] turbine capital cost
-        double piping_inventory_etc;        // [$] piping, inventory control, etc. 
-        double balance_of_plant;            // [$] transformers, inverters, controls, etc.
+        double HTR_capital;            // [$] high temperature recuperator capital cost
+        double LTR_capital;            // [$] low temperature recuperator capital cost
+        double PHX_capital;            // [$] primary heat exchanger capital cost
+        double air_cooler_capital;     // [$] air cooler capital cost
+        double compressor_capital;     // [$] primary compressor capital cost
+        double recompressor_capital;   // [$] recompressor capital cost
+        double turbine_capital;        // [$] turbine capital cost
+        double piping_inventory_etc;   // [$] piping, inventory control, etc. 
+        double balance_of_plant;       // [$] transformers, inverters, controls, etc.
 
         // Total capital, maintenance, and LCOE
         double cycle_capital;               // [$]       Power block capital costs
@@ -80,8 +80,8 @@ public:
             solar_tower = solar_field = falling_particle_receiver = land = balance_of_plant = 
                 particles = particle_storage = particle_lifts = particle_losses = 0;
 
-            HTR_capital_cost = LTR_capital_cost = PHX_capital_cost = air_cooler_capital_cost =
-                compressor_capital_cost = recompressor_capital_cost = turbine_capital_cost = 0;
+            HTR_capital = LTR_capital = PHX_capital = air_cooler_capital =
+                compressor_capital = recompressor_capital = turbine_capital = 0;
 
             annual_maintenance = total_adjusted_cost = cycle_capital = piping_inventory_etc = 
                 plant_capital = total_capital = levelized_cost_of_energy = 0;
@@ -300,8 +300,9 @@ public:
 
 private:
 
+    void temperatureCostScaling();      // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 
     void particleTemperatures();        // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
-    void receiverLosses();              // Calculates estimated receiver losses
+    void receiverLosses();              // Calculates estimated receiver thermal losses
     void sizeEquipment();               // Sizes CSP Gen3 equipment (solar tower, etc). 
     double costLand();                  // Calculates cost of the total land required.
     double costTower();                 // Calculates cost of the solar tower. 

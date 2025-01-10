@@ -345,13 +345,13 @@ void C_sco2_phx_air_cooler::design_core()
 
     // Calculating CSP equipment costs
 
-    csp_cost_model.s_costs.HTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;            // high-temp recuperator cost
-    csp_cost_model.s_costs.LTR_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;            // low-temp recuperator cost
-    csp_cost_model.s_costs.PHX_capital_cost = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;                               // primary HX cost
-    csp_cost_model.s_costs.air_cooler_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;      // air cooler cost
-    csp_cost_model.s_costs.compressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment;   // main compressor cost
-    csp_cost_model.s_costs.recompressor_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
-    csp_cost_model.s_costs.turbine_capital_cost = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;          // turbine cost
+    csp_cost_model.s_costs.HTR_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;            // high-temp recuperator cost
+    csp_cost_model.s_costs.LTR_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;            // low-temp recuperator cost
+    csp_cost_model.s_costs.PHX_capital = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;                               // primary HX cost
+    csp_cost_model.s_costs.air_cooler_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;      // air cooler cost
+    csp_cost_model.s_costs.compressor_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment;   // main compressor cost
+    csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
+    csp_cost_model.s_costs.turbine_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;          // turbine cost
 
     csp_cost_model.s_parasitics.cooler = ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
 
@@ -366,7 +366,7 @@ void C_sco2_phx_air_cooler::design_core()
     csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_T_c_out;  // [K]
 
     csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des; 
-    csp_cost_model.s_cycle.T_turb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out;                          // [K]   turbine inlet temperature
+    csp_cost_model.s_cycle.T_trb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out;                          // [K]   turbine inlet temperature
     csp_cost_model.s_cycle.P_max = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_out / 1000.0; // [MPa] power cycle high pressure
     csp_cost_model.s_cycle.P_min = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
 

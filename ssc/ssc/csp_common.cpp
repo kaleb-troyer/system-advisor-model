@@ -1840,13 +1840,13 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     cm->assign("particle_lifts_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.particle_lifts * 1.0E-6));
     cm->assign("land_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.land * 1.0E-6));
 
-    cm->assign("HTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.HTR_capital_cost * 1.0E-6));
-    cm->assign("LTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.LTR_capital_cost * 1.0E-6));
-    cm->assign("PHX_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.PHX_capital_cost * 1.0E-6));
-    cm->assign("air_cooler_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.air_cooler_capital_cost * 1.0E-6));
-    cm->assign("compressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.compressor_capital_cost * 1.0E-6));
-    cm->assign("recompressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.recompressor_capital_cost * 1.0E-6));
-    cm->assign("turbine_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.turbine_capital_cost * 1.0E-6));
+    cm->assign("HTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.HTR_capital * 1.0E-6));
+    cm->assign("LTR_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.LTR_capital * 1.0E-6));
+    cm->assign("PHX_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.PHX_capital * 1.0E-6));
+    cm->assign("air_cooler_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.air_cooler_capital * 1.0E-6));
+    cm->assign("compressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.compressor_capital * 1.0E-6));
+    cm->assign("recompressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.recompressor_capital * 1.0E-6));
+    cm->assign("turbine_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.turbine_capital * 1.0E-6));
     cm->assign("piping_inventory_etc", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc * 1.0E-6));
     cm->assign("balance_of_plant_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.balance_of_plant * 1.0E-6));
 

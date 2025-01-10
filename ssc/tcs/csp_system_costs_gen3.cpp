@@ -42,6 +42,9 @@ void cspGen3CostModel::designRoutine() {
     8) Calculate the levelized cost of energy.
     */
 
+    // LTR / HTR / turbine temperature scaling
+    temperatureCostScaling(); 
+
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
     s_particles.bulk_density = 1625;
@@ -70,7 +73,7 @@ void cspGen3CostModel::designRoutine() {
     do {
         /*
         Iteratively solving for equipment sizes until thermal losses
-        in the receiver has converged. 
+        in the receiver have converged. 
         */
 
         W_dot_field = W_dot_rec + W_dot_losses;  // Update field power requirements
@@ -99,9 +102,8 @@ void cspGen3CostModel::designRoutine() {
     
     // calculating levelized cost of energy
     s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
-    s_costs.cycle_capital = s_costs.HTR_capital_cost + s_costs.LTR_capital_cost + s_costs.PHX_capital_cost + s_costs.air_cooler_capital_cost + s_costs.compressor_capital_cost + s_costs.recompressor_capital_cost + s_costs.turbine_capital_cost;
+    s_costs.cycle_capital = s_costs.HTR_capital + s_costs.LTR_capital + s_costs.PHX_capital + s_costs.air_cooler_capital + s_costs.compressor_capital + s_costs.recompressor_capital + s_costs.turbine_capital;
 
-    /*s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.20;*/
     s_costs.piping_inventory_etc = s_costs.cycle_capital * costPipingFactor(); 
     s_costs.cycle_capital += s_costs.piping_inventory_etc; 
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
@@ -265,6 +267,49 @@ void cspGen3CostModel::particleTemperatures() {
 
 }
 
+void cspGen3CostModel::temperatureCostScaling() {
+    /*
+    N. T. Weiland, B. W. Lance, and S. R. Pidaparti, “sCO2 Power
+    Cycle Component Cost Correlations From DOE Data Spanning Multiple
+    Scales and Applications,” presented at the ASME Turbo Expo 2019,
+    American Society of Mechanical Engineers Digital Collection, Nov.
+    2019. doi: 10.1115/GT2019-90493.
+
+    fT = 1 + c * (Tmax - Tbase) + d * (Tmax - Tbase)**2
+    */
+
+    double fT_LTR = 1.0; // [-] low temperature recuperator cost-scaling factor
+    double fT_HTR = 1.0; // [-] high temperature recuperator cost-scaling factor
+    double fT_trb = 1.0; // [-] turbine cost-scaling factor
+    double T_base = 550; // [C] temperature break point
+
+    // low temperature recuperator
+    double c_LTR = 0.021410; 
+    double d_LTR = 0.0;
+    if (s_cycle.T_LTR_o >= T_base) {
+        fT_LTR = 1.0 + c_LTR * (s_cycle.T_LTR_o - T_base) + d_LTR * pow(s_cycle.T_LTR_o - T_base, 2);
+    }
+
+    // high temperature recuperator
+    double c_HTR = 0.021410; 
+    double d_HTR = 0.0;
+    if (s_cycle.T_HTR_o >= T_base) {
+        fT_HTR = 1.0 + c_HTR * (s_cycle.T_HTR_o - T_base) + d_HTR * pow(s_cycle.T_HTR_o - T_base, 2);
+    }
+
+    // axial turbine
+    double c_trb = 0.0; 
+    double d_trb = 1.106E-4; 
+    if (s_cycle.T_trb_i >= T_base) {
+        fT_HTR = 1.0 + c_trb * (s_cycle.T_trb_i - T_base) + d_trb * pow(s_cycle.T_trb_i - T_base, 2);
+    }
+
+    s_costs.LTR_capital = s_costs.LTR_capital * fT_LTR; 
+    s_costs.HTR_capital = s_costs.HTR_capital * fT_HTR; 
+    s_costs.turbine_capital = s_costs.turbine_capital * fT_trb;
+
+}
+
 double cspGen3CostModel::costPipingFactor() {
     /*
     Estimates the fractional share of the cost of piping and inventory
@@ -273,7 +318,7 @@ double cspGen3CostModel::costPipingFactor() {
     (2019) on the cost of piping. 
     */
 
-    s_piping.T_max = s_cycle.T_turb_i - 273.15;     // [C] turbine inlet temperature in celsius
+    s_piping.T_max = s_cycle.T_trb_i - 273.15;     // [C] turbine inlet temperature in celsius
     s_piping.baseline = costPipingLength(700.0);    // [$/m] piping cost per length at 700C
     s_piping.cost_per_length = costPipingLength(s_piping.T_max); 
     s_piping.normalized_cost = s_piping.cost_per_length / s_piping.baseline;
@@ -461,5 +506,7 @@ double cspGen3CostModel::costParticleLosses() {
     double annual_particle_losses = C1 * C2 * s_storage.hours_of_capacity * s_particles.m_dot_phx * s_receiver.particle_loss_factor;
     return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg;
 };
+
+
 
 
