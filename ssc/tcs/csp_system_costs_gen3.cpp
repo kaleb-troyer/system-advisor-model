@@ -281,7 +281,7 @@ void cspGen3CostModel::temperatureCostScaling() {
     double fT_LTR = 1.0; // [-] low temperature recuperator cost-scaling factor
     double fT_HTR = 1.0; // [-] high temperature recuperator cost-scaling factor
     double fT_trb = 1.0; // [-] turbine cost-scaling factor
-    double T_base = 550; // [C] temperature break point
+    double T_base = 550 + 273.15; // [K] temperature break point
 
     // low temperature recuperator
     double c_LTR = 0.021410; 
