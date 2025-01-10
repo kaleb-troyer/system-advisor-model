@@ -104,8 +104,8 @@ void cspGen3CostModel::designRoutine() {
     s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital + s_costs.LTR_capital + s_costs.PHX_capital + s_costs.air_cooler_capital + s_costs.compressor_capital + s_costs.recompressor_capital + s_costs.turbine_capital;
 
-    s_costs.piping_inventory_etc = s_costs.cycle_capital * costPipingFactor(); 
-    s_costs.cycle_capital += s_costs.piping_inventory_etc; 
+    s_costs.piping_inventory_etc = s_costs.cycle_capital * costPipingFactor();
+    s_costs.cycle_capital += s_costs.piping_inventory_etc;
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
     s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
@@ -301,7 +301,7 @@ void cspGen3CostModel::temperatureCostScaling() {
     double c_trb = 0.0; 
     double d_trb = 1.106E-4; 
     if (s_cycle.T_trb_i >= T_base) {
-        fT_HTR = 1.0 + c_trb * (s_cycle.T_trb_i - T_base) + d_trb * pow(s_cycle.T_trb_i - T_base, 2);
+        fT_trb = 1.0 + c_trb * (s_cycle.T_trb_i - T_base) + d_trb * pow(s_cycle.T_trb_i - T_base, 2);
     }
 
     s_costs.LTR_capital = s_costs.LTR_capital * fT_LTR; 
