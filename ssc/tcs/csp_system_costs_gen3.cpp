@@ -42,8 +42,9 @@ void cspGen3CostModel::designRoutine() {
     8) Calculate the levelized cost of energy.
     */
 
-    // LTR / HTR / turbine temperature scaling
+    // LTR, HTR, turbine, and pipe cost-scaling by temperature
     temperatureCostScaling(); 
+    pipingFactor(); 
 
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
@@ -64,6 +65,7 @@ void cspGen3CostModel::designRoutine() {
     W_dot_therm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWt] power required at power block
     W_dot_rec = s_field.solar_multiple * W_dot_therm;     // [MWt] power absorbed by receiver
 
+    // estimating particle temperatures at the receiver and TES
     particleTemperatures();
 
     double tolerance = W_dot_rec * 1E-4;    // convergence criteria for receiver losses
@@ -100,11 +102,12 @@ void cspGen3CostModel::designRoutine() {
     W_dot_less = s_cycle.W_dot_gen - (s_parasitics.field + s_parasitics.lifts + s_parasitics.cooler);   // [MWe]
     W_elec_annual = W_dot_less * s_storage.capacity_factor * (24.0 * 365.0);                            // [MWe-h / year]
     
-    // calculating levelized cost of energy
+    // aggregating all capital costs to calculate the levelized cost of energy
     s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital + s_costs.LTR_capital + s_costs.PHX_capital + s_costs.air_cooler_capital + s_costs.compressor_capital + s_costs.recompressor_capital + s_costs.turbine_capital;
 
-    s_costs.piping_inventory_etc = s_costs.cycle_capital * costPipingFactor();
+    //s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.20;
+    s_costs.piping_inventory_etc = s_costs.cycle_capital * s_piping.cost_factor;
     s_costs.cycle_capital += s_costs.piping_inventory_etc;
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
@@ -281,7 +284,7 @@ void cspGen3CostModel::temperatureCostScaling() {
     double fT_LTR = 1.0; // [-] low temperature recuperator cost-scaling factor
     double fT_HTR = 1.0; // [-] high temperature recuperator cost-scaling factor
     double fT_trb = 1.0; // [-] turbine cost-scaling factor
-    double T_base = 550 + 273.15; // [K] temperature break point
+    double T_base = 550.0 + 273.15; // [K] temperature break point
 
     // low temperature recuperator
     double c_LTR = 0.021410; 
@@ -310,7 +313,7 @@ void cspGen3CostModel::temperatureCostScaling() {
 
 }
 
-double cspGen3CostModel::costPipingFactor() {
+void cspGen3CostModel::pipingFactor() {
     /*
     Estimates the fractional share of the cost of piping and inventory
     using conventions described in the ASME Boiler and Pressure Vessel
@@ -318,9 +321,9 @@ double cspGen3CostModel::costPipingFactor() {
     (2019) on the cost of piping. 
     */
 
-    s_piping.T_max = s_cycle.T_trb_i - 273.15;     // [C] turbine inlet temperature in celsius
-    s_piping.baseline = costPipingLength(700.0);    // [$/m] piping cost per length at 700C
-    s_piping.cost_per_length = costPipingLength(s_piping.T_max); 
+    s_piping.T_max = s_cycle.T_trb_i - 273.15;  // [C] turbine inlet temperature in celsius
+    s_piping.baseline = costPiping(700.0);      // [$/m] piping cost per length at 700C
+    s_piping.cost_per_length = costPiping(s_piping.T_max); 
     s_piping.normalized_cost = s_piping.cost_per_length / s_piping.baseline;
 
     /*
@@ -333,11 +336,12 @@ double cspGen3CostModel::costPipingFactor() {
     Dividing the calculation into a fixed and variable component aims to
     account for piping not affected by the turbine inlet temperature. 
     */
+
     s_piping.cost_factor = s_piping.normalized_cost * s_piping.f_var + s_piping.f_fix; 
-    return s_piping.cost_factor; 
+
 }; 
 
-double cspGen3CostModel::costPipingLength(double T) {
+double cspGen3CostModel::costPiping(double T) {
     /*
     Helper function to calculate the piping cost factor. 
     */

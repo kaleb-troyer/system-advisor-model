@@ -300,20 +300,20 @@ public:
 
 private:
 
-    void temperatureCostScaling();      // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 
-    void particleTemperatures();        // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
-    void receiverLosses();              // Calculates estimated receiver thermal losses
-    void sizeEquipment();               // Sizes CSP Gen3 equipment (solar tower, etc). 
-    double costLand();                  // Calculates cost of the total land required.
-    double costTower();                 // Calculates cost of the solar tower. 
-    double costField();                 // Calculates cost of the solar field / heliostats. 
-    double costLifts();                 // Calculates cost of the particle lifts. 
-    double costStorage();               // Calculates cost of the thermal energy storage. 
-    double costReceiver();              // Calculates cost of the falling particle receiver. 
-    double costParticles();             // Calculates cost of bulk particles required. 
-    double costParticleLosses();        // Calculates incurred cost of particle loss / attrition. 
-    double costPipingFactor();          // Calculates piping % share of power block costs.
-    double costPipingLength(double T);  // Calculates the piping cost per length for a given temperature 
+    void temperatureCostScaling();  // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 
+    void particleTemperatures();    // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
+    void receiverLosses();          // Calculates estimated receiver thermal losses
+    void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc). 
+    void pipingFactor();            // Calculates piping % share of power block costs.
+    double costLand();              // Calculates cost of the total land required.
+    double costTower();             // Calculates cost of the solar tower. 
+    double costField();             // Calculates cost of the solar field / heliostats. 
+    double costLifts();             // Calculates cost of the particle lifts. 
+    double costStorage();           // Calculates cost of the thermal energy storage. 
+    double costReceiver();          // Calculates cost of the falling particle receiver. 
+    double costParticles();         // Calculates cost of bulk particles required. 
+    double costPiping(double T);    // Calculates the piping cost per length for a given temperature 
+    double costParticleLosses();    // Calculates incurred cost of particle loss / attrition. 
     
 };
 

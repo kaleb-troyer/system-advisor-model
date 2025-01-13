@@ -831,7 +831,7 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
 
-    // System Cost Aggregation (distinct from other cost design parameters) 
+    // System Cost Aggregation (distinct from other cost design solution parameters, for gen3 analysis) 
     { SSC_OUTPUT, SSC_NUMBER,  "total_cost",                "Total cost of CSP and power cycle",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",           "Total specific cost bare erected",                        "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal",   "Total specific (thermal) cost bare erected",              "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
@@ -850,7 +850,8 @@ var_info vtab_sco2_design[] = {
     { SSC_OUTPUT, SSC_NUMBER,  "compressor_capital_cost",   "primary compressor capital cost",                         "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "recompressor_capital_cost", "recompressor capital cost",                               "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "turbine_capital_cost",      "turbine capital cost",                                    "M$",      "System Design Solution", "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "piping_inventory_etc_cost", "piping, inventory control, etc. ",                        "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "piping_capital_cost",       "piping, inventory control, etc.",                         "M$",      "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "piping_cost_factor",        "% of cycle capital constituting pipe costs",              "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "balance_of_plant_cost",     "transformers, inverters, controls, etc.,"                 "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "cycle_capital_cost",        "Power block capital costs",                               "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "plant_capital_cost",        "CSP equipment capital costs",                             "M$",      "System Design Solution", "",      "*",     "",       "" },
@@ -1847,7 +1848,10 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     cm->assign("compressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.compressor_capital * 1.0E-6));
     cm->assign("recompressor_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.recompressor_capital * 1.0E-6));
     cm->assign("turbine_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.turbine_capital * 1.0E-6));
-    cm->assign("piping_inventory_etc", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc * 1.0E-6));
+    cm->assign("piping_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc * 1.0E-6));
+
+    double piping_cost_factor = c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc / (c_sco2_cycle.get_design_solved()->s_costs.cycle_capital - c_sco2_cycle.get_design_solved()->s_costs.piping_inventory_etc); 
+    cm->assign("piping_cost_factor", (ssc_number_t)(piping_cost_factor)); 
     cm->assign("balance_of_plant_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.balance_of_plant * 1.0E-6));
 
     cm->assign("cycle_capital_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.cycle_capital * 1.0E-6));

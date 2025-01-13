@@ -2310,7 +2310,10 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_costs.PHX_capital = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;             // primary HX cost
         csp_cost_model.s_costs.air_cooler_capital = 1E6 * ms_des_solved.ms_mc_air_cooler.m_cost_equipment;       // air cooler cost
         csp_cost_model.s_costs.compressor_capital = 1E6 * ms_des_solved.ms_mc_ms_des_solved.m_cost_equipment;    // main compressor cost
-        csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
+
+        if (ms_des_solved.m_is_rc) {
+            csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
+        } else { csp_cost_model.s_costs.recompressor_capital = 0.0; }
         csp_cost_model.s_costs.turbine_capital = 1E6 * ms_des_solved.ms_t_des_solved.m_equipment_cost;           // turbine cost
 
         csp_cost_model.s_parasitics.cooler = ms_des_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
@@ -3089,7 +3092,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
             ms_opt_des_par.m_PR_HP_to_LP_guess = PR_mc_guess;		//[-]
         }
 
-        ms_opt_des_par.m_recomp_frac_guess = 0.5;
+        ms_opt_des_par.m_recomp_frac_guess = 0.0;
         ms_opt_des_par.m_fixed_recomp_frac = true;
         ms_opt_des_par.m_LT_frac_guess = 0.5;
         ms_opt_des_par.m_fixed_LT_frac = true;
