@@ -745,6 +745,7 @@ var_info vtab_sco2_design[] = {
     { SSC_INPUT,  SSC_NUMBER,  "quiet",                "if !=0, silence status=successful log notices.",         "",           "",    "Meta",               "?=0",   "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "opt_logging",          "if !=0, save each opt loop result to objective.csv.",    "",           "",    "Meta",               "?=0",   "",       "" },
     { SSC_INPUT,  SSC_NUMBER,  "opt_penalty",          "if !=0, allow addition of penalty terms to objective.",  "",           "",    "Meta",               "?=1",   "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "try_simple_cycle",     "if !=0, check a simple cycle after optimizer converges.","",           "",    "Meta",               "?=1",   "",       "" },
 
     // ** Design Parameters **
 		// System Design
@@ -1040,6 +1041,7 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     s_sco2_des_par.m_quiet = cm->as_integer("quiet");
     s_sco2_des_par.m_opt_logging = cm->as_integer("opt_logging");
     s_sco2_des_par.m_opt_penalty = cm->as_integer("opt_penalty");
+    s_sco2_des_par.m_try_simple_cycle = cm->as_integer("try_simple_cycle"); 
     // System design parameters
 	s_sco2_des_par.m_hot_fl_code = cm->as_integer("htf");							//[-] Integer code for HTF
 	s_sco2_des_par.mc_hot_fl_props = cm->as_matrix("htf_props");					//[-] Custom HTF properties
@@ -1296,20 +1298,24 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	}
 	catch (C_csp_exception &csp_exception)
 	{
-		// Report warning before exiting with error
-		while (c_sco2_cycle.mc_messages.get_message(&out_type, &out_msg))
-		{
-			cm->log(out_msg + "\n");
-			cm->log("\n");
-		}
+        if (s_sco2_des_par.m_quiet == 0) {
+                // Report warning before exiting with error
+            while (c_sco2_cycle.mc_messages.get_message(&out_type, &out_msg))
+            {
+                cm->log(out_msg + "\n");
+                cm->log("\n");
+            }
 
-		throw exec_error("sco2_csp_system", csp_exception.m_error_message);
+            throw exec_error("sco2_csp_system", csp_exception.m_error_message);
+        }
 	}
 
 	// If all calls were successful, log to SSC any messages from sco2_recomp_csp
 	while (c_sco2_cycle.mc_messages.get_message(&out_type, &out_msg))
 	{
-		cm->log(out_msg + "\n");
+        if (s_sco2_des_par.m_quiet == 0) {
+    		cm->log(out_msg + "\n");
+        }
 	}
 
 	// Helpful to know right away whether cycle contains recompressor

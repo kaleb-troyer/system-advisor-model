@@ -243,6 +243,7 @@ void C_sco2_phx_air_cooler::design_core()
             // meta
         des_params.m_opt_logging = ms_des_par.m_opt_logging; 
         des_params.m_opt_penalty = ms_des_par.m_opt_penalty;
+        des_params.m_try_simple_cycle = ms_des_par.m_try_simple_cycle; 
 
 		des_params.m_T_pc_in = T_mc_in;		//[K]
 		des_params.m_DP_PC_pre = ms_des_par.m_DP_PC;
@@ -303,7 +304,7 @@ void C_sco2_phx_air_cooler::design_core()
 
 	if (auto_err_code != 0)
 	{
-		throw(C_csp_exception(error_msg.c_str()));
+	    throw(C_csp_exception(error_msg.c_str()));
 	}
 
 	if (error_msg.empty())
@@ -344,14 +345,16 @@ void C_sco2_phx_air_cooler::design_core()
 	mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
     // Calculating CSP equipment costs
-
     csp_cost_model.s_costs.HTR_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_HTR_des_solved.m_cost_equipment;            // high-temp recuperator cost
     csp_cost_model.s_costs.LTR_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_LTR_des_solved.m_cost_equipment;            // low-temp recuperator cost
     csp_cost_model.s_costs.PHX_capital = 1E6 * ms_des_solved.ms_phx_des_solved.m_cost_equipment;                               // primary HX cost
     csp_cost_model.s_costs.air_cooler_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_cost_equipment;      // air cooler cost
     csp_cost_model.s_costs.compressor_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_cost_equipment;   // main compressor cost
-    csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
     csp_cost_model.s_costs.turbine_capital = 1E6 * ms_des_solved.ms_rc_cycle_solved.ms_t_des_solved.m_equipment_cost;          // turbine cost
+
+    if (ms_des_solved.ms_rc_cycle_solved.m_is_rc) {
+        csp_cost_model.s_costs.recompressor_capital = 1e6 * ms_des_solved.ms_rc_cycle_solved.ms_rc_ms_des_solved.m_cost_equipment; // recompressor cost
+    } else { csp_cost_model.s_costs.recompressor_capital = 0.0; }
 
     csp_cost_model.s_parasitics.cooler = ms_des_solved.ms_rc_cycle_solved.ms_mc_air_cooler.m_W_dot_fan; // [MWe]
 

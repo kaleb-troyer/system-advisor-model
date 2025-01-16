@@ -371,10 +371,10 @@ bool compute_module::update(const std::string &current_action, float percent_don
 
 void compute_module::log(const std::string &msg, int type, float time) {
     // forward to handler interface
-    if (m_handler) m_handler->on_log(msg, type, time);
+    // if (m_handler) m_handler->on_log(msg, type, time);
 
     // also save it in module object
-    m_loglist.push_back(log_item(type, msg, time));
+    // m_loglist.push_back(log_item(type, msg, time));
 }
 
 void compute_module::clear_log() {

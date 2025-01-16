@@ -1455,7 +1455,7 @@ bool AutoPilot_MT::CreateLayout(sp_layout &layout, bool do_post_process)
                     }
                     //Display error messages
                     if(! errmsgs.empty() && _has_summary_callback)
-                        _summary_siminfo->addSimulationNotice( errmsgs.c_str() );
+                      _summary_siminfo->addSimulationNotice( errmsgs.c_str() );
             
                 }
 

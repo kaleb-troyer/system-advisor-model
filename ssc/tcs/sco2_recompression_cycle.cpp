@@ -2124,9 +2124,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	}
     else if (ms_des_par.m_des_objective_type == 3)
     {
-        //********************************************
-        // TESTING COST FUNCTIONS WITHIN OPTIMIZATION
-        //********************************************
+        //***********************************************//
+        // INTEGRATED COST FUNCTIONS WITHIN OPTIMIZATION //
+        //***********************************************//
         int cpp_offset = 1;
 
         int mc_design_err = m_mc_ms.design_given_outlet_state(m_mc_comp_model_code, m_temp_last[MC_IN],
@@ -2160,6 +2160,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         }
         else
             ms_des_solved.m_is_rc = false;
+            //m_rc_ms.reset(); 
 
         // Size turbine
         C_turbine::S_design_parameters  t_des_par;
@@ -2948,6 +2949,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
         // meta
     ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging; 
     ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty;
+    
     ms_opt_des_par.m_opt_iters = 0; 
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
@@ -3076,7 +3078,9 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 
     // Is recompression fraction fixed or optimized?
     // If fixed, then we don't need to try simple cycle
-    if (ms_auto_opt_des_par.m_is_recomp_ok == 1.0 || ms_auto_opt_des_par.m_is_recomp_ok == 0.0)
+    if ((ms_auto_opt_des_par.m_is_recomp_ok == 1.0
+        || ms_auto_opt_des_par.m_is_recomp_ok == 0.0)
+        && ms_auto_opt_des_par.m_try_simple_cycle == 1.0)
     {
 
         // Complete 'ms_opt_des_par' for simple cycle

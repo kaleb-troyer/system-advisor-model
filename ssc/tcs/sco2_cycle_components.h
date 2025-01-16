@@ -583,6 +583,25 @@ public:
 		return &ms_des_solved;
 	}
 
+    void reset() {
+
+        //ms_des_solved.m_T_in = 0.0; 
+        //ms_des_solved.m_P_in = 0.0; 
+        //ms_des_solved.m_D_in = 0.0; 
+        //ms_des_solved.m_h_in = 0.0; 
+        //ms_des_solved.m_s_in = 0.0; 
+        //ms_des_solved.m_T_out = 0.0; 
+        //ms_des_solved.m_P_out = 0.0; 
+        //ms_des_solved.m_h_out = 0.0; 
+        //ms_des_solved.m_D_out = 0.0; 
+        ms_des_solved.m_m_dot = 0.0; 
+        ms_des_solved.m_W_dot = 0.0; 
+        ms_des_solved.m_isen_spec_work = 0.0;	
+        ms_des_solved.m_cost_equipment = 0.0; 
+        ms_des_solved.m_cost_bare_erected = 0.0; 
+
+    }
+
 	const S_od_solved * get_od_solved()
 	{
 		return &ms_od_solved;

@@ -42,10 +42,6 @@ void cspGen3CostModel::designRoutine() {
     8) Calculate the levelized cost of energy.
     */
 
-    // LTR, HTR, turbine, and pipe cost-scaling by temperature
-    temperatureCostScaling(); 
-    pipingFactor(); 
-
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
     s_particles.bulk_density = 1625;
@@ -64,6 +60,10 @@ void cspGen3CostModel::designRoutine() {
     // calculating power required at the receiver, according to cycle efficiency
     W_dot_therm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWt] power required at power block
     W_dot_rec = s_field.solar_multiple * W_dot_therm;     // [MWt] power absorbed by receiver
+
+    // LTR, HTR, turbine, and pipe cost-scaling by temperature
+    temperatureCostScaling(); 
+    pipingFactor(); 
 
     // estimating particle temperatures at the receiver and TES
     particleTemperatures();
@@ -390,8 +390,10 @@ double cspGen3CostModel::costPiping(double T) {
     }
 
     s_piping.lifetime = s_financing.lifetime * s_storage.capacity_factor * 24.0 * 365.0;
-    s_piping.stress_creep_rupture = pow(s_piping.lifetime, T / (T * b2 + b3))
-        / pow(10.0, (T * b0 + b1) / (T * b2 + b3));
+
+    double fx = (-b0 * (T + 273.15) - b1) / (b2 * (T + 273.15) + b3); 
+    double gx = (T + 273.15) / (b2 * (T + 273.15) + b3); 
+    s_piping.stress_creep_rupture = pow(10.0, fx) * pow(s_piping.lifetime, gx); 
 
     /*
     Von-Mises stress of a pressurized pipe, rearranged to calculate
@@ -399,8 +401,11 @@ double cspGen3CostModel::costPiping(double T) {
    stress to creep rupture and an internal pressure.
     */
     s_piping.dP = s_cycle.P_max - 0.101325; // [MPa] pressure difference across pipe wall
-    s_piping.thickness_ratio = 1 - ((sqrt(3 * pow(s_piping.dP, 2) + 4 * pow(s_piping.stress_creep_rupture, 2)) - sqrt(3) * s_piping.dP)
-        / (2 * s_piping.stress_creep_rupture));
+    //s_piping.thickness_ratio = 1 - ((sqrt(3 * pow(s_piping.dP, 2) + 4 * pow(s_piping.stress_creep_rupture, 2)) - sqrt(3) * s_piping.dP)
+    //    / (2 * s_piping.stress_creep_rupture));
+    s_piping.thickness_ratio = ((sqrt(3.0) * s_piping.dP) + (2.0 * s_piping.stress_creep_rupture)
+        - sqrt(3.0 * pow(s_piping.dP, 2.0) + 4.0 * pow(s_piping.stress_creep_rupture, 2.0)))
+        / (2.0 * s_piping.stress_creep_rupture); 
 
     /*
     Using an assumed pipe inner radius which corresponds to an approximate
@@ -409,6 +414,7 @@ double cspGen3CostModel::costPiping(double T) {
     */
     s_piping.ri = 0.235; // [m]   inner radius (approximated)
     s_piping.ro = s_piping.ri / (1 - s_piping.thickness_ratio);
+    s_piping.th = s_piping.thickness_ratio * s_piping.ro; 
     s_piping.Ac = pi * (s_piping.ro * s_piping.ro - s_piping.ri * s_piping.ri);
     return s_piping.Ac * s_piping.s_alloy.density * s_piping.s_alloy.specific_cost;
 }; 
