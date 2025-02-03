@@ -835,7 +835,7 @@ var_info vtab_sco2_design[] = {
     // System Cost Aggregation (distinct from other cost design solution parameters, for gen3 analysis) 
     { SSC_OUTPUT, SSC_NUMBER,  "total_cost",                "Total cost of CSP and power cycle",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost",           "Total specific cost bare erected",                        "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal",   "Total specific (thermal) cost bare erected",              "M$/kWe",  "System Design Solution", "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "total_spec_cost_thermal",   "Total specific (thermal) cost bare erected",              "M$/kWt",  "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "solar_tower_cost",          "CSP Gen3 Solar Tower capital cost",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "solar_field_cost",          "CSP Gen3 Solar Field capital cost",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "falling_particle_receiver", "CSP Gen3 Falling Particle Receiver capital cost",         "M$",      "System Design Solution", "",      "*",     "",       "" },
@@ -905,7 +905,7 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "pc_W_dot",             "Precompressor power",                                    "MWe",        "Precompressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "pc_m_dot_des",         "Precompressor mass flow rate",                           "kg/s",       "Precompressor",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "pc_rho_in_des",        "Precompressor inlet density",                            "kg/m3",      "Precompressor",    "",      "*",     "",       "" },
-    { SSC_OUTPUT, SSC_NUMBER,  "pc_ideal_spec_work_des", "Precompressor ideal spec work",                          "kJ/kg",      "Precompressor",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "pc_ideal_spec_work_des", "Precompressor ideal spec work",                        "kJ/kg",      "Precompressor",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "pc_phi_des",           "Precompressor design flow coefficient",                  "",           "Precompressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_ARRAY,   "pc_tip_ratio_des",     "Precompressor design stage tip speed ratio",             "",           "Precompressor",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "pc_n_stages",          "Precompressor stages",                                   "",           "Precompressor",    "",      "*",     "",       "" },
