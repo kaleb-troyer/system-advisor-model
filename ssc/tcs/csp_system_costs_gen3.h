@@ -314,7 +314,8 @@ private:
     double costParticles();         // Calculates cost of bulk particles required. 
     double costPiping(double T);    // Calculates the piping cost per length for a given temperature 
     double costParticleLosses();    // Calculates incurred cost of particle loss / attrition. 
-    
+    double CPI(int year);           // Using the US BLS CPI, returns a correction factor for inflation to Jan 2025.  
+
 };
 
 

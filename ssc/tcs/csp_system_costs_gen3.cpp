@@ -10,18 +10,6 @@ cspGen3CostModel::cspGen3CostModel() {
     // initializing unstructured parameters
     W_dot_therm = W_dot_rec = W_dot_less = W_elec_annual = W_dot_field = W_dot_losses = 0;
 
-    // initializing structs
-    s_parasitics = parasitics();
-    s_financing = financing();
-    s_particles = particles();
-    s_receiver = receiver();
-    s_storage = storage();
-    s_cycle = cycle();
-    s_costs = costs();
-    s_field = field();
-    s_tower = tower();
-    s_lifts = lifts();
-
 };
 
 void cspGen3CostModel::designRoutine() {
@@ -42,9 +30,17 @@ void cspGen3CostModel::designRoutine() {
     8) Calculate the levelized cost of energy.
     */
 
+    s_costs.HTR_capital = CPI(2017) * s_costs.HTR_capital; 
+    s_costs.LTR_capital = CPI(2017) * s_costs.LTR_capital; 
+    s_costs.PHX_capital = CPI(2017) * s_costs.PHX_capital; 
+    s_costs.air_cooler_capital = CPI(2017) * s_costs.air_cooler_capital; 
+    s_costs.compressor_capital = CPI(2017) * s_costs.compressor_capital; 
+    s_costs.recompressor_capital = CPI(2017) * s_costs.recompressor_capital; 
+    s_costs.turbine_capital = CPI(2017) * s_costs.turbine_capital; 
+
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
-    s_particles.bulk_density = 1625;
+    s_particles.bulk_density = 1625.0;
     s_particles.cost_per_kg = 0.185;
 
     // solar multiple, thermal energy storage
@@ -111,7 +107,7 @@ void cspGen3CostModel::designRoutine() {
     s_costs.cycle_capital += s_costs.piping_inventory_etc;
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
-    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net;
+    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net * CPI(2016);
     s_costs.total_adjusted_cost = (1.0 + s_financing.construction) * (1.0 + s_financing.indirect) * (1.0 + s_financing.contingency) * s_costs.total_capital; 
     s_costs.levelized_cost_of_energy =
         ((s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor) + (s_financing.lifetime * s_costs.annual_maintenance))
@@ -253,7 +249,7 @@ void cspGen3CostModel::particleTemperatures() {
     is a decision variable in the optimization process. 
     */
 
-    s_storage.dT = 2; // TES temperature drop
+    s_storage.dT = 2.0; // TES temperature drop
     // thermal energy storage inlet / outlet temperatures
     s_storage.s_warm.To = s_cycle.T_phx_i; 
     s_storage.s_cold.Ti = s_cycle.T_phx_o; 
@@ -262,7 +258,7 @@ void cspGen3CostModel::particleTemperatures() {
     s_storage.s_warm.Tm = (s_storage.s_warm.Ti + s_storage.s_warm.To) / 2; 
     s_storage.s_cold.Tm = (s_storage.s_cold.Ti + s_storage.s_cold.To) / 2; 
 
-    s_lifts.dT = 5; // Lift temperature drop
+    s_lifts.dT = 5.0; // Lift temperature drop
     // receiver particle inlet / outlet and body temperatures
     s_receiver.Ti = s_storage.s_cold.To - s_lifts.dT;
     s_receiver.To = s_storage.s_warm.Ti; 
@@ -306,6 +302,10 @@ void cspGen3CostModel::temperatureCostScaling() {
     if (s_cycle.T_trb_i >= T_base) {
         fT_trb = 1.0 + c_trb * (s_cycle.T_trb_i - T_base) + d_trb * pow(s_cycle.T_trb_i - T_base, 2);
     }
+
+    fT_LTR = 1.0; 
+    fT_HTR = 1.0;
+    fT_trb = 1.0; 
 
     s_costs.LTR_capital = s_costs.LTR_capital * fT_LTR; 
     s_costs.HTR_capital = s_costs.HTR_capital * fT_HTR; 
@@ -453,7 +453,7 @@ double cspGen3CostModel::costLifts() {
     Sustainability, Charlotte, 2016.
     */
     const double C1 = 58.37;    // [$-s/m-kg]
-    return C1 * s_lifts.height * s_particles.m_dot_rec;
+    return C1 * s_lifts.height * s_particles.m_dot_rec * CPI(2016);
 };
 
 double cspGen3CostModel::costLand() {
@@ -461,7 +461,7 @@ double cspGen3CostModel::costLand() {
     Mehos, M.; Turchi, C.; Jorgenson, J.; Denholm, P.; Ho, C.; Armijo, K. On the Path to SunShot: Advancing Concentrating Solar Power
     Technology, Performance, and Dispatchability; EERE Publication and Product Library: Golden, CO, USA, 2016.
     */
-    return s_field.land_cost_per_area * s_field.area_total_land;
+    return s_field.land_cost_per_area * s_field.area_total_land * CPI(2016);
 };
 
 double cspGen3CostModel::costStorage() {
@@ -478,7 +478,7 @@ double cspGen3CostModel::costStorage() {
     double C_bin_cold = C1 + C2 * ((s_storage.s_cold.Tm - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
     double A_bin_cold = 2 * pi * s_storage.s_cold.radius * s_storage.s_cold.height + pi * s_storage.s_cold.radius * pow(pow(s_storage.s_cold.height, 2) + pow(s_storage.s_cold.radius, 2), 0.5);
-    return (C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold);
+    return ((C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold)) * CPI(2018);
 };
 
 double cspGen3CostModel::costReceiver() {
@@ -488,7 +488,7 @@ double cspGen3CostModel::costReceiver() {
     Engineering, vol. 109, pp. 958-969, 2016.
     */
     const double C1 = 37400; // [$/m^2]
-    return C1 * s_receiver.height * s_receiver.width;
+    return C1 * s_receiver.height * s_receiver.width * CPI(2016);
 };
 
 double cspGen3CostModel::costParticles() {
@@ -502,7 +502,7 @@ double cspGen3CostModel::costParticles() {
     Solar Power Gen3 Demonstration Roadmap," National
     Renewable Energy Laboratory, Golden, 2017.
     */
-    return (1 + s_particles.non_storage) * s_particles.cost_per_kg * s_particles.m_particles;
+    return (1 + s_particles.non_storage) * s_particles.cost_per_kg * s_particles.m_particles * CPI(2024);
 };
 
 double cspGen3CostModel::costParticleLosses() {
@@ -514,9 +514,64 @@ double cspGen3CostModel::costParticleLosses() {
     const double C1 = 365.0;  // [days / year]
     const double C2 = 3600.0; // [seconds / hour] 
     double annual_particle_losses = C1 * C2 * s_storage.hours_of_capacity * s_particles.m_dot_phx * s_receiver.particle_loss_factor;
-    return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg;
+    return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg * CPI(2024);
 };
 
+double cspGen3CostModel::CPI(int year) {
+    /*
+    Taken from the US Bureau of Labor Statistics CPI calculator.
+    Each dollar value is corrected from the first month of the given
+    year to the first month of 2025.
 
+    https://www.bls.gov/data/inflation_calculator.htm
+    */
+
+    double dollar = 1.0; 
+    switch (year) {
+        case 2012:
+            dollar = 1.3924; 
+            break;
+        case 2013:
+            dollar = 1.3705; 
+            break; 
+        case 2014:
+            dollar = 1.3492; 
+            break;
+        case 2015:
+            dollar = 1.3504; 
+            break;
+        case 2016:
+            dollar = 1.3321; 
+            break;
+        case 2017:
+            dollar = 1.2996; 
+            break;
+        case 2018:
+            dollar = 1.2733; 
+            break;
+        case 2019:
+            dollar = 1.2538; 
+            break;
+        case 2020:
+            dollar = 1.2234; 
+            break;
+        case 2021:
+            dollar = 1.2065; 
+            break;
+        case 2022:
+            dollar = 1.1226; 
+            break;
+        case 2023:
+            dollar = 1.0549; 
+            break;
+        case 2024:
+            dollar = 1.0233; 
+            break;
+        default:
+            break;
+    }
+
+    return dollar;
+}
 
 

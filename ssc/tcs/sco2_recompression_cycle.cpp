@@ -2313,7 +2313,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_costs.compressor_capital = 1E6 * ms_des_solved.ms_mc_ms_des_solved.m_cost_equipment;    // main compressor cost
 
         if (ms_des_solved.m_is_rc) {
-            csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
+                csp_cost_model.s_costs.recompressor_capital = 1E6 * ms_des_solved.ms_rc_ms_des_solved.m_cost_equipment;  // recompressor cost
         } else { csp_cost_model.s_costs.recompressor_capital = 0.0; }
         csp_cost_model.s_costs.turbine_capital = 1E6 * ms_des_solved.ms_t_des_solved.m_equipment_cost;           // turbine cost
 
@@ -3098,7 +3098,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 
         ms_opt_des_par.m_recomp_frac_guess = 0.0;
         ms_opt_des_par.m_fixed_recomp_frac = true;
-        ms_opt_des_par.m_LT_frac_guess = 0.5;
+        ms_opt_des_par.m_LT_frac_guess = 1.0;
         ms_opt_des_par.m_fixed_LT_frac = true;
 
         int s_error_code = 0;
