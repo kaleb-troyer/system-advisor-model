@@ -102,7 +102,7 @@ void cspGen3CostModel::designRoutine() {
     s_costs.balance_of_plant = s_financing.balance_of_plant * s_cycle.W_dot_gen; // [$]
     s_costs.cycle_capital = s_costs.HTR_capital + s_costs.LTR_capital + s_costs.PHX_capital + s_costs.air_cooler_capital + s_costs.compressor_capital + s_costs.recompressor_capital + s_costs.turbine_capital;
 
-    //s_costs.piping_inventory_etc = s_costs.cycle_capital * 0.20;
+
     s_costs.piping_inventory_etc = s_costs.cycle_capital * s_piping.cost_factor;
     s_costs.cycle_capital += s_costs.piping_inventory_etc;
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
@@ -168,9 +168,16 @@ void cspGen3CostModel::receiverLosses() {
     double E6 = exp(-E5 / G) / H;
     double TH = E6 * pow(E5, F); 
     double qs = exp(-W_dot_field / s_receiver.area_aperature);
-    s_receiver.efficiency = A + (B * qs) + (C * qs * qs)
-        + (D * qs * TH * s_tower.Vt)
-        + (E * TH * pow(s_tower.Vt, 2.0));
+
+    if (s_receiver.efficiency > 0.0) {
+        s_receiver.efficiency = (A + (B * qs) + (C * qs * qs)
+            + (D * qs * TH * s_tower.Vt)
+            + (E * TH * pow(s_tower.Vt, 2.0)))
+            * s_receiver.efficiency_modifier;
+    } else {
+        s_receiver.efficiency = abs(s_receiver.efficiency);
+    }
+
     W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency) * scale;
     s_receiver.efficiency = 1.0 - (W_dot_losses / W_dot_field);
 

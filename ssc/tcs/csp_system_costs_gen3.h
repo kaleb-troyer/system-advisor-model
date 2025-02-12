@@ -235,14 +235,16 @@ public:
         double area_aperature;       // [m2]  aperature area = receiver area
         double aspect_ratio;         // [-]   receiver height / receiver width
         double particle_loss_factor; // [-]   particle loss from open air receiver
+        double efficiency_modifier;  // [-]   receiver efficiency modifier
         double efficiency;           // [-]   receiver efficiency
         double Tm;                   // [K]   particle mean temperature in receiver 
         double Ti;                   // [K]   particle temperature at receiver inlet
         double To;                   // [K]   particle temperature at receiver outlet 
 
         receiver() {
-            height = width = area_aperature = aspect_ratio = wind_direction = 0;
-            particle_loss_factor = efficiency = Tm = Ti = To = 0;
+            height = width = area_aperature = aspect_ratio = wind_direction =
+                particle_loss_factor = efficiency = Tm =
+                Ti = To = efficiency_modifier = 0.0;
         };
     } s_receiver;
 

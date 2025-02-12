@@ -748,7 +748,7 @@ var_info vtab_sco2_design[] = {
     { SSC_INPUT,  SSC_NUMBER,  "try_simple_cycle",     "if !=0, check a simple cycle after optimizer converges.","",           "",    "Meta",               "?=1",   "",       "" },
 
     // ** Design Parameters **
-		// System Design
+		// System Design Parameters
 	{ SSC_INPUT,  SSC_NUMBER,  "htf",                  "Integer code for HTF used in PHX",                       "",           "",    "System Design",      "*",     "",       "" },
     { SSC_INPUT,  SSC_MATRIX,  "htf_props",            "User defined HTF property data",                         "", "7 columns (T,Cp,dens,visc,kvisc,cond,h), at least 3 rows", "System Design", "?=[[0]]", "", "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "T_htf_hot_des",        "HTF design hot temperature (PHX inlet)",                 "C",          "",    "System Design",      "*",     "",       "" },
@@ -756,10 +756,12 @@ var_info vtab_sco2_design[] = {
 	{ SSC_INPUT,  SSC_NUMBER,  "T_amb_des",            "Ambient temperature",                                    "C",          "",    "System Design",      "*",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "dT_mc_approach",       "Temp diff btw ambient air and main compressor inlet",    "C",          "",    "System Design",      "*",     "",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "site_elevation",       "Site elevation",                                         "m",          "",    "System Design",      "*",     "",       "" },
-	{ SSC_INPUT,  SSC_NUMBER,  "W_dot_net_des",        "Design cycle power output (no cooling parasitics)",      "MWe",        "",    "System Design",      "*",     "",       "" },
-	{ SSC_INPUT,  SSC_NUMBER,  "design_method",        "1 = Specify efficiency, 2 = Specify total recup UA, 3 = Specify each recup design","","","System Design","*","",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "W_dot_net_des",        "Design cycle power output (no cooling parasitics)",      "MWe",        "",    "System Design",      "*",     "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "design_method",        "1 = Specify efficiency, 2 = Specify total recup UA, 3 = Specify each recup design","","","System Design","*","",       "" },
 	{ SSC_INPUT,  SSC_NUMBER,  "eta_thermal_des",      "Power cycle thermal efficiency",                         "",           "",    "System Design",      "design_method=1","",  "" },
     { SSC_INPUT,  SSC_NUMBER,  "TES_capacity",         "Thermal energy storage capacity",                        "",           "",    "System Design",      "*",     "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "heliostat_cost",       "Cost per m^2 of heliostat reflective surface area.",     "$/m^2",      "",    "System Design",      "*",     "",       "" },
+    { SSC_INPUT,  SSC_NUMBER,  "receiver_eta_mod",     "Modifies the receiver efficiency. If <0, it overrides the efficiency instead.", "", "", "System Design", "*", "",      "" },
 
     // Heat exchanger design
         // Combined recuperator design parameter (design_method == 2)
@@ -1059,6 +1061,8 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	s_sco2_des_par.m_elevation = cm->as_double("site_elevation");					//[m] Site elevation
 	s_sco2_des_par.m_W_dot_net = cm->as_double("W_dot_net_des")*1000.0;			//[kWe] Convert from MWe, cycle power output w/o cooling parasitics
     s_sco2_des_par.m_TES_capacity = cm->as_double("TES_capacity");              //[h] Energy storage in hours
+    s_sco2_des_par.m_heliostat_cost = cm->as_double("heliostat_cost");        //[$/m^2] Cost per m^2 of heliostat reflective surface area.
+    s_sco2_des_par.m_receiver_eta_mod = cm->as_double("receiver_eta_mod");    //[-] Modifies the receiver efficiency. If <0, it overrides the efficiency instead.
 
     s_sco2_des_par.m_cycle_config = cm->as_integer("cycle_config");			//[-] 1 = recompression, 2 = partial cooling
 

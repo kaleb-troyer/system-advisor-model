@@ -244,6 +244,8 @@ public:
         NS_HX_counterflow_eqs::E_UA_target_type m_phx_od_UA_target_type;
         double m_T_htf_hot_in;			//[K] Design-point hot inlet temperature
 
+        double m_heliostat_cost;        //[$/m^2] Cost per m^2 of heliostat reflective surface area. 
+        double m_receiver_eta_mod;      //[-] Modifies the receiver efficiency. If <0, it overrides the efficiency instead.
 
 		S_auto_opt_design_parameters()
 		{
@@ -280,7 +282,8 @@ public:
 			mf_callback_log = 0;
 			mp_mf_active = 0;
 
-            m_opt_logging = m_opt_penalty = m_try_simple_cycle = 0;
+            m_opt_logging = m_opt_penalty = m_try_simple_cycle = 0.0;
+            m_heliostat_cost = m_receiver_eta_mod = 0.0; 
 
 			m_DP_PC_pre.resize(2);
 			std::fill(m_DP_PC_pre.begin(), m_DP_PC_pre.end(), std::numeric_limits<double>::quiet_NaN());

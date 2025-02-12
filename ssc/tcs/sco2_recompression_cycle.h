@@ -149,6 +149,8 @@ public:
         int m_opt_logging;                  //[-] if !=0, save each opt loop result to objective.csv.
         int m_opt_penalty;                  //[-] if !=0, allow addition of penalty terms to objective.
         double m_opt_iters;                 //[-] optimization iterations counter
+        double m_heliostat_cost;            //[$/m^2] 
+        double m_receiver_eta_mod;          //[-] 
 
 		double m_UA_rec_total;				//[kW/K] Total design-point recuperator UA
 		    // LTR thermal design

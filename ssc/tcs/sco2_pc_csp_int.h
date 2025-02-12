@@ -77,6 +77,8 @@ public:
 		double m_UA_recup_tot_des;		//[kW/K] Total recuperator conductance
 		int m_cycle_config;				//[-] 2 = partial cooling, [else] = recompression
         double m_TES_capacity;          //[h] Thermal energy storage capacity in hours
+        double m_heliostat_cost;        //[$/m^2] Cost per m^2 of heliostat reflective surface area. 
+        double m_receiver_eta_mod;      //[-] Modifies the receiver efficiency. If <0, it overrides the efficiency instead.
 
         bool m_fixed_T_hot_i;           //[t/f] if true, use given value
 
@@ -184,7 +186,9 @@ public:
 
 				m_phx_dt_cold_approach = m_frac_fan_power = m_deltaP_cooler_frac = m_eta_fan =
 				m_quiet = m_opt_logging = m_opt_penalty = m_try_simple_cycle = std::numeric_limits<double>::quiet_NaN();
-	
+
+            m_heliostat_cost = m_receiver_eta_mod = 0.0; 
+
             m_fixed_P_mc_out = false;       //[-] If false, then should default to optimizing this parameter
             m_fixed_PR_HP_to_LP = false;    //[-] If false, then should default to optimizing this parameter
             m_fixed_f_PR_HP_to_IP = false;  //[-] If false, then should default to optimizing this parameter

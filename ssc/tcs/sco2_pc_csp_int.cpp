@@ -292,6 +292,9 @@ void C_sco2_phx_air_cooler::design_core()
         des_params.m_T_htf_hot_in = ms_des_par.m_T_htf_hot_in;
         des_params.m_fixed_T_hot_i = ms_des_par.m_fixed_T_hot_i;
 
+        des_params.m_heliostat_cost = ms_des_par.m_heliostat_cost; 
+        des_params.m_receiver_eta_mod = ms_des_par.m_receiver_eta_mod; 
+
 		auto_err_code = mpc_sco2_cycle->auto_opt_design(des_params);
 
     }
@@ -372,6 +375,9 @@ void C_sco2_phx_air_cooler::design_core()
     csp_cost_model.s_cycle.T_trb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out;                          // [K]   turbine inlet temperature
     csp_cost_model.s_cycle.P_max = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_out / 1000.0; // [MPa] power cycle high pressure
     csp_cost_model.s_cycle.P_min = ms_des_solved.ms_rc_cycle_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
+
+    csp_cost_model.s_field.heliostat_cost_per_area = ms_des_par.m_heliostat_cost;
+    csp_cost_model.s_receiver.efficiency_modifier = ms_des_par.m_receiver_eta_mod;
 
     csp_cost_model.designRoutine();
     ms_des_solved.s_costs = csp_cost_model.s_costs; 

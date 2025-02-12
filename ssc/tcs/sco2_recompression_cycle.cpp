@@ -2334,6 +2334,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.P_max = ms_des_solved.ms_mc_ms_des_solved.m_P_out / 1000.0; // [MPa] power cycle high pressure
         csp_cost_model.s_cycle.P_min = ms_des_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
 
+        csp_cost_model.s_field.heliostat_cost_per_area = ms_opt_des_par.m_heliostat_cost;
+        csp_cost_model.s_receiver.efficiency_modifier = ms_opt_des_par.m_receiver_eta_mod; 
+
         csp_cost_model.designRoutine();
         const double objective_scalar = 100.0; 
         m_objective_metric_last = objective_scalar / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
@@ -2949,6 +2952,9 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
         // meta
     ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging; 
     ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty;
+
+    ms_opt_des_par.m_heliostat_cost = ms_auto_opt_des_par.m_heliostat_cost; 
+    ms_opt_des_par.m_receiver_eta_mod = ms_auto_opt_des_par.m_receiver_eta_mod; 
     
     ms_opt_des_par.m_opt_iters = 0; 
         // LTR thermal design
