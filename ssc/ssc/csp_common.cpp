@@ -830,9 +830,10 @@ var_info vtab_sco2_design[] = {
 	{ SSC_OUTPUT, SSC_NUMBER,  "recomp_frac",          "Recompression fraction",                                 "-",          "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "cycle_cost",           "Cycle cost bare erected",                                "M$",         "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "cycle_spec_cost",      "Cycle specific cost bare erected",                       "$/kWe",      "System Design Solution",    "",      "*",     "",       "" },
-	{ SSC_OUTPUT, SSC_NUMBER,  "cycle_spec_cost_thermal", "Cycle specific (thermal) cost bare erected",          "$/kWt",      "System Design Solution",    "",      "*",     "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "cycle_spec_cost_thermal", "Cycle specific (thermal) cost bare erected",          "$/kWt",      "System Design Solution",    "",      "*",     "",       "" },
 	{ SSC_OUTPUT, SSC_NUMBER,  "W_dot_net_less_cooling", "System power output subtracting cooling parastics",    "MWe,"        "System Design Solution",    "",      "*",     "",       "" },
     { SSC_OUTPUT, SSC_NUMBER,  "eta_thermal_net_less_cooling_des","Calculated cycle thermal efficiency using W_dot_net_less_cooling", "-", "System Design Solution","",  "*", "",       "" },
+    { SSC_OUTPUT, SSC_NUMBER,  "receiver_efficiency",  "Receiver Thermal Efficiency",                            "-",          "System Design Solution",    "",      "*",     "",       "" },
 
     // System Cost Aggregation (distinct from other cost design solution parameters, for gen3 analysis) 
     { SSC_OUTPUT, SSC_NUMBER,  "total_cost",                "Total cost of CSP and power cycle",                       "M$",      "System Design Solution", "",      "*",     "",       "" },
@@ -1824,7 +1825,6 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
 	cm->assign("cooler_tot_UA", (ssc_number_t)cooler_tot_UA);		//[MW/K]
 	cm->assign("cooler_tot_W_dot_fan", (ssc_number_t)cooler_tot_W_dot_fan);	//[MWe]
 
-
     // Add cost for piping, inventory control, etc.
     double piping_inventory_etc_rate = 0.2;     //[-]
     double piping_inventory_etc_cost = piping_inventory_etc_rate * cost_bare_erected_sum;   //[M$]
@@ -1842,6 +1842,7 @@ int sco2_design_cmod_common(compute_module *cm, C_sco2_phx_air_cooler & c_sco2_c
     //cm->assign("CSP_equip_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->m_cost_CSP_equip)); //[M$]
     //cost_CSP_bare_erected_sum = c_sco2_cycle.get_design_solved()->m_cost_CSP_equip; 
 
+    cm->assign("receiver_efficiency", (ssc_number_t)(c_sco2_cycle.get_design_solved()->receiver_efficiency)); 
     cm->assign("solar_tower_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.solar_tower * 1.0E-6));
     cm->assign("solar_field_cost", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.solar_field * 1.0E-6));
     cm->assign("falling_particle_receiver", (ssc_number_t)(c_sco2_cycle.get_design_solved()->s_costs.falling_particle_receiver * 1.0E-6));

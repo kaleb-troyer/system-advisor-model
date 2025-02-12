@@ -200,7 +200,8 @@ public:
 	{
 		C_HX_counterflow_CRM::S_des_solved ms_phx_des_solved;
 		C_sco2_cycle_core::S_design_solved ms_rc_cycle_solved;
-        cspGen3CostModel::costs s_costs; 
+        cspGen3CostModel::costs s_costs;
+        double receiver_efficiency = 0.0; 
     };
 
 	struct S_od_par

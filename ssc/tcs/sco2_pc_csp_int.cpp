@@ -381,6 +381,7 @@ void C_sco2_phx_air_cooler::design_core()
 
     csp_cost_model.designRoutine();
     ms_des_solved.s_costs = csp_cost_model.s_costs; 
+    ms_des_solved.receiver_efficiency = csp_cost_model.s_receiver.efficiency;
 
 	//*************************************************************************************
 	//*************************************************************************************
