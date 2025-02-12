@@ -169,15 +169,10 @@ void cspGen3CostModel::receiverLosses() {
     double TH = E6 * pow(E5, F); 
     double qs = exp(-W_dot_field / s_receiver.area_aperature);
 
-    if (s_receiver.efficiency > 0.0) {
-        s_receiver.efficiency = (A + (B * qs) + (C * qs * qs)
-            + (D * qs * TH * s_tower.Vt)
-            + (E * TH * pow(s_tower.Vt, 2.0)))
-            * s_receiver.efficiency_modifier;
-    } else {
-        s_receiver.efficiency = abs(s_receiver.efficiency);
-    }
-
+    s_receiver.efficiency = (A + (B * qs) + (C * qs * qs)
+        + (D * qs * TH * s_tower.Vt)
+        + (E * TH * pow(s_tower.Vt, 2.0)))
+        * s_receiver.efficiency_modifier;
     W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency) * scale;
     s_receiver.efficiency = 1.0 - (W_dot_losses / W_dot_field);
 
