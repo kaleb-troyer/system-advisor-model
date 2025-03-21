@@ -302,6 +302,18 @@ public:
 
 private:
 
+    enum { // Equipment types for CEPCI cost correction
+        BASE = 0,   // Default (average CEPCI)
+        PIPE = 1,   // Piping, Inventory, etc.
+        HTEX,       // Heat Exchangers
+        TURB,       // Turbines
+        COMP,       // Compressors
+        LABR,       // Labor
+        LAND,       // Land
+        LIFT,       // Lifts / Hoists
+        TANK,       // Storage tanks
+    };
+
     void temperatureCostScaling();  // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 
     void particleTemperatures();    // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
     void receiverLosses();          // Calculates estimated receiver thermal losses
@@ -316,7 +328,10 @@ private:
     double costParticles();         // Calculates cost of bulk particles required. 
     double costPiping(double T);    // Calculates the piping cost per length for a given temperature 
     double costParticleLosses();    // Calculates incurred cost of particle loss / attrition. 
-    double CPI(int year);           // Using the US BLS CPI, returns a correction factor for inflation to Jan 2025.  
+
+    double CEPCI(                   // Using the US BLS CPI, returns a correction factor for inflation to Jan 2025.
+        int year, int type
+    );   
 
 };
 

@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <unordered_map>
 #include "csp_system_costs_gen3.h"
 
 const double pi = 3.14159265358979323846;
@@ -30,13 +31,13 @@ void cspGen3CostModel::designRoutine() {
     8) Calculate the levelized cost of energy.
     */
 
-    s_costs.HTR_capital = CPI(2017) * s_costs.HTR_capital; 
-    s_costs.LTR_capital = CPI(2017) * s_costs.LTR_capital; 
-    s_costs.PHX_capital = CPI(2017) * s_costs.PHX_capital; 
-    s_costs.air_cooler_capital = CPI(2017) * s_costs.air_cooler_capital; 
-    s_costs.compressor_capital = CPI(2017) * s_costs.compressor_capital; 
-    s_costs.recompressor_capital = CPI(2017) * s_costs.recompressor_capital; 
-    s_costs.turbine_capital = CPI(2017) * s_costs.turbine_capital; 
+    s_costs.HTR_capital = CEPCI(2017, HTEX) * s_costs.HTR_capital; 
+    s_costs.LTR_capital = CEPCI(2017, HTEX) * s_costs.LTR_capital; 
+    s_costs.PHX_capital = CEPCI(2017, HTEX) * s_costs.PHX_capital; 
+    s_costs.air_cooler_capital = CEPCI(2017, HTEX) * s_costs.air_cooler_capital; 
+    s_costs.compressor_capital = CEPCI(2017, COMP) * s_costs.compressor_capital; 
+    s_costs.recompressor_capital = CEPCI(2017, COMP) * s_costs.recompressor_capital; 
+    s_costs.turbine_capital = CEPCI(2017, TURB) * s_costs.turbine_capital; 
 
     // particulate properties / characteristics 
     s_particles.angle_of_repose = 0.559;
@@ -107,7 +108,7 @@ void cspGen3CostModel::designRoutine() {
     s_costs.cycle_capital += s_costs.piping_inventory_etc;
     s_costs.plant_capital = s_costs.solar_tower + s_costs.solar_field + s_costs.falling_particle_receiver + s_costs.particles + s_costs.particle_losses + s_costs.particle_storage + s_costs.particle_lifts + s_costs.land + s_costs.balance_of_plant;
     s_costs.total_capital = s_costs.cycle_capital + s_costs.plant_capital; 
-    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net * CPI(2016);
+    s_costs.annual_maintenance = s_financing.maintenance * s_cycle.W_dot_net * CEPCI(2016, LABR);
     s_costs.total_adjusted_cost = (1.0 + s_financing.construction) * (1.0 + s_financing.indirect) * (1.0 + s_financing.contingency) * s_costs.total_capital; 
     s_costs.levelized_cost_of_energy =
         ((s_financing.lifetime * s_costs.total_adjusted_cost * s_financing.capital_recovery_factor) + (s_financing.lifetime * s_costs.annual_maintenance))
@@ -455,7 +456,7 @@ double cspGen3CostModel::costLifts() {
     Sustainability, Charlotte, 2016.
     */
     const double C1 = 58.37;    // [$-s/m-kg]
-    return C1 * s_lifts.height * s_particles.m_dot_rec * CPI(2016);
+    return C1 * s_lifts.height * s_particles.m_dot_rec * CEPCI(2016, LIFT);
 };
 
 double cspGen3CostModel::costLand() {
@@ -463,7 +464,7 @@ double cspGen3CostModel::costLand() {
     Mehos, M.; Turchi, C.; Jorgenson, J.; Denholm, P.; Ho, C.; Armijo, K. On the Path to SunShot: Advancing Concentrating Solar Power
     Technology, Performance, and Dispatchability; EERE Publication and Product Library: Golden, CO, USA, 2016.
     */
-    return s_field.land_cost_per_area * s_field.area_total_land * CPI(2016);
+    return s_field.land_cost_per_area * s_field.area_total_land * CEPCI(2016, LAND);
 };
 
 double cspGen3CostModel::costStorage() {
@@ -480,7 +481,7 @@ double cspGen3CostModel::costStorage() {
     double C_bin_cold = C1 + C2 * ((s_storage.s_cold.Tm - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
     double A_bin_cold = 2 * pi * s_storage.s_cold.radius * s_storage.s_cold.height + pi * s_storage.s_cold.radius * pow(pow(s_storage.s_cold.height, 2) + pow(s_storage.s_cold.radius, 2), 0.5);
-    return ((C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold)) * CPI(2018);
+    return ((C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold)) * CEPCI(2018, TANK);
 };
 
 double cspGen3CostModel::costReceiver() {
@@ -490,7 +491,7 @@ double cspGen3CostModel::costReceiver() {
     Engineering, vol. 109, pp. 958-969, 2016.
     */
     const double C1 = 37400; // [$/m^2]
-    return C1 * s_receiver.height * s_receiver.width * CPI(2016);
+    return C1 * s_receiver.height * s_receiver.width * CEPCI(2016, BASE);
 };
 
 double cspGen3CostModel::costParticles() {
@@ -504,7 +505,7 @@ double cspGen3CostModel::costParticles() {
     Solar Power Gen3 Demonstration Roadmap," National
     Renewable Energy Laboratory, Golden, 2017.
     */
-    return (1 + s_particles.non_storage) * s_particles.cost_per_kg * s_particles.m_particles * CPI(2024);
+    return (1 + s_particles.non_storage) * s_particles.cost_per_kg * s_particles.m_particles * CEPCI(2024, BASE);
 };
 
 double cspGen3CostModel::costParticleLosses() {
@@ -516,64 +517,42 @@ double cspGen3CostModel::costParticleLosses() {
     const double C1 = 365.0;  // [days / year]
     const double C2 = 3600.0; // [seconds / hour] 
     double annual_particle_losses = C1 * C2 * s_storage.hours_of_capacity * s_particles.m_dot_phx * s_receiver.particle_loss_factor;
-    return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg * CPI(2024);
+    return s_financing.lifetime * annual_particle_losses * s_particles.cost_per_kg * CEPCI(2024, BASE);
 };
 
-double cspGen3CostModel::CPI(int year) {
+double cspGen3CostModel::CEPCI(int year, int type) {
     /*
-    Taken from the US Bureau of Labor Statistics CPI calculator.
+    Taken from the Chemical Engineering Plant Cost Index (CEPCI).
     Each dollar value is corrected from the first month of the given
-    year to the first month of 2025.
+    year to the first month of 2024. 
 
-    https://www.bls.gov/data/inflation_calculator.htm
+    https://toweringskills.com/financial-analysis/cost-indices/
     */
 
-    double dollar = 1.0; 
-    switch (year) {
-        case 2012:
-            dollar = 1.3924; 
-            break;
-        case 2013:
-            dollar = 1.3705; 
-            break; 
-        case 2014:
-            dollar = 1.3492; 
-            break;
-        case 2015:
-            dollar = 1.3504; 
-            break;
-        case 2016:
-            dollar = 1.3321; 
-            break;
-        case 2017:
-            dollar = 1.2996; 
-            break;
-        case 2018:
-            dollar = 1.2733; 
-            break;
-        case 2019:
-            dollar = 1.2538; 
-            break;
-        case 2020:
-            dollar = 1.2234; 
-            break;
-        case 2021:
-            dollar = 1.2065; 
-            break;
-        case 2022:
-            dollar = 1.1226; 
-            break;
-        case 2023:
-            dollar = 1.0549; 
-            break;
-        case 2024:
-            dollar = 1.0233; 
-            break;
-        default:
-            break;
-    }
+    // The CEPCI lookup table. Ordered by years 2012-2024 and by equipment type enums. 
+    static const std::unordered_map<int, std::unordered_map<int, double>> CEPCI_lookup = {
+        {2012, {{BASE, 584.6}, {PIPE, 584.6}, {HTEX, 584.6}, {TURB, 584.6}, {COMP, 584.6}, {LABR, 584.6}, {LAND, 584.6}, {LIFT, 584.6}, {TANK, 584.6}}},
+        {2013, {{BASE, 567.3}, {PIPE, 567.3}, {HTEX, 567.3}, {TURB, 567.3}, {COMP, 567.3}, {LABR, 567.3}, {LAND, 567.3}, {LIFT, 567.3}, {TANK, 567.3}}},
+        {2014, {{BASE, 576.1}, {PIPE, 576.1}, {HTEX, 576.1}, {TURB, 576.1}, {COMP, 576.1}, {LABR, 576.1}, {LAND, 576.1}, {LIFT, 576.1}, {TANK, 576.1}}},
+        {2015, {{BASE, 556.8}, {PIPE, 556.8}, {HTEX, 556.8}, {TURB, 556.8}, {COMP, 556.8}, {LABR, 556.8}, {LAND, 556.8}, {LIFT, 556.8}, {TANK, 556.8}}},
+        {2016, {{BASE, 541.7}, {PIPE, 541.7}, {HTEX, 541.7}, {TURB, 541.7}, {COMP, 541.7}, {LABR, 541.7}, {LAND, 541.7}, {LIFT, 541.7}, {TANK, 541.7}}},
+        {2017, {{BASE, 567.5}, {PIPE, 567.5}, {HTEX, 567.5}, {TURB, 567.5}, {COMP, 567.5}, {LABR, 567.5}, {LAND, 567.5}, {LIFT, 567.5}, {TANK, 567.5}}},
+        {2018, {{BASE, 603.1}, {PIPE, 603.1}, {HTEX, 603.1}, {TURB, 603.1}, {COMP, 603.1}, {LABR, 603.1}, {LAND, 603.1}, {LIFT, 603.1}, {TANK, 603.1}}},
+        {2019, {{BASE, 607.5}, {PIPE, 607.5}, {HTEX, 607.5}, {TURB, 607.5}, {COMP, 607.5}, {LABR, 607.5}, {LAND, 607.5}, {LIFT, 607.5}, {TANK, 607.5}}},
+        {2020, {{BASE, 596.2}, {PIPE, 596.2}, {HTEX, 596.2}, {TURB, 596.2}, {COMP, 596.2}, {LABR, 596.2}, {LAND, 596.2}, {LIFT, 596.2}, {TANK, 596.2}}},
+        {2021, {{BASE, 708.8}, {PIPE, 708.8}, {HTEX, 708.8}, {TURB, 708.8}, {COMP, 708.8}, {LABR, 708.8}, {LAND, 708.8}, {LIFT, 708.8}, {TANK, 708.8}}},
+        {2022, {{BASE, 816.0}, {PIPE, 816.0}, {HTEX, 816.0}, {TURB, 816.0}, {COMP, 816.0}, {LABR, 816.0}, {LAND, 816.0}, {LIFT, 816.0}, {TANK, 816.0}}},
+        {2023, {{BASE, 797.9}, {PIPE, 797.9}, {HTEX, 797.9}, {TURB, 797.9}, {COMP, 797.9}, {LABR, 797.9}, {LAND, 797.9}, {LIFT, 797.9}, {TANK, 797.9}}},
+        {2024, {{BASE, 795.4}, {PIPE, 795.4}, {HTEX, 795.4}, {TURB, 795.4}, {COMP, 795.4}, {LABR, 795.4}, {LAND, 795.4}, {LIFT, 795.4}, {TANK, 795.4}}}
+    };
 
-    return dollar;
+    // calculating cepci for given year and equipment type
+    double factor = CEPCI_lookup.at(year).find(type)->second;
+
+    // calculating 2024 cepci for given equipment type
+    double baseln = CEPCI_lookup.at(2024).find(type)->second;
+
+    return baseln / factor;
 }
 
 
