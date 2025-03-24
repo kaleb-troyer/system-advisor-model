@@ -304,14 +304,12 @@ private:
 
     enum { // Equipment types for CEPCI cost correction
         BASE = 0,   // Default (average CEPCI)
-        PIPE = 1,   // Piping, Inventory, etc.
-        HTEX,       // Heat Exchangers
-        TURB,       // Turbines
-        COMP,       // Compressors
-        LABR,       // Labor
-        LAND,       // Land
-        LIFT,       // Lifts / Hoists
-        TANK,       // Storage tanks
+        PIPE = 1,   // Piping, Valves, Fittings, etc.
+        HTEX,       // Heat Exchangers and Tanks
+        TURB,       // Pumps and Turbomachinery
+        LABR,       // Labor and Supervision
+        LAND,       // Land and Buildings
+        LIFT,       // Lifts / Hoists / Process Machinery
     };
 
     void temperatureCostScaling();  // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 

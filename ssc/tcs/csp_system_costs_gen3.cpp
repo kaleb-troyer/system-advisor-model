@@ -35,8 +35,8 @@ void cspGen3CostModel::designRoutine() {
     s_costs.LTR_capital = CEPCI(2017, HTEX) * s_costs.LTR_capital; 
     s_costs.PHX_capital = CEPCI(2017, HTEX) * s_costs.PHX_capital; 
     s_costs.air_cooler_capital = CEPCI(2017, HTEX) * s_costs.air_cooler_capital; 
-    s_costs.compressor_capital = CEPCI(2017, COMP) * s_costs.compressor_capital; 
-    s_costs.recompressor_capital = CEPCI(2017, COMP) * s_costs.recompressor_capital; 
+    s_costs.compressor_capital = CEPCI(2017, TURB) * s_costs.compressor_capital; 
+    s_costs.recompressor_capital = CEPCI(2017, TURB) * s_costs.recompressor_capital; 
     s_costs.turbine_capital = CEPCI(2017, TURB) * s_costs.turbine_capital; 
 
     // particulate properties / characteristics 
@@ -481,7 +481,7 @@ double cspGen3CostModel::costStorage() {
     double C_bin_cold = C1 + C2 * ((s_storage.s_cold.Tm - C3) / C4); // [$/m2] cost of bin insulation
     double A_bin_warm = 2 * pi * s_storage.s_warm.radius * s_storage.s_warm.height + pi * s_storage.s_warm.radius * pow(pow(s_storage.s_warm.height, 2) + pow(s_storage.s_warm.radius, 2), 0.5);
     double A_bin_cold = 2 * pi * s_storage.s_cold.radius * s_storage.s_cold.height + pi * s_storage.s_cold.radius * pow(pow(s_storage.s_cold.height, 2) + pow(s_storage.s_cold.radius, 2), 0.5);
-    return ((C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold)) * CEPCI(2018, TANK);
+    return ((C_bin_warm * A_bin_warm) + (C_bin_cold * A_bin_cold)) * CEPCI(2018, HTEX);
 };
 
 double cspGen3CostModel::costReceiver() {
@@ -526,24 +526,24 @@ double cspGen3CostModel::CEPCI(int year, int type) {
     Each dollar value is corrected from the first month of the given
     year to the first month of 2024. 
 
-    https://toweringskills.com/financial-analysis/cost-indices/
+    Chemical Engineering Journal (2012 - 2024)
     */
 
     // The CEPCI lookup table. Ordered by years 2012-2024 and by equipment type enums. 
     static const std::unordered_map<int, std::unordered_map<int, double>> CEPCI_lookup = {
-        {2012, {{BASE, 584.6}, {PIPE, 584.6}, {HTEX, 584.6}, {TURB, 584.6}, {COMP, 584.6}, {LABR, 584.6}, {LAND, 584.6}, {LIFT, 584.6}, {TANK, 584.6}}},
-        {2013, {{BASE, 567.3}, {PIPE, 567.3}, {HTEX, 567.3}, {TURB, 567.3}, {COMP, 567.3}, {LABR, 567.3}, {LAND, 567.3}, {LIFT, 567.3}, {TANK, 567.3}}},
-        {2014, {{BASE, 576.1}, {PIPE, 576.1}, {HTEX, 576.1}, {TURB, 576.1}, {COMP, 576.1}, {LABR, 576.1}, {LAND, 576.1}, {LIFT, 576.1}, {TANK, 576.1}}},
-        {2015, {{BASE, 556.8}, {PIPE, 556.8}, {HTEX, 556.8}, {TURB, 556.8}, {COMP, 556.8}, {LABR, 556.8}, {LAND, 556.8}, {LIFT, 556.8}, {TANK, 556.8}}},
-        {2016, {{BASE, 541.7}, {PIPE, 541.7}, {HTEX, 541.7}, {TURB, 541.7}, {COMP, 541.7}, {LABR, 541.7}, {LAND, 541.7}, {LIFT, 541.7}, {TANK, 541.7}}},
-        {2017, {{BASE, 567.5}, {PIPE, 567.5}, {HTEX, 567.5}, {TURB, 567.5}, {COMP, 567.5}, {LABR, 567.5}, {LAND, 567.5}, {LIFT, 567.5}, {TANK, 567.5}}},
-        {2018, {{BASE, 603.1}, {PIPE, 603.1}, {HTEX, 603.1}, {TURB, 603.1}, {COMP, 603.1}, {LABR, 603.1}, {LAND, 603.1}, {LIFT, 603.1}, {TANK, 603.1}}},
-        {2019, {{BASE, 607.5}, {PIPE, 607.5}, {HTEX, 607.5}, {TURB, 607.5}, {COMP, 607.5}, {LABR, 607.5}, {LAND, 607.5}, {LIFT, 607.5}, {TANK, 607.5}}},
-        {2020, {{BASE, 596.2}, {PIPE, 596.2}, {HTEX, 596.2}, {TURB, 596.2}, {COMP, 596.2}, {LABR, 596.2}, {LAND, 596.2}, {LIFT, 596.2}, {TANK, 596.2}}},
-        {2021, {{BASE, 708.8}, {PIPE, 708.8}, {HTEX, 708.8}, {TURB, 708.8}, {COMP, 708.8}, {LABR, 708.8}, {LAND, 708.8}, {LIFT, 708.8}, {TANK, 708.8}}},
-        {2022, {{BASE, 816.0}, {PIPE, 816.0}, {HTEX, 816.0}, {TURB, 816.0}, {COMP, 816.0}, {LABR, 816.0}, {LAND, 816.0}, {LIFT, 816.0}, {TANK, 816.0}}},
-        {2023, {{BASE, 797.9}, {PIPE, 797.9}, {HTEX, 797.9}, {TURB, 797.9}, {COMP, 797.9}, {LABR, 797.9}, {LAND, 797.9}, {LIFT, 797.9}, {TANK, 797.9}}},
-        {2024, {{BASE, 795.4}, {PIPE, 795.4}, {HTEX, 795.4}, {TURB, 795.4}, {COMP, 795.4}, {LABR, 795.4}, {LAND, 795.4}, {LIFT, 795.4}, {TANK, 795.4}}}
+        {2012, {{BASE, 584.6}, {HTEX, 683.1}, {LIFT, 675.7}, {PIPE, 924.9}, {TURB, 911.6}, {LABR, 329.0}, {LAND, 520.6}}},
+        {2013, {{BASE, 567.3}, {HTEX, 630.1}, {LIFT, 657.6}, {PIPE, 890.4}, {TURB, 913.9}, {LABR, 326.8}, {LAND, 530.9}}},
+        {2014, {{BASE, 576.1}, {HTEX, 632.6}, {LIFT, 657.4}, {PIPE, 883.5}, {TURB, 928.7}, {LABR, 321.9}, {LAND, 537.6}}},
+        {2015, {{BASE, 556.8}, {HTEX, 636.4}, {LIFT, 663.5}, {PIPE, 868.9}, {TURB, 948.7}, {LABR, 320.1}, {LAND, 546.9}}},
+        {2016, {{BASE, 541.7}, {HTEX, 551.7}, {LIFT, 648.5}, {PIPE, 795.0}, {TURB, 979.1}, {LABR, 317.7}, {LAND, 537.8}}},
+        {2017, {{BASE, 567.5}, {HTEX, 578.3}, {LIFT, 669.5}, {PIPE, 835.2}, {TURB, 971.3}, {LABR, 313.5}, {LAND, 550.2}}},
+        {2018, {{BASE, 603.1}, {HTEX, 606.2}, {LIFT, 697.1}, {PIPE, 910.2}, {TURB, 1001.}, {LABR, 309.2}, {LAND, 570.4}}},
+        {2019, {{BASE, 607.5}, {HTEX, 676.5}, {LIFT, 732.2}, {PIPE, 978.9}, {TURB, 1061.}, {LABR, 316.9}, {LAND, 601.6}}},
+        {2020, {{BASE, 596.2}, {HTEX, 618.7}, {LIFT, 721.7}, {PIPE, 957.3}, {TURB, 1080.}, {LABR, 313.7}, {LAND, 588.3}}},
+        {2021, {{BASE, 708.8}, {HTEX, 637.3}, {LIFT, 746.8}, {PIPE, 1012.}, {TURB, 1103.}, {LABR, 311.1}, {LAND, 635.0}}},
+        {2022, {{BASE, 816.0}, {HTEX, 856.8}, {LIFT, 993.2}, {PIPE, 1453.}, {TURB, 1233.}, {LABR, 310.7}, {LAND, 828.1}}},
+        {2023, {{BASE, 797.9}, {HTEX, 833.1}, {LIFT, 1030.}, {PIPE, 1428.}, {TURB, 1389.}, {LABR, 312.4}, {LAND, 795.2}}},
+        {2024, {{BASE, 795.4}, {HTEX, 804.7}, {LIFT, 1027.}, {PIPE, 1343.}, {TURB, 1523.}, {LABR, 315.3}, {LAND, 813.9}}}
     };
 
     // calculating cepci for given year and equipment type
