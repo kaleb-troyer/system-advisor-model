@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#include "csp_solver_falling_particle_receiver.h"
+
 using namespace std;
 
 class cspGen3CostModel {
@@ -12,7 +14,7 @@ public:
     cspGen3CostModel();             // Class initializer. Memory is shared and modified between optimizations. 
     ~cspGen3CostModel() = default;  // Default destructor. Memory is out-of-scope after the optimization is completed. 
     void designRoutine();           // Accepts a power block to design a CSP plant and calculate LCOE. 
-
+    
     // derived parameters    
     double W_dot_therm;     // [MWt]    power cycle thermal input
     double W_dot_field;     // [MWt]    power delivered to the receiver from the solar field
@@ -176,6 +178,8 @@ public:
         double cost_per_kg;     // [$/kg]   particle bulk cost
         double angle_of_repose; // [rad]    particle repose angle
         double bulk_density;    // [kg/m3]  particle bulk density
+        double mean_diameter;   // [m]      particle mean diameter
+        double absorptivity;    // [-]      particle absorptivity
 
         // parameters derived from cycle
         double m_particles;     // [kg]     bulk particle mass
@@ -183,11 +187,15 @@ public:
         double m_dot_rec;       // [kg/s]   mass flow through receiver
 
         // assumed non-storage particle factor
-        double non_storage = 0.05; // [-] 
+        double non_storage;     // [-]      percent of particles not kept in TES
 
         particles() {
             cost_per_kg = angle_of_repose = bulk_density
                 = m_particles = m_dot_phx = m_dot_rec = 0;
+
+            mean_diameter = 250e-6;
+            absorptivity = 0.34; 
+            non_storage = 0.05;
         };
     } s_particles;
 

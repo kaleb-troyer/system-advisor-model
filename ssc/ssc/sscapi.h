@@ -70,6 +70,16 @@ extern "C" {
 /** Returns the library version number as an integer.  Version numbers start at 1. */
 SSCEXPORT int ssc_version();
 
+//---------------------------------------//
+//---- custom export for fpr testing ----//
+//---------------------------------------//
+
+SSCEXPORT double ssc_testing(double Ti, double To, double H, double W, double h, double w, double d); 
+
+//---------------------------------------//
+//------------- end custom --------------//
+//---------------------------------------//
+
 /** Returns information about the build configuration of this particular SSC library binary as a text string that lists the compiler, platform, build date/time and other information. */
 SSCEXPORT const char *ssc_build_info();
 

@@ -274,6 +274,9 @@
     <ClCompile Include="..\..\..\ssc\tcs\csp_system_costs_gen3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ssc\tcs\csp_solver_falling_particle_receiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\source\.repositories\sam_dev\ssc\tcs\atmospheric_aod.h">
@@ -463,6 +466,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\ssc\tcs\csp_system_costs_gen3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ssc\tcs\csp_solver_falling_particle_receiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
