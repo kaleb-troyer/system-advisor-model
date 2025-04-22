@@ -328,6 +328,10 @@ protected:
     util::matrix_t<double> matrix_inverse(util::matrix_t<double>& m);
 
 
+
+    s_steady_state_soln m_des_sol; 
+
+
 public:
 	// Class to save messages for up stream classes
 	C_csp_messages csp_messages;
@@ -379,6 +383,10 @@ public:
     void set_state_requirement(bool is_mode_fixed_to_input_mode);
 
     void set_fixed_mflow(double mflow);
+
+    const s_steady_state_soln& get_steady_state_soln() const {
+        return m_des_sol;
+    }
 
 };
 

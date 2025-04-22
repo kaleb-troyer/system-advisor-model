@@ -827,7 +827,7 @@ void C_falling_particle_receiver::design_point_steady_state(double v_wind_10, do
 
     // Solve for incident power needed to achieve design point thermal power to particles (assuming uniform solar flux on the curtain)
     double q_dot_inc_avg, Qtot, tol;
-    q_dot_inc_avg = m_q_rec_des / 0.85 / m_curtain_area;  // Initial guess for average incident solar flux on curtain [W/m2]  
+    q_dot_inc_avg = m_q_rec_des / 0.8 / m_curtain_area;  // Initial guess for average incident solar flux on curtain [W/m2]  
     tol = 1e-6;
 
     for (int j = 0; j < 40; j++)
@@ -846,9 +846,10 @@ void C_falling_particle_receiver::design_point_steady_state(double v_wind_10, do
             W_lift = calculate_lift_power(soln_des.m_dot_tot);
             Q_transport_loss = soln_des.Q_transport;
             tauc_avg = soln_des.tauc_avg;
+
+            m_des_sol = soln_des; 
             break;
         }
-        cout << soln_des.eta << endl; 
         q_dot_inc_avg = ((m_q_rec_des + soln_des.Q_transport) / soln_des.eta) / m_curtain_area;
     }
 
@@ -1505,7 +1506,7 @@ void C_falling_particle_receiver::solve_for_mass_flow(s_steady_state_soln &soln)
 	else  // Set initial guess for mass flow solution
 	{
         double Qinc = sum_over_rows_and_cols(soln.q_dot_inc, true) * m_curtain_elem_area;  // Total solar power incident on curtain [W]
-        double eta_guess = m_model_type == 0 ? m_fixed_efficiency : 0.85;
+        double eta_guess = m_model_type == 0 ? m_fixed_efficiency : 0.80;
         m_dot_guess = eta_guess * Qinc / (cp * (T_target_out_rec - T_cold_in_rec));	//[kg/s] Particle mass flow rate
 	}
 
@@ -1537,7 +1538,7 @@ void C_falling_particle_receiver::solve_for_mass_flow(s_steady_state_soln &soln)
     Tout_history.resize_fill(nmax, 0.0);        // Outlet temperature iteration history
     eta_history.resize_fill(nmax, 0.0);         // Receiver efficiency iteration history
     converged_history.resize_fill(nmax, false); // Steady state solution convergence history
-   
+    
 
     int qq = -1;
     bool converged = false;

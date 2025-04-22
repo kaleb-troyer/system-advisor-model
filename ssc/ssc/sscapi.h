@@ -74,7 +74,32 @@ SSCEXPORT int ssc_version();
 //---- custom export for fpr testing ----//
 //---------------------------------------//
 
-SSCEXPORT double ssc_testing(double Ti, double To, double H, double W, double h, double w, double d); 
+struct output {
+    double eta;
+    double m_dot_tot;
+    double T_particle_hot_rec;
+    double Q_inc;
+    double Q_refl;
+    double Q_rad;
+    double Q_adv;
+    double Q_cond;
+    double Q_transport;
+    double Q_thermal;
+    double tauc_avg;
+    double rhoc_avg;
+    double qnetc_sol_avg;
+    double qnetw_sol_avg;
+
+    output() {
+        eta = m_dot_tot = T_particle_hot_rec = Q_inc = Q_refl = Q_rad = Q_adv = Q_cond =
+            Q_transport = Q_thermal = tauc_avg = rhoc_avg = qnetc_sol_avg = qnetw_sol_avg = 0.0;
+    }
+};
+
+SSCEXPORT output ssc_testing(
+    double Ti, double To, double H, double W,
+    double h, double w, double d, double q
+);
 
 //---------------------------------------//
 //------------- end custom --------------//

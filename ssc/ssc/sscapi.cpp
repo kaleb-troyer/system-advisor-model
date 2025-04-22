@@ -54,8 +54,8 @@ SSCEXPORT int ssc_version()
 	return 290;
 }
 
-SSCEXPORT double ssc_testing(
-    double Ti, double To, double H, double W, double h, double w, double d
+SSCEXPORT output ssc_testing(
+    double Ti, double To, double H, double W, double h, double w, double d, double q
 ) {
 
     util::matrix_t<double> fluid_props; // unused but necessary to construct fpr_model
@@ -65,7 +65,7 @@ SSCEXPORT double ssc_testing(
         To,             // + double T_htf_hot_des           [C]         hot outlet HTF temperature at design, converted from C in constructor
         Ti,             // + double T_htf_cold_des          [C]         cold inlet HTF temperature at design, converted from C in constructor
         1.0,            // + double f_rec_min               [-]         minimum receiver thermal output as fraction of design
-        200.,           // + double q_dot_rec_des           [MWt]       design receiver thermal output, converted to [W] in init()
+        q,              // + double q_dot_rec_des           [MWt]       design receiver thermal output, converted to [W] in init()
         0.0,            // + double rec_su_delay            [hr]        required startup time
         0.0,            // + double rec_qf_delay            [-]         required startup energy as fraction of design thermal output
         2.0,            // + double m_dot_htf_max_frac      [-]         maximum receiver HTF mass flow as fraction of design mass flow
@@ -119,10 +119,26 @@ SSCEXPORT double ssc_testing(
     );
 
     fpr_model.init();
+    const auto& soln = fpr_model.get_steady_state_soln(); 
 
-    return 10 * Ti; 
+    output reval;
+    reval.eta = soln.eta;
+    reval.m_dot_tot = soln.m_dot_tot;
+    reval.T_particle_hot_rec = soln.T_particle_hot_rec;
+    reval.Q_inc = soln.Q_inc * 1E-6;
+    reval.Q_refl = soln.Q_refl * 1E-6;
+    reval.Q_rad = soln.Q_rad * 1E-6;
+    reval.Q_adv = soln.Q_adv * 1E-6;
+    reval.Q_cond = soln.Q_cond * 1E-6;
+    reval.Q_transport = soln.Q_transport * 1E-6;
+    reval.Q_thermal = soln.Q_thermal * 1E-6;
+    reval.tauc_avg = soln.tauc_avg;
+    reval.rhoc_avg = soln.rhoc_avg;
+    reval.qnetc_sol_avg = soln.qnetc_sol_avg * 1E-6;
+    reval.qnetw_sol_avg = soln.qnetw_sol_avg;
+
+    return reval;
 }
-
 
 SSCEXPORT const char *ssc_build_info()
 {
