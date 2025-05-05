@@ -124,7 +124,7 @@ SSCEXPORT output ssc_testing(
     output reval;
     reval.eta = soln.eta;
     reval.m_dot_tot = soln.m_dot_tot;
-    reval.T_particle_hot_rec = soln.T_particle_hot_rec;
+    reval.T_particle_hot_rec = soln.T_particle_hot_rec - 273.15;
     reval.Q_inc = soln.Q_inc * 1E-6;
     reval.Q_refl = soln.Q_refl * 1E-6;
     reval.Q_rad = soln.Q_rad * 1E-6;

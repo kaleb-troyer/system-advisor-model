@@ -1560,7 +1560,7 @@ void C_falling_particle_receiver::solve_for_mass_flow(s_steady_state_soln &soln)
         init_from_existing = false;
         if (qq>0 && !soln.rec_is_off && std::abs(soln.T_particle_hot_rec - Tout_history.at(qq - 1)) < 20)  
             init_from_existing = true;
-      
+        
 
         //--- Check mass flow convergence
         if (std::abs(err) < tol)  // Solution outlet temperature is at the target

@@ -128,6 +128,10 @@ void cspGen3CostModel::receiverLosses() {
     Losses are then scaled to cover receiver temperatures above and below 775C.
     */
 
+    //--------------------------------------//
+    //---- Sandia Correlation FPR model ----//
+    //-----------/*DEPRECATED*/-------------// 
+
     const double sigma = 5.670374419E-8;              // Stefan-Boltzmann Constant 
     const double epsilon = 0.80;                      // receiver emissivity (Gonzales-Portillo, 2021) (assumed)
     const double heat_transfer_coefficient = 95.0;    // (Gonzales-Portillo, 2021) (assumed)
@@ -179,71 +183,22 @@ void cspGen3CostModel::receiverLosses() {
     W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency) * scale;
     s_receiver.efficiency = 1.0 - (W_dot_losses / W_dot_field);
 
-    //------------------------------------//
-    //---- advanced fpr model testing ----//
-    //------------------------------------//
+    //-------------------------------------------------//
+    //---- NREL Physics-Based FPR Model (quasi-2D) ----//
+    //-------------------------------------------------//
+    /*
+    The following equation is a fit of an optimized receiver modeled
+    using the NREL physics-based approach, across a large parameterization
+    of inlet and outlet temperatures, and power delivered to the receiver.
+    Power delivered to the receiver has only a small impact on efficiency,
+    and is therefore not included in the fit. 
+    */
 
-    util::matrix_t<double> fluid_props; // unused but necessary to construct fpr_model
-    C_falling_particle_receiver fpr_model(
-        //---Power Tower Parameters
-        s_tower.height, // * double h_tower                 [m]         Power tower height
-        s_receiver.To - 273.15,  // + double T_htf_hot_des  [C]         hot outlet HTF temperature at design, converted from C in constructor
-        s_receiver.Ti - 273.15,  // + double T_htf_cold_des [C]         cold inlet HTF temperature at design, converted from C in constructor
-        1.0,            // + double f_rec_min               [-]         minimum receiver thermal output as fraction of design
-        W_dot_rec,      // + double q_dot_rec_des           [MWt]       design receiver thermal output, converted to [W] in init()
-        0.0,            // + double rec_su_delay            [hr]        required startup time
-        0.0,            // + double rec_qf_delay            [-]         required startup energy as fraction of design thermal output
-        2.0,            // + double m_dot_htf_max_frac      [-]         maximum receiver HTF mass flow as fraction of design mass flow
-        1.0,            // * double eta_pump                [-]         HTF pump efficiency
-        36,             // + int    field_fl                [-]         Receiver heat transfer fluid
-        fluid_props,    // - util::matrix_t<double> field_fl_props      Receiver htf fluid properties 
-
-        //---Receiver Model Parameters
-        3,              // + int    model_type              [-]         0 = Fixed efficiency, 1 = Sandia efficiency correlation for free-falling receiver, 2 = Sandia efficiency correlation for multi-stage receiver, 3 = Detailed quasi-2D physics-based receiver model
-        0.0,            // + double fixed_efficiency        [-]         User-defined fixed efficiency, only used if m_model_type == 0
-        0,              // + int    rad_model_type          [-]         Model used for advective loss (only used if m_model_type == 3): 0 = Sandia's formulation with hard-coded fudged view factor, 1 = new formulation
-        1,              // + int    hadv_model_type         [-]         Model used for advective loss (only used if m_model_type ==3): 0 = user-defined constant value, 1 = Sandia's correlation
-        0.0,            // - double hadv_user               [-]         User-provided constant advective loss coefficient (Only used if m_model_type >=3 and m_hadv_model = 0)
-
-        //--Aperture / Curtain Dimensions
-        s_receiver.height,  // + double ap_height           [m]         Aperture height
-        s_receiver.width,   // + double ap_width            [m]         Aperture width
-        0.9,            // + double ap_height_ratio         [-]         Curtain height / aperture height
-        0.9,            // + double ap_width_ratio          [-]         Cavity or curtain width / aperture width
-        0.1,            // + double ap_curtain_depth_ratio  [-]         (Distance between aperture and particle curtain) / aperture height
-        180.0,          // + double rec_orientation         [-]         Receiver orientation (0 = north, 90 = east, 180 = south, 270 = west
-
-        //---Particle Parameters
-        s_particles.mean_diameter,      // * double particle_dp             [m]         Particle diameter
-        s_particles.absorptivity,       // * double particle_abs            [-]         Particle absorptivity
-
-        //---Curtain / Cavity Parameters
-        0.60,           // + double curtain_emis            [-]         Curtain emissivity for q_net approximations
-        0.008,          // + double dthdy                   [-]         Rate of curtain thickness increase with respect to fall distance [m/m]
-        0.30,           // + double cav_abs                 [-]         Cavity wall solar absorptivity (Hanes 230, Tsun=5700K)
-        0.15,           // + double cav_emis                [-]         Cavity wall IR emissivity (Hanes 230, T=1000K)
-        0.5,            // + double cav_twall               [m]         Cavity wall thickness
-        0.2,            // + double cav_kwall               [m]         Cavity wall thermal conductivity
-        20.,            // + double cav_hext                [W/m2/K]    External heat transfer coefficient
-
-        //---Transport / Radiation Loss Parameters
-        0.0,            // + double deltaT_transport_cold   [K]         Constant tempearture loss from cold particle transport 
-        0.0,            // + double deltaT_transport_hot    [K]         Constant tempearture loss from hot particle transport 
-        1.0,            // + double tauc_mult               [-]         User-provided multiplier to adjust curtain transmissivity relative to values calculated from simple model
-        1.0,            // + double hadv_mult               [-]         User-provided multipler to adjust advective loss coefficient. Only used if m_hdav_model_type == 1
-
-        //---Discretization
-        30,             // + int    n_x                     [-]         Particle curtain (and back wall) discretization in width direction
-        30,             // + int    n_y                     [-]         Particle curtain (and back wall) discretization in height direction
-        0,              // - int    n_x_rad                 [-]         Number of curtain and back-wall x-element groups for the radiation model (only used if m_model_type == 3 and m_rad_model_type == 1)
-        0,              // - int    n_y_rad                 [-]         Number of curtain and back-wall y-element groups for the radiation model (only used if m_model_type == 3 and m_rad_model_type == 1)
-
-        //---Targets
-        s_receiver.To - 273.15,  // + double T_hot_target   [C]         Target particle outlet temperature [K], converted from C in constructor
-        1.0             // + double csky_frac               [-]         Weighting fraction on clear-sky DNI for receiver flow control
-    ); 
-
-    fpr_model.init();
+    const double A1 = 0.28989363;
+    const double A2 = 0.24336664; 
+    s_receiver.efficiency = cos(
+        (log(s_receiver.To - 273.15) - ((s_receiver.Ti - 273.15) * A1)) / (s_receiver.To - 273.15)
+    ) - A2;
 
 }; 
 
