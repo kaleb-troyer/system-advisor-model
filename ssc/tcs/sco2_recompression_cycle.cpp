@@ -3722,7 +3722,7 @@ void C_RecompCycle::finalize_design(int & error_code)
 	
 	
 	s_air_cooler_des_par_dep.m_T_hot_out_des = m_temp_last[C_sco2_cycle_core::MC_IN];			//[K]
-	s_air_cooler_des_par_dep.m_W_dot_fan_des = m_frac_fan_power*m_W_dot_net / 1000.0;		//[MWe]
+	s_air_cooler_des_par_dep.m_W_dot_fan_des = m_frac_fan_power*m_W_dot_net / 1000.0;		    //[MWe]
 		// Structure for design parameters that are independent of cycle design solution
 	C_CO2_to_air_cooler::S_des_par_ind s_air_cooler_des_par_ind;
 	s_air_cooler_des_par_ind.m_T_amb_des = m_T_amb_des;		//[K]

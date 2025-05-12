@@ -110,7 +110,7 @@ public:
             real_discount_rate = ((1 + discount_rate) / (1 + inflation)) - 1; // [-]
             capital_recovery_factor =
                 real_discount_rate * pow(1 + real_discount_rate, lifetime)
-                / (pow(1 + real_discount_rate, lifetime) - 1);
+                / (pow(1 + real_discount_rate, lifetime) - 1); 
         };
     } s_financing;
 
@@ -264,7 +264,8 @@ public:
         double dT;          // [K] losses in lift
 
         lifts() {
-            height = efficiency = dT = 0;
+            height = dT = 0;
+            efficiency = 0.8; // [-] (Ho, 2016) 
         };
     } s_lifts;
 

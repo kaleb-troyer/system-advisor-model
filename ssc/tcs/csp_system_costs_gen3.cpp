@@ -186,19 +186,25 @@ void cspGen3CostModel::receiverLosses() {
     //-------------------------------------------------//
     //---- NREL Physics-Based FPR Model (quasi-2D) ----//
     //-------------------------------------------------//
-    /*
+    /* 
     The following equation is a fit of an optimized receiver modeled
     using the NREL physics-based approach, across a large parameterization
     of inlet and outlet temperatures, and power delivered to the receiver.
     Power delivered to the receiver has only a small impact on efficiency,
     and is therefore not included in the fit. 
-    */
+    */ 
 
-    const double A1 = 0.28989363;
-    const double A2 = 0.24336664; 
-    s_receiver.efficiency = cos(
-        (log(s_receiver.To - 273.15) - ((s_receiver.Ti - 273.15) * A1)) / (s_receiver.To - 273.15)
-    ) - A2;
+    const double A1 = 0.99967897; 
+    const double A2 = 0.46471970; 
+    const double A3 = 0.25026485; 
+    const double Ta = 30.+273.15; 
+    s_receiver.efficiency = (cos((sqrt(
+                (s_receiver.To / Ta) - A1
+            ) - (s_receiver.Ti / Ta)
+        ) * A2 / (s_receiver.To / Ta)
+    ) - A3) * s_receiver.efficiency_modifier;
+
+    W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency);
 
 }; 
 
