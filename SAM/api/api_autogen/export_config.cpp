@@ -1,0 +1,452 @@
+/*
+BSD 3-Clause License
+
+Copyright (c) Alliance for Sustainable Energy, LLC. See also https://github.com/NREL/SAM/blob/develop/LICENSE
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <fstream>
+#include <stdlib.h>
+#include <string.h>
+#include <algorithm>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <set>
+
+#include <ssc/sscapi.h>
+#include <shared/lib_util.h>
+
+#include "startup_extractor.h"
+#include "ui_form_extractor.h"
+#include "equation_extractor.h"
+#include "config_extractor.h"
+#include "builder_generator.h"
+#include "data_structures.h"
+#include "export_config.h"
+
+#include "test.h"
+
+#if !defined(_WIN32)
+#include <ftw.h>
+#else
+#include <windows.h>
+#include <conio.h>
+
+#include <locale>
+#include <codecvt>
+#include <tchar.h>
+#include <shellapi.h>
+
+bool DeleteDirectory(LPCTSTR lpszDir, bool noRecycleBin = true)
+{
+	int len = _tcslen(lpszDir);
+	TCHAR *pszFrom = new TCHAR[len + 2];
+    _tcsncpy(pszFrom, lpszDir, len);
+	pszFrom[len] = 0;
+	pszFrom[len + 1] = 0;
+
+	SHFILEOPSTRUCT fileop;
+	fileop.hwnd = NULL;    // no status display
+	fileop.wFunc = FO_DELETE;  // delete operation
+	fileop.pFrom = pszFrom;  // source file name as double null terminated string
+	fileop.pTo = NULL;    // no destination needed
+	fileop.fFlags = FOF_NOCONFIRMATION | FOF_SILENT;  // do not prompt the user
+
+	if (!noRecycleBin)
+		fileop.fFlags |= FOF_ALLOWUNDO;
+
+	fileop.fAnyOperationsAborted = FALSE;
+	fileop.lpszProgressTitle = NULL;
+	fileop.hNameMappings = NULL;
+
+	int ret = SHFileOperation(&fileop);
+	delete[] pszFrom;
+	return (ret == 0);
+}
+#endif
+
+
+std::unordered_map<std::string, std::vector<std::string>> SAM_cmod_to_inputs;
+std::string active_config;
+
+#if !defined(_WIN32)
+int unlink_cb(const char *fpath, const struct stat *sb, int typeflag,
+	      struct FTW *ftwbuf)
+{
+    return remove(fpath);
+}
+#endif // !_WIN32
+
+void remove_directory(std::string sPath){
+#if defined(_WIN32)
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			std::wstring wide = converter.from_bytes(sPath);
+            DeleteDirectory(wide.c_str());
+#else
+	    return (void) nftw(sPath.c_str(), unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+#endif
+}
+
+void create_directory(const std::string& dir, bool empty){
+    mode_t nMode = 0733; // UNIX style permissions
+    int nError = 0;
+    struct stat info;
+
+    bool dir_exists = stat( dir.c_str(), &info ) == 0;
+    if(dir_exists) {
+        if (empty) {
+            remove_directory(dir);
+            dir_exists = false;
+        }
+    }
+    if (!dir_exists){
+#if defined(_WIN32)
+        nError = _mkdir(dir.c_str());
+#else
+        nError = mkdir(dir.c_str(), nMode);
+#endif
+        if (nError != 0) {
+            throw std::runtime_error("Couldn't create directory: " + dir);
+        }
+    }
+}
+
+void create_directory_recursive(const std::string& dir){
+    size_t pos = 0;
+    do
+    {
+        pos = dir.find_first_of("\\/", pos + 1);
+        // create directory if it doesn't exist
+        std::string subdir = dir.substr(0, pos);
+        if (subdir.length() > 0 && subdir.find(":", subdir.length() - 2) == std::string::npos)
+            create_directory(subdir, false);
+    } while (pos != std::string::npos);
+}
+
+void create_subdirectories(const std::string& dir, const std::vector<std::string>& folders){
+    create_directory_recursive(dir);
+
+    for (auto& name : folders){
+        std::string sPath = dir + '/' + name;
+        create_directory_recursive(sPath);
+    }
+}
+
+void create_empty_subdirectories(const std::string& dir, const std::vector<std::string>& folders){
+    struct stat info;
+    create_directory_recursive(dir);
+
+    for (auto& name : folders){
+        std::string sPath = dir + '/' + name;
+        // check if directory already exists
+        if( stat( sPath.c_str(), &info ) == 0 ) {
+            remove_directory(sPath);
+        }
+        create_directory_recursive(sPath);
+    }
+}
+
+void export_files(const std::string& config, std::set<std::string>& processed_cmods,
+                  const std::string& runtime_path, const std::string& defaults_path, const std::string& api_path,
+                  const std::string& pysam_path){
+
+    std::vector<std::string> primary_cmods = SAM_config_to_primary_modules[config];
+
+    config_extractor ce(config, runtime_path + "/defaults/");
+
+    // parse dependencies from equations for export into graph visualization and read the docs .rst
+    ce.map_equations();
+
+    // TODO: dependencies from callbacks
+//        ce.register_callback_functions();
+//        SAM_config_to_variable_graph[active_config]->print_dot(graph_path);
+
+    // modules and modules_order will need to be reset per cmod
+    for (auto & primary_cmod : primary_cmods){
+        processed_cmods.insert(util::lower_case(primary_cmod));
+
+        if (primary_cmod == "wind_landbosse")
+            continue;
+
+        std::cout << "Exporting for " << config << ": " << primary_cmod << "... ";
+        // get all the expressions
+        builder_generator b_gen(&ce);
+        b_gen.create_all(primary_cmod, defaults_path, api_path, pysam_path);
+        //b_gen.print_subgraphs(graph_path);
+    }
+    SAM_config_to_variable_graph.erase(config);
+}
+
+int main(int argc, char *argv[]){
+
+    // set default input & output file paths
+    char* pPath;
+    pPath = getenv ("SAMNTDIR");
+    if (pPath == NULL) {
+	std::cerr << "SAMNTDIR environment variable is unset" << std::endl;
+	exit(1);
+    }
+
+    std::string sam_path = std::string(pPath);
+
+    std::string startup_file = sam_path + "/deploy/runtime/startup.lk";
+    std::string runtime_path = sam_path + "/deploy/runtime";
+    std::string graph_path = sam_path + "/api/api_autogen/Graphs/Files";
+    std::string library_path = sam_path + "/api/api_autogen/library";
+    std::string api_path = library_path + "/C";
+    std::string defaults_path = library_path + "/defaults";
+    std::string pysam_path = library_path + "/PySAM";
+
+    // replace file paths with command line arguments
+    for(int i = 1; i < argc; i+=2) {
+        if (std::strcmp(argv[i], "--startup") == 0){
+            startup_file = argv[i+1];
+        }
+        if (std::strcmp(argv[i], "--runtime") == 0){
+            runtime_path = argv[i+1];
+        }
+        if (std::strcmp(argv[i], "--graph") == 0){
+            graph_path = argv[i+1];
+        }
+        if (std::strcmp(argv[i], "--api") == 0){
+            api_path = argv[i+1];
+        }
+        if (std::strcmp(argv[i], "--defaults") == 0){
+            defaults_path = argv[i+1];
+        }
+        if (std::strcmp(argv[i], "--pysam") == 0){
+            pysam_path = argv[i+1];
+        }
+    }
+    create_empty_subdirectories(api_path, std::vector<std::string>({"include", "modules"}));
+
+    create_directory_recursive(defaults_path);
+    create_directory(defaults_path, true);
+
+    create_empty_subdirectories(pysam_path, std::vector<std::string>({"modules"}));
+    create_empty_subdirectories(pysam_path + "/stubs", std::vector<std::string>({"stubs"}));
+    create_empty_subdirectories(pysam_path + "/docs", std::vector<std::string>({"modules", "lists"}));
+
+    std::cout << "Exporting C API files to " << api_path << "\n";
+    std::cout << "Exporting default JSON files to " << defaults_path << "\n";
+    std::cout << "Exporting PySAM files to " << pysam_path << "\n";
+
+    // from startup script, load file and extract information for each config
+    std::cout << "Reading startup script...\n";
+    std::ifstream ifs(startup_file.c_str());
+    if(!ifs.is_open()){
+        std::cerr << "Cannot open startup file at " << startup_file << std::endl;
+        return 1;
+    }
+
+    std::string content = static_cast<std::stringstream const&>(std::stringstream() << ifs.rdbuf()).str();
+
+    startup_extractor su_e;
+    if (!su_e.load_startup_script(content)){
+        std::cerr << "Startup script error\n";
+        return 1;
+    }
+    std::vector<std::string> unique_ui_form_names = su_e.get_unique_ui_forms();
+
+    // get all the SSC_INPUT & SSC_INOUT for all used compute_modules
+    load_primary_cmod_inputs();
+
+    // from each ui_form file, extract the config-independent defaults, equations and callback scripts
+    std::cout << "Reading ui forms and defaults...\n";
+
+    SAM_ui_extracted_db.populate_ui_data(runtime_path + "/ui/", unique_ui_form_names);
+
+    // keep track of all compute_modules that have been made into PySAM modules
+    std::set<std::string> processed_cmods;
+
+    // parsing the callbacks requires all ui forms in a config
+    active_config = "";
+
+    // do all technologies with Hybrid first because it has all the HybridTech stuff
+    for (auto & SAM_config_to_primary_module : SAM_config_to_primary_modules){
+        active_config = SAM_config_to_primary_module.first;
+       
+       if (active_config.find("Hybrid") == std::string::npos) continue;
+
+        export_files(active_config, processed_cmods, runtime_path, defaults_path, api_path, pysam_path);
+    }
+
+    // do technology configs with None first
+    for (auto & SAM_config_to_primary_module : SAM_config_to_primary_modules){
+        active_config = SAM_config_to_primary_module.first;
+
+        if (active_config.find("None") == std::string::npos && active_config != "MSPT-Single Owner"
+             && active_config != "DSPT-Single Owner"){
+            continue;
+        }
+
+       if (active_config.find("Hybrid") != std::string::npos) continue;
+
+        export_files(active_config, processed_cmods, runtime_path, defaults_path, api_path, pysam_path);
+    }
+    // do all configs
+    for (auto & SAM_config_to_primary_module : SAM_config_to_primary_modules){
+        active_config = SAM_config_to_primary_module.first;
+
+        if (active_config.find("None") != std::string::npos){
+            continue;
+        }
+
+        export_files(active_config, processed_cmods, runtime_path, defaults_path, api_path, pysam_path);
+    }
+
+    // produce remaining compute_modules
+    std::cout << "Remaining cmods: \n";
+    active_config = "";
+    int i = 0;
+    ssc_entry_t p_entry = ssc_module_entry(i);
+    while( p_entry  )
+    {
+        const char* name = ssc_entry_name(p_entry);
+        p_entry = ssc_module_entry(++i);
+
+        if (processed_cmods.count(util::lower_case(name)) != 0)
+            continue;
+
+        builder_generator cm_bg;
+        cm_bg.config_name = name;
+        cm_bg.create_all(name, defaults_path, api_path, pysam_path, false);
+    }
+
+    // pysam/docs/Configs.rst
+    printf("\n\nGenerating Configs.rst\n");
+    std::map<std::string, std::string> SAM_configs_sorted;
+    for (auto it = SAM_config_to_primary_modules.begin(); it != SAM_config_to_primary_modules.end(); ++it){
+        std::string config = it->first;
+        std::vector<std::string> primary_cmods = SAM_config_to_primary_modules[config];
+
+        std::string tech, fin;
+        get_tech_fin_of_config(config, tech, fin);
+        auto tech_desc = SAM_option_to_description[tech];
+        auto fin_desc = SAM_option_to_description[fin];
+        std::string config_name = tech_desc.first + " -- " + fin_desc.first; // use double-hyphen to distinguish names like Third Party - Host / Developer
+        std::string config_desc = tech_desc.second + ". " + fin_desc.second + ".";
+
+        std::string cmods;
+        for (auto &c : primary_cmods){
+            if (c == "wind_landbosse") continue;
+            cmods += ":doc:`../modules/" + format_as_symbol(c) + "`, ";
+        }
+        cmods.pop_back();
+        cmods.pop_back();
+
+        char buffer [1000];
+        // use reStructuredText definition format
+        std::string cfg = "";
+        for (auto& c : config)
+            if (c != ' ' && c != '-') cfg += c; 
+
+        snprintf(buffer, sizeof(buffer),
+            "%s\n---------------------------------------------------------------------------------\n\n"
+            "      %s\n\n"
+            "      Configuration name for defaults: *\"%s\"*\n\n"
+            "      %s\n\n",
+            config_name.c_str(),
+            config_desc.c_str(),
+            cfg.c_str(),
+            cmods.c_str());
+        SAM_configs_sorted[config_name] = std::string(buffer);
+    }
+
+    std::ofstream configs_file;
+    configs_file.open(pysam_path + "/docs/lists/configs.rst");
+    assert(configs_file.is_open());
+
+    for (auto & it : SAM_configs_sorted){
+        configs_file << it.second;
+    }
+
+    configs_file.close();
+    printf("Done\n\n");
+
+    // pysam/docs/Models.rst
+    printf("Generating Models.rst\n");
+    std::map<std::string, std::string> models_sorted;
+    i = 0;
+    p_entry = ssc_module_entry(i);
+    std::string cmod_toctree = ".. toctree::\n    :maxdepth: 2\n    :hidden:\n\n";
+    while( p_entry  )
+    {
+        std::string config_name = "";
+        std::string cmod_name = format_as_variable(format_as_symbol(ssc_entry_name(p_entry)));
+
+        if (cmod_name == "Tcsmslf") cmod_name = "TcsMSLF";
+        if (cmod_name == "sixparsolve") cmod_name = "SixParsolve";
+
+        for (auto & it : config_to_cmod_name) {
+            if (it.second == cmod_name)
+                config_name = it.first;
+        }
+        std::string desc = ssc_entry_description(p_entry);
+        if (desc.back() == '_')
+            desc = desc.substr(0, desc.size() - 1);
+        
+        // reStructuredText definition format
+        char buffer [2000];
+        snprintf(buffer, sizeof(buffer),
+                ":doc:`../modules/%s`%s\n"
+                "      %s\n\n", 
+                cmod_name.c_str(), (config_name.length() > 0 ) ? "" : " (HD)",
+                desc.c_str());
+        models_sorted[cmod_name] = buffer;
+        //}
+        p_entry = ssc_module_entry(++i);
+    }
+
+    std::ofstream models_file;
+    models_file.open(pysam_path + "/docs/lists/models.rst");
+    assert(models_file.is_open());
+
+    for (auto & it : models_sorted) {
+        if (it.first == "WindLandbosse") continue;
+        models_file << it.second;
+        cmod_toctree.append("    ../modules/");
+        cmod_toctree.append(it.first);
+        cmod_toctree.append(".rst\n");
+    }
+
+    models_file << cmod_toctree;
+
+    models_file.close();
+
+    printf("Done\n\n");
+
+    std::cout << "Complete...exiting\n";
+
+    return 0;
+}
+

@@ -1,0 +1,1958 @@
+/*
+
+PLEASE READ THIS FIRST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+This script controls upgrading files that were created with previous versions of SAM. This only works with .sam files, not .zsam files.
+PLEASE NOTE THAT EACH FUNCTION UPDATES A FILE ***TO*** THE VERSION NUMBER IN THE TITLE OF THE FUNCTION, FROM THE PREVIOUS VERSION.
+
+For example, if you create a file in version 2015.1.30 and open it with version 2015.4.10, ONLY THE 2015.4.10 FUNCTION WILL RUN.
+Any variables that changed between 2015.1.30 and 2015.4.10 should be changed IN THE 2015.4.10 FUNCTION.
+
+Please test your changes before you commit them! Thank you!
+
+Some more notes on how to use this:
+
+When an old project file is loaded, only variables that have the same name and data type as in the current version's configuration for
+that case are read in and can be accessed by the value() function.  For variables that no longer exist in the current version, or whose
+data types have changed, the values can be accessed using the oldvalue() function.
+
+The value() function cannot change the data type of a variable, as that is set by the current version's configuration.  
+
+To upgrade an old variable that no longer exists:
+
+	x = oldvalue('derate1');
+	value( 'loss1', 100*(1-x), 'The fraction derate1 is now the percentage loss1' );
+
+To upgrade an old variable that has a new datatype:
+
+	x = oldvalue('derate1');
+	value( 'derate1', [ x ], 'derate is now an array to support schedules' );  
+	
+To upgrade just the value of an old variable (same name and datatype), such as when the units have changed:
+
+	x = value('loss1');
+	value( 'loss1', 100*x, 'units changed from fraction to percent' );  
+	
+You don't need to delete any variables.  Old variables are discarded when a project is saved, and only the currently valid values
+are saved in the project file.
+
+Some more examples:
+
+	value( 'new_variable', 23.49, "This is a new variable that will help you define special things about your system." );
+	
+	message('Dont use this financial model anymore - beware!', 'error');
+	
+	message('Overwrote your old DC/AC ratio!', 'warning');
+	
+	value( 'loss_derate', 1-value('dc_ac_ratio')*0.01, 'A necessary change to the internal units used in SAM' );
+*/
+
+
+//***********************************************************************************************************************************************************
+//CURRENT WORKING VERSION (see SAM/main_add.h) - CHANGE THIS VERSION NUMBER WHEN RELEASES ARE CREATED AND MAKE A NEW CURRENT WORKING VERSION FUNCTION
+
+function variable_name_change(new, old){
+	value(new, oldvalue(old), 'Variable name changed from \"' + old + '\" to \"' +  new + '\"');
+}
+
+version_upgrade{'2024.12.12'} = define() {
+	
+	const cfg = config();
+
+	// Physical Trough Model Changes
+	if(cfg.tech == 'Physical Trough' || cfg.tech == 'Physical Trough IPH')
+	{
+		message('We added new packed bed and pressurized water cylinder TES options to the existing two-tank option on the Thermal Storage page. We also changed some TES variable names for the physical trough model.'
+				, 'warning');
+				
+		if(isalnum(oldvalue('tes_tank_insul_percent')) == true)
+		{
+			// Piston Cylinder TES is now tes_type == 3 (two tank == 1, packed bed == 2)
+			old_tes_type = value('tes_type');
+			tes_type = old_tes_type;
+			if(old_tes_type == 0)
+			{
+				tes_type = 1;
+			}
+			else if(old_tes_type == 1)
+			{
+				tes_type = 3;
+			}
+			value('tes_type', tes_type, 'Update TES type option for SSC variable (1=two tank, 2=packed bed, 3=pressurized water)');
+			value('TES_DISP_tes_type', tes_type - 1, 'Update TES type option for SAM user interface copy of variable (0=two tank, 1=packed bed, 2=pressurized water)');
+		}
+
+		variable_name_change('tes_cyl_tank_thick', 'tes_tank_thick');
+		variable_name_change('tes_cyl_tank_cp', 'tes_tank_cp');
+		variable_name_change('tes_cyl_tank_dens', 'tes_tank_dens');
+		variable_name_change('tes_cyl_tank_insul_percent', 'tes_tank_insul_percent');
+		variable_name_change('tes_n_tsteps', 'tes_NT_nstep');
+		
+		variable_name_change('tes_cyl_piston_loss_poly', 'tes_NT_piston_loss_poly');
+
+		piston_loss_poly = oldvalue('tes_NT_piston_loss_poly');
+		if(piston_loss_poly!=null) {
+			piston_loss_poly_labels = ['tes_cyl_piston_loss_poly_0', 
+									   'tes_cyl_piston_loss_poly_1', 
+									   'tes_cyl_piston_loss_poly_2', 
+									   'tes_cyl_piston_loss_poly_3'];
+			N_piston_loss_poly = #piston_loss_poly;
+			for (i = 0; i < #piston_loss_poly_labels; i++) {
+				if(i < N_piston_loss_poly)
+					val = piston_loss_poly[i];
+				else
+					val = 0;
+				value(piston_loss_poly_labels[i], val);
+			}
+		}
+		
+		message('We added an option on the Solar Field page to specify the trough loop minimum and maximum mass flow rate limits as either absolute (kg/s) or relative (fraction) values.'
+		        ' The default relative factors for minimum and maximum mass flow are 0.25 and 1.2, respectively.'
+		        , 'warning');
+		        
+		value('use_abs_or_rel_mdot_limit', 0, 'Use relative minimum and maximum flow rate limits (fractions) by default');
+		value('f_htfmin', 0.25, 'Set default minimum mass flow rate fraction');
+		value('f_htfmax', 1.2, 'Set default maximum mass flow rate fraction');
+			
+			
+		message('We added an option on the Thermal Storage page to size the tank with either a fixed diameter or fixed height.', 'warning');
+		h_tank = oldvalue('h_tank');
+		if(h_tank != null)
+		{
+			variable_name_change('h_tank_in', 'h_tank');
+			value('is_h_tank_fixed', 1, 'Set default tank sizing to fixed height');
+		}
+		
+		if(oldvalue('T_shutdown') == null)
+		{
+			message('We added the ability to set the field startup and shutdown temperatures, which were previously set internally by SAM.'
+				' The startup and shutdown temperatures will be set to the previous SAM-calculated value. ', 'warning');
+			
+			T_loop_out = oldvalue('T_loop_out');
+			T_loop_in = oldvalue('T_loop_in_des');
+			
+			T_startup_min = T_loop_in;
+			if(T_loop_out > 600)
+			{
+				T_startup_min = T_loop_out - 70.0;
+			}
+			T_startup = max(T_startup_min, 0.67 * T_loop_in + 0.33 * T_loop_out);
+			T_shutdown = T_startup;
+			value('T_startup', T_startup, 'Field startup temperature set using the previous SAM version method.');
+			value('T_shutdown', T_shutdown, 'Field shutdown temperature set equal to startup.');
+		}
+		
+		
+		
+	}
+	
+	// Linear Fresnel Model Changes
+	if(cfg.tech == 'MSLF' || cfg.tech == 'MSLF IPH')
+	{
+		message('We added an option on the Solar Field page to specify the trough loop minimum and maximum mass flow rate limits as either absolute (kg/s) or relative (fraction) values.'
+		        ' The default relative factors for min and max mass flow are 0.25 and 1.2, respectively.'
+		        , 'warning');
+		        
+			value('use_abs_or_rel_mdot_limit', 'Use relative (fraction) minimum and maximum flow rate limits by default');
+			value('f_htfmin', 0.25, 'Set default minimum mass flow rate fraction');
+			value('f_htfmax', 1.2, 'Set default maximum mass flow rate fraction');
+	}
+
+	// Detailed PV Model Changes
+	if(cfg.tech == 'Flat Plate PV')
+	{
+		variable_name_change('cec_gamma_pmp', 'cec_gamma_r');
+		variable_name_change('gamma_pmp_calc', 'gamma_r_calc');
+	}
+	
+	is_btm_fin = ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' || cfg.fin == 'Host Developer' || cfg.fin == 'Third Party' );
+	is_fom_fin = ( cfg.fin == 'Single Owner' || cfg.fin == 'Leveraged Partnership Flip' || cfg.fin == 'All Equity Partnership Flip' || cfg.fin == 'Sale Leaseback' || cfg.fin == 'Merchant Plant' );
+
+	// Standalone Battery Changes
+	if(cfg.tech == 'Standalone Battery')
+	{
+		message('We added a new Battery Time Step input page to explicitly define the simulation time step for standalone batteries. (For batteries coupled with a power generation system, the simulation time step is defined by the system model.)', 'warning');
+		timestep_mins = 60;
+		ts_per_hour = 1;
+		if (is_btm_fin) {
+			load = value("load");
+			ts_per_hour = #load / 8760;
+		}
+		if (is_fom_fin) {
+			if ( value('batt_dispatch_choice_ui') == 1 ) {
+				custom_dispatch = value('batt_custom_dispatch');
+				ts_per_hour = #custom_dispatch / 8760;
+			}
+			else {
+				curtailment = value("grid_curtailment");
+				ts_per_hour = #curtailment / 8760;
+			}
+		}
+		timestep_mins /= ts_per_hour;
+		options = [60, 30, 20, 15, 10, 5, 1];
+		i = 0;
+		while(timestep_mins < options[i]){
+			i++;
+		}
+		
+		value("timestep_minutes", timestep_mins, 'Simulation time step in minutes');
+		value("timestep_minutes_ui", i, 'Simulation time step option (0=60 min, 1=30 min, 2=20 min, 3=15 min, 4=10 min, 5=5 min, 6=1 min)');
+	}
+
+
+	//Check for renamed generic system configs
+	if(cfg.tech == 'Generic System' || cfg.tech == 'Generic Battery' || cfg.tech == 'Generic PVWatts Wind FuelCell Battery Hybrid')
+	{
+		if (cfg.tech == 'Generic System') {
+			message('We renamed Generic System to Custom Generation Profile', 'warning');
+			config('Custom Generation Profile', cfg.fin);
+		}
+		if(cfg.tech == 'Generic Battery') 
+		{
+			message('We renamed Generic System Battery to Custom Generation Battery', 'warning');
+			config('Custom Generation Battery', cfg.fin);
+		}
+		if(cfg.tech == 'Generic PVWatts Wind FuelCell Battery Hybrid')
+		{
+			message('We renamed Generic PVWatts Wind FuelCell Battery Hybrid to CustomGeneration PVWatts Wind FuelCell Battery Hybrid.', 'warning');
+			config('CustomGeneration PVWatts Wind FuelCell Battery Hybrid', cfg.fin);
+			//value('customgeneration_system_capacity', oldvalue('generic_system_capacity'), 'Variable name changed');
+			//value('customgeneration_total_installed_cost', oldvalue('generic_total_installed_cost'), 'Variable name changed');
+		}
+
+		config_update_with_old_values();
+		
+		variable_name_change('customgen.cost.contingency', 'genericsys.cost.contingency');
+		variable_name_change('customgen.cost.contingency_percent', 'genericsys.cost.contingency_percent');	
+		variable_name_change('customgen.cost.epc.fixed', 'genericsys.cost.epc.fixed');
+		variable_name_change('customgen.cost.epc.nonfixed', 'genericsys.cost.epc.nonfixed');
+		variable_name_change('customgen.cost.epc.percent', 'genericsys.cost.epc.percent');
+		variable_name_change('customgen.cost.epc.total','genericsys.cost.epc.total');
+		variable_name_change('customgen.cost.installed_per_capacity','genericsys.cost.installed_per_capacity');
+		variable_name_change('customgen.cost.per_watt','genericsys.cost.per_watt');
+		variable_name_change('customgen.cost.plant','genericsys.cost.plant');
+		variable_name_change('customgen.cost.plant_scaled','genericsys.cost.plant_scaled');
+		variable_name_change('customgen.cost.plm.fixed','genericsys.cost.plm.fixed');
+		variable_name_change('customgen.cost.plm.nonfixed','genericsys.cost.plm.nonfixed');
+		variable_name_change('customgen.cost.plm.percent','genericsys.cost.plm.percent');
+		variable_name_change('customgen.cost.plm.total','genericsys.cost.plm.total');
+		variable_name_change('customgen.cost.sales_tax.percent','genericsys.cost.sales_tax.percent');
+		variable_name_change('customgen.cost.sales_tax.total','genericsys.cost.sales_tax.total');
+		variable_name_change('customgen.cost.sales_tax.value','genericsys.cost.sales_tax.value');
+		
+	}
+	
+	//Check for renamed marine battery cost variables
+	if(cfg.tech == "MEwave Battery") {
+		variable_name_change('marinebatt.cost.contingency', 'genericsys.cost.contingency');
+		variable_name_change('marinebatt.cost.contingency_percent', 'genericsys.cost.contingency_percent');	
+		variable_name_change('marinebatt.cost.epc.fixed', 'customgen.cost.epc.fixed');
+		variable_name_change('marinebatt.cost.epc.nonfixed', 'genericsys.cost.epc.nonfixed');
+		variable_name_change('marinebatt.cost.epc.percent', 'custom.cost.epc.percent');
+		variable_name_change('marinebatt.cost.epc.total','genericsys.cost.epc.total');
+		variable_name_change('marinebatt.cost.installed_per_capacity','genericsys.cost.installed_per_capacity');
+		variable_name_change('marinebatt.cost.plm.fixed','genericsys.cost.plm.fixed');
+		variable_name_change('marinebatt.cost.plm.nonfixed','genericsys.cost.plm.nonfixed');
+		variable_name_change('marinebatt.cost.plm.percent','genericsys.cost.plm.percent');
+		variable_name_change('marinebatt.cost.plm.total','genericsys.cost.plm.total');
+		variable_name_change('marinebatt.cost.sales_tax.percent','genericsys.cost.sales_tax.percent');
+		variable_name_change('marinebatt.cost.sales_tax.total','genericsys.cost.sales_tax.total');
+		variable_name_change('marinebatt.cost.sales_tax.value','genericsys.cost.sales_tax.value');
+	}
+	//Check for renamed standalone battery cost variables
+	if(cfg.tech == "Standalone Battery") {
+		variable_name_change('standalonebatt.cost.contingency', 'genericsys.cost.contingency');
+		variable_name_change('standalonebatt.cost.contingency_percent', 'genericsys.cost.contingency_percent');	
+		variable_name_change('standalonebatt.cost.epc.fixed', 'customgen.cost.epc.fixed');
+		variable_name_change('standalonebatt.cost.epc.nonfixed', 'genericsys.cost.epc.nonfixed');
+		variable_name_change('standalonebatt.cost.epc.percent', 'custom.cost.epc.percent');
+		variable_name_change('standalonebatt.cost.epc.total','genericsys.cost.epc.total');
+		variable_name_change('standalonebatt.cost.installed_per_capacity','genericsys.cost.installed_per_capacity');
+		variable_name_change('standalonebatt.cost.plm.fixed','genericsys.cost.plm.fixed');
+		variable_name_change('standalonebatt.cost.plm.nonfixed','genericsys.cost.plm.nonfixed');
+		variable_name_change('standalonebatt.cost.plm.percent','genericsys.cost.plm.percent');
+		variable_name_change('standalonebatt.cost.plm.total','genericsys.cost.plm.total');
+		variable_name_change('standalonebatt.cost.sales_tax.percent','genericsys.cost.sales_tax.percent');
+		variable_name_change('standalonebatt.cost.sales_tax.total','genericsys.cost.sales_tax.total');
+		variable_name_change('standalonebatt.cost.sales_tax.value','genericsys.cost.sales_tax.value');
+	}
+	
+		
+};
+
+version_upgrade{'2023.12.17'} = define() {
+	
+	const cfg = config();
+
+	// Physical Trough Model Changes
+	if(cfg.tech == 'Physical Trough')
+	{
+		message('We improved the calculations that size the field to achieve to a target solar multiple.'
+		' This version includes all design-point optical and thermal losses. For the default case, this change increases the solar field size by 1-2%.'
+		' Please review the calculated solar field area when you open your case.', 'warning');
+	
+		if(cfg.fin == 'LCOE Calculator' || cfg.fin == 'None')
+		{
+			value('csp.dtr.cost.site_improvements.cost_per_m2', 25, 'Installation costs default.');
+			value('csp.dtr.cost.solar_field.cost_per_m2', 150, 'Installation costs default.');
+			value('csp.dtr.cost.htf_system.cost_per_m2', 60, 'Installation costs default.');
+			value('csp.dtr.cost.storage.cost_per_kwht', 62, 'Installation costs default.');
+			value('csp.dtr.cost.fossil_backup.cost_per_kwe', 0, 'Installation costs default.');
+			value('csp.dtr.cost.power_plant.cost_per_kwe', 910, 'Installation costs default.');
+			value('csp.dtr.cost.bop_per_kwe', 90, 'Installation costs default.');
+			
+			value('csp.dtr.cost.contingency_percent', 7, 'Installation costs default.');
+			value('csp.dtr.cost.epc.per_acre', 0, 'Installation costs default.');
+			value('csp.dtr.cost.epc.percent', 11, 'Installation costs default.');
+			value('csp.dtr.cost.epc.per_watt', 0, 'Installation costs default.');
+			value('csp.dtr.cost.epc.fixed', 0, 'Installation costs default.');
+			value('csp.dtr.cost.plm.per_acre', 10000, 'Installation costs default.');
+			value('csp.dtr.cost.plm.percent', 0, 'Installation costs default.');
+			value('csp.dtr.cost.plm.per_watt', 0, 'Installation costs default.');
+			value('csp.dtr.cost.plm.fixed', 0, 'Installation costs default.');
+			value('csp.dtr.cost.sales_tax.percent', 80, 'Installation costs default.');
+			value('sales_tax_rate', 5, 'Installation costs default.');
+		}
+	
+	}
+	
+	// Physical Trough IPH Model Changes
+	if(cfg.tech == 'Physical Trough IPH')
+	{
+		message('We improved the calculations that size the field to achieve to a target solar multiple.'
+		' This version includes all design-point optical and thermal losses. For the default case, this change increases the solar field size by 1-2%.'
+		' Please review the calculated solar field area when you open your case.', 'warning');
+		
+		value('use_solar_mult_or_aperture_area', 0, 'Previous model used solar multiple to size system');
+		value('specified_total_aperture', 20000, 'Default value for specified total aperture');
+		value('tes_pump_coef', oldvalue('pb_pump_coef'), 'Previous model did not have independent TES pumping power');
+		value('eta_tes_htr', oldvalue('csp.pt.tes.heater_eff'), 'Variable name change.');
+		
+		value('csp.dtr.cost.site_improvements.cost_per_m2', 25, 'Installation costs default.');
+		value('csp.dtr.cost.solar_field.cost_per_m2', 150, 'Installation costs default.');
+		value('csp.dtr.cost.htf_system.cost_per_m2', 60, 'Installation costs default.');
+		value('csp.dtr.cost.storage.cost_per_kwht', 62, 'Installation costs default.');
+		value('csp.dtr.cost.heat_sink.cost_per_kwe', 120, 'Installation costs default.');
+		value('csp.dtr.cost.bop_per_kwe', 90, 'Installation costs default.');
+		value('csp.dtr.cost.contingency_percent', 7, 'Installation costs default.');
+		value('csp.dtr.cost.epc.per_acre', 0, 'Installation costs default.');
+		value('csp.dtr.cost.epc.percent', 11, 'Installation costs default.');
+		value('csp.dtr.cost.epc.per_watt', 0, 'Installation costs default.');
+		value('csp.dtr.cost.epc.fixed', 0, 'Installation costs default.');
+		value('csp.dtr.cost.plm.per_acre', 10000, 'Installation costs default.');
+		value('csp.dtr.cost.plm.percent', 0, 'Installation costs default.');
+		value('csp.dtr.cost.plm.per_watt', 0, 'Installation costs default.');
+		value('csp.dtr.cost.plm.fixed', 0, 'Installation costs default.');
+		value('csp.dtr.cost.sales_tax.percent', 80, 'Installation costs default.');
+		value('sales_tax_rate', 5, 'Installation costs default.');
+	}
+
+
+
+	// SAM 2022.11.21 default inverters are not in new CEC inverters library
+	if ( cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery' || cfg.tech == 'High-X Concentrating PV' ) 
+	{
+		old_inverter = value( 'inv_cec_name' );
+		str = runtimedir();
+		if ( strpos( str, '/' ) > -1 ) { slash = '/'; }
+		else { slash = '\\'; }
+		arr = split ( str, slash );
+		lib_file = '';
+		for (i=0; i<#arr-1; i++) { lib_file += arr[i] + '/'; }
+		lib_file += 'libraries/CEC Inverters.csv';
+		new_inverters = csvread( lib_file, { 'table' = true } );
+		inverter_names = new_inverters{'Name'};
+		new_inverters = {};
+		inverter_names -@ 0;
+		inverter_names -@ 0;
+		check = 0;
+		i = 0;
+		while (check == 0 && i < #inverter_names) {
+			if (inverter_names[i] == old_inverter) {
+				check = 1;
+			}
+			i++;
+		}
+		if ( check == 0 )
+		{
+			stable_sort( lower(inverter_names) );
+			msg = 'The inverter in the file you are opening is from an out-of-date library.\n\n';
+			inv = '';
+			inv = choose_from_list( inverter_names, msg + 'Inverter from old library is:\n  ' + old_inverter +'\nChoose an inverter from the new library:', 'Choose Inverter' );
+			if ( inv == '' ) { inv = inverter_names[0] ; }
+			value( 'inv_cec_name', inv, 'Inverter updated from ' + old_inverter + ' to ' + inv + '.');
+		}	
+		message('We updated the CEC module and inverter libraries from the CEC data available in November, 2023. Please check the library on the Module and Inverter page to verify the selected module and inverter is in the new library.'); 
+	}
+
+	// handle adjust variables conversion from table to variables
+	// note marine energy availability not used in any configurations in SAM 2022.11.21 so no need to handle conversion
+	// standalone battery also does not have availability losses
+	// all others call this "availability loss" except for detailed PV, handled separately below
+	if ( cfg.tech == 'PVWatts' || cfg.tech ==  'High-X Concentrating PV' || cfg.tech == 'PVWatts Battery' || cfg.tech ==  'Generic Battery' || cfg.tech ==  'ETES' || cfg.tech == 'PTES'
+	    || cfg.tech ==  'Physical Trough' || cfg.tech ==  'Empirical Trough' || cfg.tech ==  'MSPT' || cfg.tech == 'MSLF' || cfg.tech ==  'DSLF' || cfg.tech ==  'Generic CSP System' 
+	    || cfg.tech ==  'Physical Trough IPH' || cfg.tech ==  'DSGL IPH' || cfg.tech ==  'Wind Power' || cfg.tech == 'Fuel Cell' || cfg.tech ==  'Geothermal Power' || cfg.tech ==  'Solar Water Heating'
+	    || cfg.tech == 'Biopower' || cfg.tech == 'Generic System' || cfg.tech ==  'MSLF IPH' || cfg.tech ==  'MSPT IPH' ) 
+	{	
+		x = oldvalue('adjust');
+		message('Availability losses variable format changed from single table ("adjust") to separate variables: adjust_constant (number), adjust_en_timeindex (number), adjust_timeindex (array), adjust_en_periods (number), adjust_periods (array).');
+		value('adjust_constant', x.constant);
+		value('adjust_en_periods', x.en_periods);
+		//assigned periods are a matrix [[x,y,z]], unassigned periods are [1]. the latter must be reformatted to [0,0,0] to simulate correctly.
+		p = x.periods;
+		p1 = p[0];
+		if ( typeof(p1) == 'number' ) {
+			p = [[0,0,0]];
+		}
+		elseif ( #p1 != 3 ) {
+			p = [[0,0,0]];
+		}
+		value('adjust_periods', p); 
+		value('adjust_en_timeindex', x.en_timeindex);
+		value('adjust_timeindex', x.timeindex);
+	}
+	if ( cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery' ) {
+		//change in default subarray modules per string
+		if ( oldvalue('subarray2_enable') == 0 && oldvalue('subarray2_modules_per_string') == 0 && oldvalue('subarray2_nstrings') == 0 ) {
+			value('subarray2_modules_per_string', 1, 'Change default Subarray 2 modules per string from 0 to 1 to avoid simulation error' );
+			value('subarray2_nstrings', 1, 'Change default Subarray 2 strings in parallel from 0 to 1 to avoid simulation error');
+		}
+		if ( oldvalue('subarray3_enable') == 0 && oldvalue('subarray3_modules_per_string') == 0 && oldvalue('subarray3_nstrings') == 0 ) {
+			value('subarray3_modules_per_string', 1, 'Change default Subarray 3 modules per string from 0 to 1 to avoid simulation error' );
+			value('subarray3_nstrings', 1, 'Change default Subarray 3 strings in parallel from 0 to 1 to avoid simulation error');
+		}
+		if ( oldvalue('subarray4_enable') == 0 && oldvalue('subarray4_modules_per_string') == 0 && oldvalue('subarray4_nstrings') == 0 ) {
+			value('subarray4_modules_per_string', 1, 'Change default Subarray 4 modules per string from 0 to 1 to avoid simulation error' );
+			value('subarray4_nstrings', 1, 'Change default Subarray 4 strings in parallel from 0 to 1 to avoid simulation error');
+		}
+		
+		//changed module aspect ratio
+		message('The module aspect ratio input is now on the Module page instead of the Shading and Layout page. For the CEC performance model with module library, SAM now calculates the aspect ratio from the length and width data in the module library if it is avalailable.');
+		
+		//DC adjust factor
+		x = oldvalue('dc_adjust');
+		message('DC Losses variable format changed from single table ("dc_adjust") to separate variables: dc_adjust_constant (number), dc_adjust_en_timeindex (number), dc_adjust_timeindex (array), dc_adjust_en_periods (number), dc_adjust_periods (array).');
+		value('dc_adjust_constant', x.constant);
+		value('dc_adjust_en_periods', x.en_periods);
+		//assigned periods from previous versions are a matrix [[x,y,z]], unassigned periods are [1]. the latter must be reformatted to [[0,0,0]] to simulate correctly.
+		p = x.periods;
+		p1 = p[0];
+		if ( typeof(p1) == 'number' ) {
+			p = [[0,0,0]];
+		}
+		elseif ( #p1 != 3 ) {
+			p = [[0,0,0]];
+		}
+		value('dc_adjust_periods', p); 
+		value('dc_adjust_en_timeindex', x.en_timeindex);
+		value('dc_adjust_timeindex', x.timeindex);
+		
+		//AC adjust factor
+		x = oldvalue('adjust');
+		message('AC losses variable format changed from single table ("adjust") to separate variables: adjust_constant (number), adjust_en_timeindex (number), adjust_timeindex (array), adjust_en_periods (number), adjust_periods (array).');
+		value('adjust_constant', x.constant);
+		value('adjust_en_periods', x.en_periods);
+		//assigned periods are a matrix [[x,y,z]], unassigned periods are [1]. the latter must be reformatted to [0,0,0] to simulate correctly.
+		p = x.periods;
+		p1 = p[0];
+		if ( typeof(p1) == 'number' ) {
+			p = [[0,0,0]];
+		}
+		elseif ( #p1 != 3 ) {
+			p = [[0,0,0]];
+		}
+		value('adjust_periods', p); 
+		value('adjust_en_timeindex', x.en_timeindex);
+		value('adjust_timeindex', x.timeindex);
+		
+		//shading variable renaming
+		x = oldvalue('subarray1_shading');
+		message('Subarray 1 Shading variable format changed from table to separate variables.');
+		value('subarray1_shading_en_azal', x.en_azal); 
+		value('subarray1_shading_azal', x.azal);
+		value('subarray1_shading_en_diff', x.en_diff);
+		value('subarray1_shading_diff', x.diff);
+		value('subarray1_shading_en_mxh', x.en_mxh);
+		value('subarray1_shading_mxh', x.mxh);
+		value('subarray1_shading_en_string_option', x.en_string_option);
+		value('subarray1_shading_string_option', x.string_option);
+		value('subarray1_shading_en_timestep', x.en_timestep);
+		value('subarray1_shading_timestep', x.timestep);
+		x = oldvalue('subarray2_shading');
+		message('Subarray 2 Shading variable format changed from table to separate variables.');
+		value('subarray2_shading_en_azal', x.en_azal); 
+		value('subarray2_shading_azal', x.azal);
+		value('subarray2_shading_en_diff', x.en_diff);
+		value('subarray2_shading_diff', x.diff);
+		value('subarray2_shading_en_mxh', x.en_mxh);
+		value('subarray2_shading_mxh', x.mxh);
+		value('subarray2_shading_en_string_option', x.en_string_option);
+		value('subarray2_shading_string_option', x.string_option);
+		value('subarray2_shading_en_timestep', x.en_timestep);
+		value('subarray2_shading_timestep', x.timestep);
+		x = oldvalue('subarray3_shading');
+		message('Subarray 3 Shading variable format changed from table to separate variables.');
+		value('subarray3_shading_en_azal', x.en_azal); 
+		value('subarray3_shading_azal', x.azal);
+		value('subarray3_shading_en_diff', x.en_diff);
+		value('subarray3_shading_diff', x.diff);
+		value('subarray3_shading_en_mxh', x.en_mxh);
+		value('subarray3_shading_mxh', x.mxh);
+		value('subarray3_shading_en_string_option', x.en_string_option);
+		value('subarray3_shading_string_option', x.string_option);
+		value('subarray3_shading_en_timestep', x.en_timestep);
+		value('subarray3_shading_timestep', x.timestep);
+		x = oldvalue('subarray4_shading');
+		message('Subarray 4 Shading variable format changed from table to separate variables.');
+		value('subarray4_shading_en_azal', x.en_azal); 
+		value('subarray4_shading_azal', x.azal);
+		value('subarray4_shading_en_diff', x.en_diff);
+		value('subarray4_shading_diff', x.diff);
+		value('subarray4_shading_en_mxh', x.en_mxh);
+		value('subarray4_shading_mxh', x.mxh);
+		value('subarray4_shading_en_string_option', x.en_string_option);
+		value('subarray4_shading_string_option', x.string_option);
+		value('subarray4_shading_en_timestep', x.en_timestep);
+		value('subarray4_shading_timestep', x.timestep);
+	}
+	if ( cfg.tech == 'PVWatts' ) {
+		//shading variable renaming
+		x = oldvalue('shading');
+		message('Shading variable format changed from table to separate variables.');
+		value('shading_en_azal', x.en_azal); 
+		value('shading_azal', x.azal);
+		value('shading_en_diff', x.en_diff);
+		value('shading_diff', x.diff);
+		value('shading_en_mxh', x.en_mxh);
+		value('shading_mxh', x.mxh);
+		value('shading_en_string_option', x.en_string_option);
+		value('shading_string_option', x.string_option);
+		value('shading_en_timestep', x.en_timestep);
+		value('shading_timestep', x.timestep);
+	}
+	if ( cfg.tech ==  'Generic CSP System' || cfg.tech ==  'MSPT') {	
+		x = oldvalue('sf_adjust');
+		message('Solar Field Losses (availability losses) variable format changed from table to separate variables.');
+		value('sf_adjust_constant', x.constant, 'Convert Solar Field Losses sf_adjust:constant to sf_adjust_constant');
+		value('sf_adjust_en_periods', x.en_periods, 'Convert Solar Field Losses asf_djust:en_periods to sf_adjust_en_periods');
+		p = x.periods; //this logic works for both blank period arrays and for completed ones
+		value('sf_adjust_periods', p, 'Convert Solar Field Losses sf_adjust:periods to sf_adjust_periods');
+		value('sf_adjust_en_timeindex', x.en_timeindex, 'Convert Solar Field Losses sf_adjust:en_timeindex to sf_adjust_en_timeindex');
+		value('sf_adjust_timeindex', x.timeindex, 'Convert Solar Field Losses sf_adjust:timeindex to sf_adjust_timeindex');
+	}
+
+	// new variables for MSLF
+	if(cfg.tech == 'MSLF'){
+	
+		old_fp_mode = value( 'fp_mode' );
+		if(old_fp_mode != 1){
+			message('Your file uses fossil backup for freeze protection (dropdown on Thermal Storage page). We removed this option for this release'
+			' and switched to using electricity that is deducted from the total plant output. Your annual energy will decrease, and the difference'
+			' will depend on the amount of freeze protection required. For reference, the annual energy in the default case decreases by around 12%.', 'warning');
+		}
+	
+		// General Warnings
+		message('We improved this model to use the numerical solver and plant controller that the power tower and Physical trough use. This framework improves mass and energy balances and system control.'
+		' The new implementation requires moving or renaming many inputs from your old file. Please carefully review the new input pages and results.', 'warning');
+		message('We improved the calculations that size the field to achieve to a target solar multiple.'
+		' This version includes all design-point optical and thermal losses. For the default case, this change increases the solar field size by 1-2%.'
+		' Please review the calculated solar field area when you open your case.', 'warning');
+		
+	
+		// System Design
+		value('solar_mult_in', oldvalue('solar_mult'), 'Changed variable cmod name.');
+		value('total_Ap_in', oldvalue('a_field'), 'Added variable to cmod');
+		value('solar_mult_or_Ap', oldvalue('csp.mslf.sf.sm_or_area'), 'Added variable to cmod');
+		value('gross_net_conversion_factor', oldvalue('csp.mslf.cycle.gr_to_net'), 'Added variable to cmod');
+		
+		// Solar Field
+		value('rec_su_delay', 0.2, 'Added receiver startup delay time (s)');
+		value('rec_qf_delay', 0.25, 'Added receiver startup delay energy fraction');
+		value('p_start', 0.021, 'Added collector startup energy (kWhe/sca)');
+		value('DISP_combo_htf_type', oldvalue('csp.mslf.sf.Fluid'), 'Changed variable UI name');
+		value('field_fl_props', oldvalue('HTF_data'), 'Changed variable UI name');
+		
+		// Collector and Receiver
+		value('DISP_rec_model', oldvalue('csp.mslf.sf.rec_model'), 'Changed variable UI name.');
+		value('DISP_opt_model', oldvalue('csp.mslf.sf.opt_model'), 'Changed variable UI name.');
+		value('DISP_IAM_T_coefs0', oldvalue('csp.mslf.sf.IAM_T_coefs0'), 'Changed variable UI name.');
+		value('DISP_IAM_T_coefs1', oldvalue('csp.mslf.sf.IAM_T_coefs1'), 'Changed variable UI name.');
+		value('DISP_IAM_T_coefs2', oldvalue('csp.mslf.sf.IAM_T_coefs2'), 'Changed variable UI name.');
+		value('DISP_IAM_T_coefs3', oldvalue('csp.mslf.sf.IAM_T_coefs3'), 'Changed variable UI name.');
+		value('DISP_IAM_T_coefs4', oldvalue('csp.mslf.sf.IAM_T_coefs4'), 'Changed variable UI name.');
+		value('DISP_IAM_L_coefs0', oldvalue('csp.mslf.sf.IAM_L_coefs0'), 'Changed variable UI name.');
+		value('DISP_IAM_L_coefs1', oldvalue('csp.mslf.sf.IAM_L_coefs1'), 'Changed variable UI name.');
+		value('DISP_IAM_L_coefs2', oldvalue('csp.mslf.sf.IAM_L_coefs2'), 'Changed variable UI name.');
+		value('DISP_IAM_L_coefs3', oldvalue('csp.mslf.sf.IAM_L_coefs3'), 'Changed variable UI name.');
+		value('DISP_IAM_L_coefs4', oldvalue('csp.mslf.sf.IAM_L_coefs4'), 'Changed variable UI name.');
+		value('DISP_HL_T_coefs0', oldvalue('csp.mslf.sf.HL_T_coefs0'), 'Changed variable UI name.');
+		value('DISP_HL_T_coefs1', oldvalue('csp.mslf.sf.HL_T_coefs1'), 'Changed variable UI name.');
+		value('DISP_HL_T_coefs2', oldvalue('csp.mslf.sf.HL_T_coefs2'), 'Changed variable UI name.');
+		value('DISP_HL_T_coefs3', oldvalue('csp.mslf.sf.HL_T_coefs3'), 'Changed variable UI name.');
+		value('DISP_HL_T_coefs4', oldvalue('csp.mslf.sf.HL_T_coefs4'), 'Changed variable UI name.');
+		value('DISP_HL_w_coefs0', oldvalue('csp.mslf.sf.HL_w_coefs0'), 'Changed variable UI name.');
+		value('DISP_HL_w_coefs1', oldvalue('csp.mslf.sf.HL_w_coefs1'), 'Changed variable UI name.');
+		value('DISP_HL_w_coefs2', oldvalue('csp.mslf.sf.HL_w_coefs2'), 'Changed variable UI name.');
+		value('DISP_HL_w_coefs3', oldvalue('csp.mslf.sf.HL_w_coefs3'), 'Changed variable UI name.');
+		value('DISP_HL_w_coefs4', oldvalue('csp.mslf.sf.HL_w_coefs4'), 'Changed variable UI name.');
+		value('DISP_DP_coefs0', oldvalue('csp.mslf.sf.DP_coefs0'), 'Changed variable UI name.');
+		value('DISP_DP_coefs1', oldvalue('csp.mslf.sf.DP_coefs1'), 'Changed variable UI name.');
+		value('DISP_DP_coefs2', oldvalue('csp.mslf.sf.DP_coefs2'), 'Changed variable UI name.');
+		value('DISP_DP_coefs3', oldvalue('csp.mslf.sf.DP_coefs3'), 'Changed variable UI name.');
+		value('DISP_HCE_FieldFrac1', oldvalue('csp.mslf.sf.HCE_FieldFrac1'), 'Changed UI cmod name.');
+		value('DISP_HCE_FieldFrac2', oldvalue('csp.mslf.sf.HCE_FieldFrac2'), 'Changed UI cmod name.');
+		value('DISP_HCE_FieldFrac3', oldvalue('csp.mslf.sf.HCE_FieldFrac3'), 'Changed UI cmod name.');
+		value('DISP_HCE_FieldFrac4', oldvalue('csp.mslf.sf.HCE_FieldFrac4'), 'Changed UI cmod name.');
+		value('DISP_alpha_abs1', oldvalue('csp.mslf.sf.alpha_abs1'), 'Changed variable UI name.');
+		value('DISP_alpha_abs2', oldvalue('csp.mslf.sf.alpha_abs2'), 'Changed variable UI name.');
+		value('DISP_alpha_abs3', oldvalue('csp.mslf.sf.alpha_abs3'), 'Changed variable UI name.');
+		value('DISP_alpha_abs4', oldvalue('csp.mslf.sf.alpha_abs4'), 'Changed variable UI name.');
+		
+		value('DISP_alpha_env1', oldvalue('csp.mslf.sf.alpha_env1'), 'Changed variable UI name.');
+		value('DISP_alpha_env2', oldvalue('csp.mslf.sf.alpha_env2'), 'Changed variable UI name.');
+		value('DISP_alpha_env3', oldvalue('csp.mslf.sf.alpha_env3'), 'Changed variable UI name.');
+		value('DISP_alpha_env4', oldvalue('csp.mslf.sf.alpha_env4'), 'Changed variable UI name.');
+		value('DISP_epsilon_glass1', oldvalue('csp.mslf.sf.epsilon_glass1'), 'Changed variable UI name.');
+		value('DISP_epsilon_glass2', oldvalue('csp.mslf.sf.epsilon_glass2'), 'Changed variable UI name.');
+		value('DISP_epsilon_glass3', oldvalue('csp.mslf.sf.epsilon_glass3'), 'Changed variable UI name.');
+		value('DISP_epsilon_glass4', oldvalue('csp.mslf.sf.epsilon_glass4'), 'Changed variable UI name.');
+		value('DISP_Tau_envelope1', oldvalue('csp.mslf.sf.Tau_envelope1'), 'Changed variable UI name.');
+		value('DISP_Tau_envelope2', oldvalue('csp.mslf.sf.Tau_envelope2'), 'Changed variable UI name.');
+		value('DISP_Tau_envelope3', oldvalue('csp.mslf.sf.Tau_envelope3'), 'Changed variable UI name.');
+		value('DISP_Tau_envelope4', oldvalue('csp.mslf.sf.Tau_envelope4'), 'Changed variable UI name.');
+		value('DISP_GlazingIntactIn1', oldvalue('csp.mslf.sf.GlazingIntactIn1'), 'Changed variable UI name.');
+		value('DISP_GlazingIntactIn2', oldvalue('csp.mslf.sf.GlazingIntactIn2'), 'Changed variable UI name.');
+		value('DISP_GlazingIntactIn3', oldvalue('csp.mslf.sf.GlazingIntactIn3'), 'Changed variable UI name.');
+		value('DISP_GlazingIntactIn4', oldvalue('csp.mslf.sf.GlazingIntactIn4'), 'Changed variable UI name.');
+		value('DISP_AnnulusGas1', oldvalue('csp.mslf.sf.AnnulusGas1'), 'Changed variable UI name.');
+		value('DISP_AnnulusGas2', oldvalue('csp.mslf.sf.AnnulusGas2'), 'Changed variable UI name.');
+		value('DISP_AnnulusGas3', oldvalue('csp.mslf.sf.AnnulusGas3'), 'Changed variable UI name.');
+		value('DISP_AnnulusGas4', oldvalue('csp.mslf.sf.AnnulusGas4'), 'Changed variable UI name.');
+		value('DISP_P_a1', oldvalue('csp.mslf.sf.P_a1'), 'Changed variable UI name.');
+		value('DISP_P_a2', oldvalue('csp.mslf.sf.P_a2'), 'Changed variable UI name.');
+		value('DISP_P_a3', oldvalue('csp.mslf.sf.P_a3'), 'Changed variable UI name.');
+		value('DISP_P_a4', oldvalue('csp.mslf.sf.P_a4'), 'Changed variable UI name.');
+		value('DISP_Design_loss1', oldvalue('csp.mslf.sf.Design_loss1'), 'Changed variable UI name.');
+		value('DISP_Design_loss2', oldvalue('csp.mslf.sf.Design_loss2'), 'Changed variable UI name.');
+		value('DISP_Design_loss3', oldvalue('csp.mslf.sf.Design_loss3'), 'Changed variable UI name.');
+		value('DISP_Design_loss4', oldvalue('csp.mslf.sf.Design_loss4'), 'Changed variable UI name.');
+		value('DISP_Shadowing1', oldvalue('csp.mslf.sf.Shadowing1'), 'Changed variable UI name.');
+		value('DISP_Shadowing2', oldvalue('csp.mslf.sf.Shadowing2'), 'Changed variable UI name.');
+		value('DISP_Shadowing3', oldvalue('csp.mslf.sf.Shadowing3'), 'Changed variable UI name.');
+		value('DISP_Shadowing4', oldvalue('csp.mslf.sf.Shadowing4'), 'Changed variable UI name.');
+		value('DISP_dirt_env1', oldvalue('csp.mslf.sf.dirt_env1'), 'Changed variable UI name.');
+		value('DISP_dirt_env2', oldvalue('csp.mslf.sf.dirt_env2'), 'Changed variable UI name.');
+		value('DISP_dirt_env3', oldvalue('csp.mslf.sf.dirt_env3'), 'Changed variable UI name.');
+		value('DISP_dirt_env4', oldvalue('csp.mslf.sf.dirt_env4'), 'Changed variable UI name.');
+		
+		value('DISP_D_abs_in', oldvalue('csp.mslf.sf.D_abs_in'), 'Changed variable UI name.');
+		value('DISP_D_abs_out', oldvalue('csp.mslf.sf.D_abs_out'), 'Changed variable UI name.');
+		value('DISP_D_glass_in', oldvalue('csp.mslf.sf.D_glass_in'), 'Changed variable UI name.');
+		value('DISP_D_glass_out', oldvalue('csp.mslf.sf.D_glass_out'), 'Changed variable UI name.');
+		value('DISP_D_plug', oldvalue('csp.mslf.sf.D_plug'), 'Changed variable UI name.');
+		value('DISP_Rough', oldvalue('csp.mslf.sf.Rough'), 'Changed variable UI name.');
+		value('DISP_Flow_type', oldvalue('csp.mslf.sf.Flow_type'), 'Changed variable UI name.');
+		value('DISP_AbsorberMaterial', oldvalue('csp.mslf.sf.AbsorberMaterial'), 'Changed variable UI name.');
+		
+		// Thermal Storage
+		value('init_hot_htf_percent', 30, 'Added Initial hot HTF percent');
+		value('hot_tank_max_heat', oldvalue('tank_max_heat'), 'New model has hot and cold tank max heat.');
+		value('cold_tank_max_heat', oldvalue('tank_max_heat'), 'New model has hot and cold tank max heat.');
+		value('DISP_store_fluid', oldvalue('csp.mslf.control.store_fluid'), 'Changed variable UI name.');
+		
+		// System Control
+		value('is_dispatch', 0, 'Added dispatch optimization.');
+		value('is_dispatch_series', 0, 'Added dispatch optimization.');
+		//value('dispatch_series', oldvalue('tank_max_heat'), 'Added dispatch optimization.');
+		value('disp_frequency', 24, 'Added dispatch optimization.');
+		value('disp_horizon', 48, 'Added dispatch optimization.');
+		value('disp_max_iter', 50000, 'Added dispatch optimizationv.');
+		value('disp_timeout', 5, 'Added dispatch optimization.');
+		value('disp_mip_gap', 0.001, 'Added dispatch optimization.');
+		value('disp_time_weighting', 0.999, 'Added dispatch optimization.');
+		value('disp_rsu_cost_rel', 1.4, 'Added dispatch optimization.');
+		value('disp_csu_cost_rel', 87, 'Added dispatch optimization.');
+		value('disp_pen_ramping', 1, 'Added dispatch optimization.');
+
+		value('SC_DISP_bop_par', oldvalue('csp.mslf.control.bop_array_mult'), 'Changed variable UI name.');
+		value('SC_DISP_bop_par_f', oldvalue('csp.mslf.control.bop_array_pf'), 'Changed variable UI name.');
+		value('SC_DISP_bop_par_0', oldvalue('csp.mslf.control.bop_array_c0'), 'Changed variable UI name.');
+		value('SC_DISP_bop_par_1', oldvalue('csp.mslf.control.bop_array_c1'), 'Changed variable UI name.');
+		value('SC_DISP_bop_par_2', oldvalue('csp.mslf.control.bop_array_c2'), 'Changed variable UI name.');
+		value('SC_DISP_aux_par', oldvalue('csp.mslf.control.aux_array_mult'), 'Changed variable UI name.');
+		value('SC_DISP_aux_par_f', oldvalue('csp.mslf.control.aux_array_pf'), 'Changed variable UI name.');
+		value('SC_DISP_aux_par_0', oldvalue('csp.mslf.control.aux_array_c0'), 'Changed variable UI name.');
+		value('SC_DISP_aux_par_1', oldvalue('csp.mslf.control.aux_array_c1'), 'Changed variable UI name.');
+		value('SC_DISP_aux_par_2', oldvalue('csp.mslf.control.aux_array_c2'), 'Changed variable UI name.');
+		
+		value('adjust_constant', oldvalue('adjust'){'constant'}, 'Changed adjust variable type.');
+		value('adjust_en_periods', oldvalue('adjust'){'en_periods'}, 'Changed adjust variable type.');
+		value('adjust_en_timeindex', oldvalue('adjust'){'en_timeindex'}, 'Changed adjust variable type.');
+
+
+		// Financial TOD
+		value('dispatch_tod_factors', [oldvalue('dispatch_factor1'), oldvalue('dispatch_factor2'), oldvalue('dispatch_factor3'),
+									   oldvalue('dispatch_factor4'), oldvalue('dispatch_factor5'), oldvalue('dispatch_factor6'),
+									   oldvalue('dispatch_factor7'), oldvalue('dispatch_factor8'), oldvalue('dispatch_factor9')],'Combined dispatch factors into array.');
+
+		// Capital Costs
+		value('site_improvements_spec_cost', oldvalue('csp.mslf.cost.site_improvements.cost_per_m2'), 'Changed variable cmod name.');
+		value('solar_field_spec_cost', oldvalue('csp.mslf.cost.solar_field.cost_per_m2'), 'Changed variable cmod name.');
+		value('htf_system_spec_cost', oldvalue('csp.mslf.cost.htf_system.cost_per_m2'), 'Changed variable cmod name.');
+		value('storage_spec_cost', oldvalue('csp.mslf.cost.ts_per_kwht'), 'Changed variable cmod name.');
+		value('fossil_spec_cost', oldvalue('csp.mslf.cost.fossil_backup.cost_per_kwe'), 'Changed variable cmod name.');
+		value('power_plant_spec_cost', oldvalue('csp.mslf.cost.power_plant.cost_per_kwe'), 'Changed variable cmod name.');
+		value('bop_spec_cost', oldvalue('csp.mslf.cost.bop_per_kwe'), 'Changed variable cmod name.');
+		value('contingency_percent', oldvalue('csp.mslf.cost.contingency_percent'), 'Changed variable cmod name.');
+		value('epc_cost_per_acre', oldvalue('csp.mslf.cost.epc.per_acre'), 'Changed variable cmod name.');
+		value('epc_cost_percent_direct', oldvalue('csp.mslf.cost.epc.percent'), 'Changed variable cmod name.');
+		value('epc_cost_per_watt', oldvalue('csp.mslf.cost.epc.per_watt'), 'Changed variable cmod name.');
+		value('epc_cost_fixed', oldvalue('csp.mslf.cost.epc.fixed'), 'Changed variable cmod name.');
+		value('plm_cost_per_acre', oldvalue('csp.mslf.cost.plm.per_acre'), 'Changed variable cmod name.');
+		value('plm_cost_percent_direct', oldvalue('csp.mslf.cost.plm.percent'), 'Changed variable cmod name.');
+		value('plm_cost_per_watt', oldvalue('csp.mslf.cost.plm.per_watt'), 'Changed variable cmod name.');
+		value('plm_cost_fixed', oldvalue('csp.mslf.cost.plm.fixed'), 'Changed variable cmod name.');
+		value('sales_tax_percent', oldvalue('csp.mslf.cost.sales_tax.percent'), 'Changed variable cmod name.');
+
+	}
+	
+		if ( cfg.tech == 'Fuel Cell' ) {
+		message('Fuel cell and battery dispatch inputs are now on separate pages.');
+		message('Update internal variable names for Run Fuel Cell, Fuel Cell Percent of Max Power, and Charge Battery from Fuel Cell inputs to use underscore instead of period.');
+		value('fc_p1_discharge',oldvalue('fc.p1.discharge'));
+		value('fc_p2_discharge',oldvalue('fc.p2.discharge'));
+		value('fc_p3_discharge',oldvalue('fc.p3.discharge'));
+		value('fc_p4_discharge',oldvalue('fc.p4.discharge'));
+		value('fc_p5_discharge',oldvalue('fc.p5.discharge'));
+		value('fc_p6_discharge',oldvalue('fc.p6.discharge'));
+		value('fc_discharge_percent_1',oldvalue('fc.discharge.percent.1'));
+		value('fc_discharge_percent_2',oldvalue('fc.discharge.percent.2'));
+		value('fc_discharge_percent_3',oldvalue('fc.discharge.percent.3'));
+		value('fc_discharge_percent_4',oldvalue('fc.discharge.percent.4'));
+		value('fc_discharge_percent_5',oldvalue('fc.discharge.percent.5'));
+		value('fc_discharge_percent_6',oldvalue('fc.discharge.percent.6'));
+		value('fc_storage_p1_charge',oldvalue('fc.storage.p1.charge'));
+		value('fc_storage_p2_charge',oldvalue('fc.storage.p2.charge'));
+		value('fc_storage_p3_charge',oldvalue('fc.storage.p3.charge'));
+		value('fc_storage_p4_charge',oldvalue('fc.storage.p4.charge'));
+		value('fc_storage_p5_charge',oldvalue('fc.storage.p5.charge'));
+		value('fc_storage_p6_charge',oldvalue('fc.storage.p6.charge'));
+        value('dispatch_manual_fuelcell_sched',value('dispatch_manual_sched'),'Copy battery dispatch weekday schedule to new fuel cell dispatch schedule.');
+        value('dispatch_manual_fuelcell_sched_weekend',value('dispatch_manual_sched_weekend'),'Copy battery dispatch weekend schedule to new fuel cell dispatch schedule.');
+		value('fuelcell_dispatch_excl', value('fuelcell_dispatch_choice'));
+	}
+};
+
+
+version_upgrade{'2022.12.22'} = define() {
+
+	const cfg = config();
+
+	if(cfg.tech == 'MSPT' || cfg.tech == 'Physical Trough'){
+		value('ctes_cost', oldvalue('ctes_cost_per_m3')/1000.0, 'Change input variable to match cmod units.');
+		value('radiator_fluidcost', oldvalue('radiator_fluidcost_per_m3')/1000.0, 'Change input variable to match cmod units.');
+	}
+};
+
+version_upgrade{'2022.11.21'} = define() {
+	
+	const cfg = config();
+	
+	if ( cfg.fin != 'LCOE Calculator' && cfg.fin != 'None' ) {
+		value('itc_fed_amount', [oldvalue('itc_fed_amount')], 'Changed from number to array.');
+		value('itc_sta_amount', [oldvalue('itc_sta_amount')], 'Changed from number to array.');
+		value('itc_fed_percent', [oldvalue('itc_fed_percent')], 'Changed from number to array.');
+		value('itc_sta_percent', [oldvalue('itc_sta_percent')], 'Changed from number to array.');
+		value('itc_fed_percent_maxvalue', [oldvalue('itc_fed_percent_maxvalue')], 'Changed from number to array.');
+		value('itc_sta_percent_maxvalue', [oldvalue('itc_sta_percent_maxvalue')], 'Changed from number to array.');
+		message('We changed the type of the state and federal investment tax credit (ITC) inputs from a number to an array so that the credit can be applied either in Year 1 or spread out over multiple years.');
+	}
+
+	if(cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') {
+		for (i=1; i<=4; i++) {
+			value('subarray' + i + '_rear_soiling_loss', oldvalue('subarray' + i + '_rear_irradiance_loss'), 'We replaced the single bifacial rear irradiance loss input with two inputs for soiling and rack shading on the rear of the module.');
+		}
+		message('There are new spatial albedo options for bifacial modules. See the \"Advanced\" panel at the bottom of the Location and Resource page.');
+		message('There is a new Spatial tab on the results page that shows irradiance on the ground between rows of the array.');
+	}
+	
+	if(cfg.tech == 'MSPT'){
+		value('tes_init_hot_htf_percent', oldvalue('csp.pt.tes.init_hot_htf_percent'), 'Internal variable name change.');
+	}
+	
+	if (cfg.tech == 'MSPT' || cfg.tech == 'Physical Trough' || cfg.tech == 'MSLF' || cfg.tech == 'ETES' ) {
+		message('We removed the boiler operating pressure input (P_boil) from the Power Cycle page. Its value is now set to 100 Bar and cannot be modified. This avoids the confusion caused by having both cycle efficiency and boiler pressure as inputs. Its value in the file you are opening was ' + oldvalue('P_boil') + ' Bar.');
+	}
+
+	if(cfg.tech == 'MSPT' || cfg.tech == 'Physical Trough') {
+		message('We modified the dispatch model in this version of SAM to use absolute prices, so we changed the units and implementation ' +
+		' of the following inputs on the System Control page: Receiver startup cost penalty, Power generation ramping penalty, and Cycle startup cost penalty. '
+		' As such, this version cannot use the corresponding inputs from your saved file, and we have loaded the default values instead. If you plan to use dispatch '
+		' optimization with this file, please review these inputs and check dispatch model results.');
+		
+		message('We modified the dispatch model in this version of SAM, and we subsequently updated default values for the following inputs on the System Control page: '
+		' Objective function time weighting exponent (0.99 to 0.999) and Maximum branch and bound iterations (35,000 to 50,000). We loaded the valeus from your saved file, '
+		' but you may want to review these inputs.');
+	}
+};
+
+version_upgrade{'2021.12.2'} = define() {
+
+	const cfg = config();
+	
+	if(cfg.tech == 'MSPT') {
+		message('We have changed the units for the piping heat loss coefficient for the Molten Salt Power Tower Model from W/m to W/m2-K.' +
+		'This new convention allows the performance model to calculate piping thermal losses ' +
+		'as the receiver thermal power and design temperatures vary. We found that the old default value of 10,200 W/m ' + 
+		'corresponds to about 13 W/m2-K, which we think is too high for insulated piping, so we chose a new default value of 2 W/m2-K. ' +
+		'We are changing the piping heat loss coefficient value in your file of ' + oldvalue('piping_loss') + 
+		' W/m to the default value of 2 W/m2-K. Please review this input on the Tower and Receiver page and modify it as necessary for your design.');
+	}
+	
+	is_batt_tech = ( cfg.tech == 'PV Battery' || cfg.tech == 'Generic Battery' ); // does not include fuel cell (standalone not available in older versions)
+
+	// Battery lifetime updates
+	if ( cfg.tech == 'Fuel Cell' ) {
+		value('ui_batt_life_model',0);
+		value('batt_life_model',0);
+		message('The Battery Storage input page has a new option to choose a battery life model for different battery types. Be sure to check battery life model option when the file opens.','warning');
+	}
+	if ( is_batt_tech ) {
+		value('ui_batt_life_model',0);
+		value('batt_life_model',0);
+		value('batt_life_excl', value('ui_batt_life_model'));
+		message('The battery replacement and lifetime inputs are now on the new Battery Life input page with a new option to choose a battery life model for different battery types. Be sure to check battery life model option on the Battery Life page when the file opens.','warning');
+	}
+	
+	if (cfg.tech == 'PVWatts Battery') {
+		if ( oldvalue('annual_crit') > 0 ){
+			message('Critical loads are not available for PVWatts - Battery configurations because the battery model is not detailed enough to model the battery operation during a grid outage. SAM will load your PVWatts - Battery case, but it will discard the critical load and grid outage inputs. You can model grid outages with the Detailed PV - Battery, Generic Battery, or Standalone Battery model.','error');
+		}
+	}
+
+	// New Grid Outage page
+	if ( is_batt_tech || ( cfg.tech == 'Fuel Cell' ) ) {
+		if ( value('annual_crit') > 0 )
+		{
+			message('Inputs for grid outages are now on a new Grid Outage page: Critical load data, grid outage data, and the battery minimum state of charge during grid outage input. The Electric Load page displays critical load data when it is defined on the Grid Outage page.');
+		}
+	
+	}
+
+	//Battery Thermal remove weather file ambient temperature option
+	old_batt_thermal_choice = oldvalue('batt_thermal_choice');
+	old_batt_single_temp = oldvalue('batt_room_temperature_single');
+	old_temp_vector = oldvalue('batt_room_temperature_vector');
+	old_temp_celsius = oldvalue('batt_room_temperature_celsius');
+	new_temp_vector = [];
+	if (is_batt_tech) {
+		if (old_batt_thermal_choice == 0) { 
+			value('batt_thermal_choice', 1);
+			value('batt_room_temperature_vector', old_temp_celsius);
+			//value('batt_room_temperature_celsius', value('batt_room_temperature_vector'));
+			message('The option to use ambient file weather dry-bulb temperature inputs as the battery room temperature has been removed. The weather file ambient temperatures for this case have been copied into the Time series environment array.', 'warning');
+		}
+		elseif (old_batt_thermal_choice == 1) {
+			value('batt_thermal_choice', 0);
+			value('batt_room_temperature_single', old_batt_single_temp);
+			message('The option to use ambient file weather dry-bulb temperature inputs as the battery room temperature has been removed.');
+		}
+		else {
+			value('batt_thermal_choice', 1);
+			value('batt_room_temperature_vector', old_temp_vector);
+			message('The option to use ambient file weather dry-bulb temperature inputs as the battery room temperature has been removed.');
+		}
+	}
+	
+	is_btm_fin = ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' || cfg.fin == 'Host Developer' );
+	is_fom_fin = ( cfg.fin == 'Single Owner' || cfg.fin == 'Leveraged Partnership Flip' || cfg.fin == 'All Equity Partnership Flip' || cfg.fin == 'Sale Leaseback' || cfg.fin == 'Merchant Plant' );
+	btm_options = ['Peak Shaving','Input Grid Power Targets','Input Battery Power Targets','Manual Dispatch','Price Signal Forecast'];
+	peak_shaving_options = ['One Day Look Ahead (Perfect)','One Day Look Behind'];
+	fom_options = ['Automated Dispatch','PV Smoothing','Dispatch to Custom Time Series','Manual Dispatch'];
+	automated_options = ['Perfect Look Ahead','One Day Look Behind','Look Ahead to Custom Weather File'];
+	if ( is_batt_tech )
+	{
+		old_duration_choice = oldvalue('batt_duration_choice');
+		old_duration_kwh = oldvalue('batt_bank_size');
+		
+		// Use != because some r0 and r1 files don't have batt_duration_choice
+		if (old_duration_choice != 1) {
+			value('batt_bank_size_ui', old_duration_kwh);
+		}
+		// If duration choice is 1 the callbacks will update the file properly
+	
+		old_batt_pv_forecast = oldvalue('batt_pv_dc_forecast'); // array
+        value( 'batt_pv_ac_forecast', old_batt_pv_forecast );  // Often either doesn't exist or is [0], but if not display message for user
+        // Use sum instead of # since # is picky about this being an array
+        if (sum(old_batt_pv_forecast) > 1) {
+			message( 'Custom weather file forecasts for battery dispatch have changed from DC to AC power. Please re-import the forecast on the battery dispatch page to convert to AC power.' );
+        }
+        
+		if ( is_fom_fin )
+		{
+			old = oldvalue( 'batt_dispatch_choice');
+			auto = 999;
+			if ( old == 0 ) { new = 0; auto = 0; }
+			elseif ( old == 1 ) { new = 0; auto = 1; }
+			elseif ( old == 2 ) { new = 0; auto = 2; }
+			elseif ( old == 3 ) { new = 2; }
+			else { new = 3; } // old = 4
+			value( 'batt_dispatch_choice_ui', new );
+			value( 'batt_dispatch_choice', new ); // Github SAM issue 818 without having to click on Dispatch page after upgrading.
+			if ( auto != 999 ) { value( 'batt_dispatch_wf_forecast_choice', auto ); }
+			value('batt_dispatch_excl', value('batt_dispatch_choice_ui'));
+			message( 'The inputs for front-of-meter battery dispatch options have been reorganized. The dispatch option for this case is ' + fom_options[new] + ?(auto==999)[' ' + automated_options[auto],''] + '. Please check the Battery Dispatch input page to make sure they are correct.' );
+			// check for custom weather file for forecast
+		}
+		if ( is_btm_fin )
+		{
+			old = oldvalue( 'batt_dispatch_choice');
+			peak_shaving = 999;
+			if ( old == 0 ) { new = 0; peak_shaving = 0; }
+			elseif ( old == 1 ) { new = 0; peak_shaving = 1; }
+			elseif ( old == 2 ) { new = 1; }
+			elseif ( old == 3 ) { new = 2; }
+			elseif ( old == 4 ) { new = 3; }
+			else { new = 4; } // old = 5
+			value( 'batt_dispatch_choice_ui', new );
+			if ( peak_shaving != 999 ) { value( 'peak_shaving_batt_dispatch_choice', peak_shaving ); }
+			value('batt_dispatch_excl', value('batt_dispatch_choice_ui'));
+			message( 'The inputs for behind-the-meter battery dispatch options have been reorganized. The dispatch option for this case is ' + btm_options[new] + ?(peak_shaving==999)[' ' + peak_shaving_options[peak_shaving],''] + '. Please check the Battery Dispatch input page to make sure they are correct.' );
+		}
+	}
+	
+	//warn users about upgrade to dc_degradation from compounding to linear
+	if (cfg.tech == 'Flat Plate PV' && cfg.fin != 'LCOE Calculator' && cfg.fin != 'None')
+	{
+		dc_degradation = value('dc_degradation');
+		if (#dc_degradation == 1 && dc_degradation[0] != 0)
+			message('We have changed the functionality of the DC degradation input to apply linearly instead of compounding year over year.', 'warning');
+	}
+	
+	//warn users for FOM financial models about electricity purchases page being added- all configs now fail with current defaults
+	if (cfg.fin == 'Single Owner' || cfg.fin == 'Leveraged Partnership Flip' || cfg.fin == 'All Equity Partnership Flip' || cfg.fin == 'Sale Leaseback') //not a problem for merchant plant
+	{
+		if (value('ppa_soln_mode') == 0)
+		{
+			message('The PPA financial models have been updated to account for electricity purchases for parasitic loads. The default option is to purchase electricity at the PPA price, '
+			'but that option cannot be used when the PPA is calculated to achieve a specified IRR target. Please visit the Electricity Purchases page to set a rate, '
+			'or the Revenue page to change the solution mode to "Specify PPA Price".' , 'error');
+		}
+	}
+	
+	//add a warning for upgrade to AR panels
+	if(cfg.tech == 'Flat Plate PV' || cfg.tech == 'PVWatts' || cfg.tech == 'PV Battery' || cfg.tech == 'PVWatts Battery' || cfg.tech == 'Fuel Cell')
+	{
+		message('We have changed the assumptions within all PV models to assume that the modules have an anti-reflective coating. Please see the Release Notes for details.', 'warning');
+	}
+	
+	//add a notice about upgrade to pvwatts version
+	if (cfg.tech == 'PVWatts' || cfg.tech == 'PVWatts Battery' || cfg.tech == 'Fuel Cell')
+	{
+		message('This version of SAM updates the PVWatts model to the latest version, pvwattsv8. Results will change compared to previous versions. '
+		'Please see Help for a link to a detailed description of model updates.', 'warning');
+	}
+	
+	// default inverters are not in new CEC inverters library
+	if ( cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery' || cfg.tech == 'High-X Concentrating PV' ) 
+	{
+		old_inverter = value( 'inv_snl_inverter_name' );
+		str = runtimedir();
+		if ( strpos( str, '/' ) > -1 ) { slash = '/'; }
+		else { slash = '\\'; }
+		arr = split ( str, slash );
+		lib_file = '';
+		for (i=0; i<#arr-1; i++) { lib_file += arr[i] + '/'; }
+		lib_file += 'libraries/CEC Inverters.csv';
+		new_inverters = csvread( lib_file, { 'table' = true } );
+		inverter_names = new_inverters{'Name'};
+		new_inverters = {};
+		inverter_names -@ 0;
+		inverter_names -@ 0;
+		if ( inverter_names ?@ old_inverter < 0 )
+		{
+			stable_sort( lower(inverter_names) );
+			msg = 'The inverter in the file you are opening is from an out-of-date library.\n\n';
+			inv = '';
+			inv = choose_from_list( inverter_names, msg + 'Inverter from old library is:\n  ' + old_inverter +'\nChoose an inverter from the new library:', 'Choose Inverter' );
+			if ( inv == '' ) { inv = inverter_names[0] ; }
+			value( 'inv_snl_inverter_name', inv, 'Inverter updated from ' + old_inverter + ' to ' + inv + '.');
+		}	
+		message('We updated the CEC module and inverter libraries from the CEC data available on December 1, 2021.'); 
+	}
+
+};
+
+version_upgrade{'2020.11.29'} = define() {
+    const cfg = config();
+	if( cfg.tech == 'MSPT' )
+	{
+		pc_config = oldvalue("pc_config");
+		if(pc_config == 2)
+		{
+			value("pc_config", 0);
+			message('The Supercritical Carbon Dioxide (sCO2) Power Cycle option has been removed from the Power Cycle page.'
+						'To model an sCO2 cycle, use the sCO2 Cycle Integration macro with the NREL sCO2 Power Cycle Python model. See the macro instructions for details.'
+						' Setting power cycle option to the default Rankine Cycle.','warning');
+		}
+	}
+	if( cfg.tech == 'Physical Trough' )
+	{
+		value('tes_lengths', [[0,90,100,120,0,30,90,80,80,120,80]], "Hidden variable 'tes_lengths' updated per issue 419");
+	}
+    //To be included in next full release (version_upgrade{'2020.11.29'})
+    if (cfg.tech == 'Dish Stirling' )
+    {
+		retire_tech();
+		//The version upgrade script is set up to delete cases with this technology made from a previous release from the project file. This is done in project.cpp
+		message('The Dish Stirling model is not available in SAM ' + samver() +'. Removing Case \"' + case_name() + '\" from the file. The most recent version with the model is SAM 2020.2.29, which you can download from https://sam.nrel.gov/download/','warning');
+    }
+    if (cfg.tech == 'DSPT')
+    {
+		retire_tech();
+		//The version upgrade script is set up to delete cases with this technology made from a previous release from the project file. This is done in project.cpp
+		message ('The Direct Steam Power Tower model is not available in SAM ' + samver() +'. Removing Case \"' + case_name() + '\" from the file. The most recent version with the model is SAM 2020.2.29, which you can download from https://sam.nrel.gov/download/','warning');
+	}
+    
+    // Use en_batt instead of cfg.tech to capture fuel cell configurations
+    if (oldvalue('en_batt') == 1) {
+		message('The old Battery Storage page has been split into two new input pages: Battery Cell and System, and Battery Dispatch.');
+        old_replacement_option = oldvalue('batt_replacement_schedule');
+        max_replacements = max(old_replacement_option);
+        repl_msg = 'For the battery "Replace at specified schedule" option, "Battery bank replacement schedule (%/year)" replaces the two "Battery bank replacement schedule" and "Battery bank replacement percent" inputs to avoid inconsistencies between the two.';
+        if (max_replacements > 1) {
+            message( repl_msg + ' You used the replacement schedule to specify up to ' + max_replacements + ' replacements per year, so you may need to adjust the replacement percentages in the new schedule. Please contact us at sam.support@nrel.gov if you need help with this.', 'warning');
+        }
+        else if (max_replacements > 0) {
+            message(repl_msg);
+        }
+        
+        fin = cfg.fin;
+        is_fom = ( fin == 'Single Owner' || fin == 'Leveraged Partnership Flip' || fin == 'All Equity Partnership Flip' || fin == 'Sale Leaseback' || fin == 'Merchant Plant');
+        if (is_fom) {
+            old_cycle_cost = oldvalue('batt_cycle_cost');
+            value('batt_cycle_cost', [old_cycle_cost], 'Convert single value to array.');
+            message('We have renamed "Battery cycle cost" to "Cycle degradation penalty" to make it clear that this is a dispatch parameter rather than a project cost. The cycle degradation penalty is now an array so you have the option to specify a different penalty for each year of the analysis period.', 'notice');
+        }
+    
+    }
+
+    // front-of-meter battery set sell rate to zero in case it is incorrectly set to nonzero value
+    if  ( ( cfg.tech == 'PV Battery' || cfg.tech == 'Generic Battery' ) && cfg.fin == 'Single Owner' )
+    {
+		x = value('ur_ec_tou_mat');
+		y=[];
+		show_msg = false;
+		for (i=0; i<#x; i++ )
+		{
+			if ( x[i][5] != 0 ) { y[i] = [x[i][0],x[i][1],x[i][2],x[i][3],x[i][4],0]; }
+			show_msg = true;
+		}
+		value('ur_ec_tou_mat',y,'Sell rates do not apply for front-of-meter battery systems. Setting all sell rates in time-of-use energy rate table to zero.');
+		message('For front-of-meter battery systems, we have renamed the Electricity Rates input page to Electricity Purchases to make it clearer that those inputs are for electricity purchases to charge the battery.','notice');
+    }
+    
+};
+
+version_upgrade{'2020.2.29'} = define() {
+    const cfg = config();
+    if ( cfg.tech == 'Generic System' || cfg.tech == 'Flat Plate PV' )
+    {
+        if ( oldvalue('en_batt') == 1 )
+        {
+			if ( cfg.tech == 'Generic System' )
+			{
+				ok = config('Generic Battery', cfg.fin, 'Generic Battery configuration replaces Generic System with battery enabled.');
+				config_update_with_old_values();
+				if ( !ok ) { msgbox('Failed to change configuration!\nGeneric Battery configuration replaces Generic System with battery enabled.'); }
+			}
+			if ( cfg.tech == 'Flat Plate PV' )
+			{
+				ok = config('PV Battery', cfg.fin, 'Battery PV configuration replaces Detailed PV with battery enabled.');
+				config_update_with_old_values();
+				if ( !ok ) { msgbox('Failed to change configuration!\nBattery PV configuration replaces Detailed PV with battery enabled.'); }
+			}
+			/* Since original cfg.tech = 'Flat Plate PV' and new cfg.tech = 'PV Battery' old to new value automatic mapping is disabled */
+			old_replacement_cost = oldvalue('batt_replacement_cost');
+			value('om_replacement_cost1', [old_replacement_cost], 'Battery replacement cost moved from Battery Storage to System Costs input page.');
+			old_escalation = oldvalue('batt_replacement_cost_escal');
+			value('om_replacement_cost_escal', old_escalation, 'Battery replacement cost escalation moved from Battery Storage to System Costs input page.');
+			value('batt_thermal_choice', 1, 'Set value for new battery environment temperature option to "Enter single fixed temperature."');
+			old_temperature = oldvalue('T_room');
+			value('batt_room_temperature_single', old_temperature, 'Updated battery room temperature internal variable name from T_room to batt_room_temperature_single.');
+			if ( value('batt_room_temperature_single') < 25 )
+			{
+				value('batt_room_temperature_single', 25, 'Changed battery room temperature from ' + old_temperature + ' degrees C to 25 to address battery thermal model issue that will be fixed in SAM Fall 2020 version.');
+			}
+			old_resistance = oldvalue('batt_resistance');
+			if ( old_resistance >= 0.002 )
+			{
+				value('batt_resistance',0.002,'Changed battery resistance from ' + old_resistance + ' ohms to a more realistic .002 to address battery thermal model issue that will be fixed in SAM Fall 2020 version.');
+			}
+		}
+	}
+    if ( cfg.tech == 'PVWatts')
+    {
+		message('This version of SAM updates the PVWatts model to the latest version, pvwattsv7. Results will change compared to previous versions. '
+		'Please see Help for a link to a detailed description of model updates.','warning');
+		if ( value('batt_simple_enable') == 1)
+		{
+			ok = config('PVWatts Battery', cfg.fin, 'Generic Battery configuration replaces Generic System with battery enabled.');
+			config_update_with_old_values();
+			if ( !ok ) { msgbox('Failed to change configuration!\nPVWatts Battery configuration replaces PVWatts with battery enabled.'); }
+		}
+	}
+    if ( cfg.tech == 'Physical Trough' )
+    {
+        old_custom_sgs_pipe_sizes = oldvalue('custom_sgs_pipe_sizes');                              // array
+        value( 'custom_tes_pipe_sizes', [ old_custom_sgs_pipe_sizes ] );               // matrix, renamed
+        old_sgs_diams = oldvalue('sgs_diams');                 // array
+        value( 'tes_diams', [ old_sgs_diams ] );                   // matrix, renamed
+        old_sgs_wallthicks = oldvalue('sgs_wallthicks');                  // array
+        value( 'tes_wallthicks', [ old_sgs_wallthicks ] );                    // matrix, renamed
+        old_sgs_lengths = oldvalue('sgs_lengths');                            // array
+        value( 'tes_lengths', [ old_sgs_lengths ] );              // matrix, renamed
+        old_sf_rnr_diams = oldvalue('sf_rnr_diams');                      // array
+        value( 'sf_rnr_diams', [ old_sf_rnr_diams ] );                       // matrix
+        old_sf_rnr_wallthicks = oldvalue('sf_rnr_wallthicks');                      // array
+        value( 'sf_rnr_wallthicks', [ old_sf_rnr_wallthicks ] );        // matrix
+        old_sf_rnr_lengths = oldvalue('sf_rnr_lengths');                // array
+        value( 'sf_rnr_lengths', [ old_sf_rnr_lengths ] );      // matrix
+        old_sf_hdr_diams = oldvalue('sf_hdr_diams');                    // array
+        value( 'sf_hdr_diams', [ old_sf_hdr_diams ] );                      // matrix
+        old_sf_hdr_wallthicks = oldvalue('sf_hdr_wallthicks');                     // array
+        value( 'sf_hdr_wallthicks', [ old_sf_hdr_wallthicks ] );      // matrix
+        old_sf_hdr_lengths = oldvalue('sf_hdr_lengths');               // array
+        value( 'sf_hdr_lengths', [ old_sf_hdr_lengths ] ); // matrix
+        old_k_tes_loss_coeffs = oldvalue('k_tes_loss_coeffs');                    // array
+        value( 'k_tes_loss_coeffs', [ old_k_tes_loss_coeffs ] );      // matrix
+        value( 'hot_tank_max_heat', oldvalue('tank_max_heat') );
+        value( 'cold_tank_max_heat', oldvalue('tank_max_heat') );
+        value( 'gross_net_conversion_factor', oldvalue('csp.dtr.pwrb.gross_net_conversion_factor') );
+        value( 'f_turb_tou_periods', oldvalue('tslogic_c') );
+        value( 'csp.pt.pwrb.condenser_type', oldvalue('combo_condenser_type') );
+        value( 'csp.pt.pwrb.pressure_mode', oldvalue('pressure_mode') );
+        value( 'bop_par', oldvalue('csp.dtr.par.bop_val') );
+        value( 'bop_par_f', oldvalue('csp.dtr.par.bop_pf') );
+        value( 'bop_par_0', oldvalue('csp.dtr.par.bop_c0') );
+        value( 'bop_par_1', oldvalue('csp.dtr.par.bop_c1') );
+        value( 'bop_par_2', oldvalue('csp.dtr.par.bop_c2') );
+        value( 'aux_par', oldvalue('csp.dtr.par.aux_val') );
+        value( 'aux_par_f', oldvalue('csp.dtr.par.aux_pf') );
+        value( 'aux_par_0', oldvalue('csp.dtr.par.aux_c0') );
+        value( 'aux_par_1', oldvalue('csp.dtr.par.aux_c1') );
+        value( 'aux_par_2', oldvalue('csp.dtr.par.aux_c2') );
+        old_combo_FieldConfig = to_int( oldvalue('combo_FieldConfig') );
+        value( 'combo_FieldConfig', old_combo_FieldConfig + 1 );
+        // Doesn't seem to work:
+        old_combo_htf_type = to_int( oldvalue('combo_htf_type') );
+        if ( old_combo_htf_type > 8 ) {
+                        value( 'combo_htf_type', old_combo_htf_type + 1 );
+        }
+    }
+    // update ppa_price_input before configuration changes
+    fin = cfg.fin;
+    is_ppa = ( fin == 'Single Owner' || fin == 'Leveraged Partnership Flip' || fin == 'All Equity Partnership Flip' || fin == 'Sale Leaseback' || fin == 'Host Developer');
+    if ( is_ppa ) 
+    {
+		value( 'ppa_price_input', [oldvalue('ppa_price_input')], 'Convert single value to array.' );
+        message('You can now specify a different PPA price for each year of the analysis period on the Finanical Parameters page.','notice');
+    }
+};
+
+// ** Not sure how this works for patches, so using new version number for testing
+version_upgrade{'2018.11.11'} = define () {
+	const cfg = config();
+	if ( cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config changed from Flat Plate PV to PV Battery in 2020.2.29 function
+	{
+		old_inverter = value( 'inv_snl_inverter_name' );
+		str = runtimedir();
+		if ( strpos( str, '/' ) > -1 ) { slash = '/'; }
+		else { slash = '\\'; }
+		arr = split ( str, slash );
+		lib_file = '';
+		for (i=0; i<#arr-1; i++) { lib_file += arr[i] + '/'; }
+		lib_file += 'libraries/CEC Inverters.csv';
+		new_inverters = csvread( lib_file, { 'table' = true } );
+		inverter_names = new_inverters{'Name'};
+		new_inverters = {};
+		inverter_names -@ 0;
+		inverter_names -@ 0;
+		stable_sort( lower(inverter_names) );
+		msg = 'The inverter in the file you are opening is from an out-of-date library.\n\n';
+		inv = '';
+		inv = choose_from_list( inverter_names, msg + 'Inverter from old library is:\n  ' + old_inverter +'\nChoose an inverter from the new library:', 'Choose Inverter' );
+		if ( inv == '' ) { inv = inverter_names[0] ; }
+		value( 'inv_snl_inverter_name', inv, 'Inverter updated from ' + old_inverter + ' to ' + inv + '.');
+		message('We updated the CEC inverter library from the November 2018 version to the March 1, 2019 version. The new library includes both grid support and utility interactive inverters as defined by the CEC since January 15, 2019.'); 
+	}
+};
+version_upgrade{'2018.10.29'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config changed from Flat Plate PV to PV Battery in 2020.2.29 function
+	{
+		//upgrades for the new way that auto-sizing works
+		dcac_old = oldvalue('dcac_ratio');
+		value('desired_dcac_ratio', dcac_old, 'Renamed DC-AC Ratio input variable.');
+		old_autosize = oldvalue('size_auto_or_manual');
+		if (old_autosize == 1) //specify desired array size
+			value('enable_auto_size', 0, 'Changed variable name and value for automatically sizing system.');
+		else if (old_autosize == 0) //auto-size in old version
+		{
+			//multiple subarrays not allowed with new auto-sizing
+			if (value('subarray2_enable') == 1 || value('subarray3_enable') == 1 || value('subarray4_enable') == 1)
+			{
+				value('enable_auto_size', 0, 'Changed the way SAM automatically sizes systems.');
+				message('We have updated the way that SAM automatically sizes systems in this version. We have used the same system configuration' 
+				' as was specified in your old file, but turned off automatic system sizing in this case because the new automatic system sizing'
+				' algorithms no longer work with multiple subarrays. Please go to the System Design page if you wish to turn automatic system sizing on again.', 'warning');
+			}
+			else
+			{
+				value('enable_auto_size', 0, 'Changed the way SAM automatically sizes systems.');
+				message('We have updated the way that SAM automatically sizes systems in this version. We have used the same system configuration' 
+				' as was specified in your old file, but turned off automatic system sizing in this case because it may not result in the same system configuration.'
+				' Please go to the System Design page if you wish to turn automatic system sizing on again.', 'warning');
+			}
+	
+		}
+		// battery model update dispatch
+		if (value('en_batt')){
+			finance = cfg.fin;
+			if (finance == "Residential" || finance == "Commercial" || finance == "Third Party"){
+				if (value('batt_dispatch_choice') == 3){
+					value('batt_dispatch_choice', 4);
+				}
+			}
+			else {
+				value('batt_dispatch_choice', 4);
+			}
+			message('We have updated the battery controller, which may result in different operational behavior than the previous version.' 
+				' Please check to ensure the battery still operates as you expect.', 'warning');
+		}
+		if (value('irrad_mode') > 2) //POA input options
+			message('We have updated the way that the POA decomposition algorithm handles calculating negative DNI or DHI data. You may receive more simulation warnings than you did previously, '
+			'and your results may change slightly, particularly toward the beginning and end of the day.', 'warning');
+	}
+};
+
+version_upgrade{'2018.9.20'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config changed from Flat Plate PV to PV Battery in 2020.2.29 function
+	{
+		//upgrades for multiple MPPT inverters
+		x = oldvalue('modules_per_string');
+		value('subarray1_modules_per_string', x, 'Variable change to be able to model different numbers of modules per string between subarrays.');
+		for (i = 2; i <= 4; i++)
+		{				
+			if (value('subarray' + to_string(i) + '_enable') == 1)
+				value('subarray' + to_string(i) +'_modules_per_string', x, 'Variable change to be able to model different numbers of modules per string between subarrays.');
+		}
+		
+		/*
+		//message that we got rid of auto sizing
+		if (oldvalue('size_auto_or_manual') == 0)
+			message('We have removed the option for SAM to automatically size your system using the "Specify desired array size" '
+			'option on the System Design page. Please see Help on the System Design page for more details.', 'warning');*/
+		
+		//bug fix for multiple subarrays with unequal numbers of strings
+		if (value('num_enabled') > 1)
+		{
+			uneven = false;
+			prev_subarray = value('subarray1_nstrings');
+			for (i = 2; i <= 4; i++)
+			{	
+				if (!value('subarray' + to_string(i) + '_enable')) //skip disabled subarrays
+					continue;
+				this_subarray = value('subarray' + to_string(i) + '_nstrings');
+				if (this_subarray != prev_subarray) //only need to check against previous subarray because all subarrays had to be the same, or it would have been affected by bug
+					uneven = true;
+				prev_subarray = this_subarray;
+			}
+			if (uneven)
+				message('This version fixes a bug that caused SAM to calculate the wrong maximum power point when multiple subarrays were '
+				'enabled with unequal numbers of strings. The fix will cause slight changes to your results.', 'warning');
+		}
+	}
+
+	if (cfg.tech == 'Physical Trough' || cfg.tech == 'MSPT' || cfg.tech == 'MSLF') {
+		// Combines the three UDPC tables into one //
+		
+		// Get the three user defined power cycle tables
+		x_ud_T_htf = oldvalue('ud_T_htf_ind_od');
+		x_ud_m_dot = oldvalue('ud_m_dot_htf_ind_od');
+		x_ud_T_amb = oldvalue('ud_T_amb_ind_od');
+
+		// Get the low, design, and high indep values
+		x_T_htf_lvls = [value('ud_T_htf_low'), value('ud_COPY_T_HTF_des'), value('ud_T_htf_high')];
+		x_m_dot_lvls = [value('ud_m_dot_htf_low'), value('ud_m_dot_design'), value('ud_m_dot_htf_high')];
+		x_T_amb_lvls = [value('ud_T_amb_low'), value('ud_COPY_T_amb_des'), value('ud_T_amb_high')];
+		
+		// Columns with the dependent values
+		x_col_idxs = [[1, 4, 7, 10],  // low
+					[2, 5, 8, 11],    // des
+					[3, 6, 9, 12]];   // high
+		
+		x_new_table = [];
+		x_new_idx = 0;
+		
+		// T_htf table //
+		// for each level
+		for (i=0; i < #x_col_idxs; i++) {
+			// for each row in original table
+			for (j=0; j < #x_ud_T_htf; j++) {
+				x_row = [];
+				x_row += x_ud_T_htf[j][0];  // indep val
+				x_row += x_m_dot_lvls[i];
+				x_row += x_T_amb_lvls[1];   // design level
+				// grab each dependent value
+				for (k=0; k < #x_col_idxs[0]; k++) {
+					x_row += x_ud_T_htf[j][x_col_idxs[i][k]];
+				}
+				x_new_table[x_new_idx] = x_row;
+				x_new_idx++;
+			}
+		}
+		
+		// m_dot table //
+		// for each level
+		for (i=0; i < #x_col_idxs; i++) {
+			// for each row in original table
+			for (j=0; j < #x_ud_m_dot; j++) {
+				x_row = [];
+				x_row += x_T_htf_lvls[1];   // design level
+				x_row += x_ud_m_dot[j][0];  // indep val
+				x_row += x_T_amb_lvls[i];
+				// grab each dependent value
+				for (k=0; k < #x_col_idxs[0]; k++) {
+					x_row += x_ud_m_dot[j][x_col_idxs[i][k]];
+				}
+				x_new_table[x_new_idx] = x_row;
+				x_new_idx++;
+			}
+		}
+		
+		// T_amb table //
+		// for each level
+		for (i=0; i < #x_col_idxs; i++) {
+			// for each row in original table
+			for (j=0; j < #x_ud_T_amb; j++) {
+				x_row = [];
+				x_row += x_T_htf_lvls[i];
+				x_row += x_m_dot_lvls[1];   // design level
+				x_row += x_ud_T_amb[j][0];  // indep val
+				// grab each dependent value
+				for (k=0; k < #x_col_idxs[0]; k++) {
+					x_row += x_ud_T_amb[j][x_col_idxs[i][k]];
+				}
+				x_new_table[x_new_idx] = x_row;
+				x_new_idx++;
+			}
+		}
+
+		value('ud_ind_od', x_new_table);  // output new combined table
+		
+		value('ud_T_htf_levels', #x_ud_T_htf);       // set number of levels
+		value('ud_m_dot_htf_levels', #x_ud_m_dot);
+		value('ud_T_amb_levels', #x_ud_T_amb);
+		
+		// Clear original tables
+		//value('ud_T_htf_ind_od', [[0]]);
+		//value('ud_m_dot_htf_ind_od', [[0]]);
+		//value('ud_T_amb_ind_od', [[0]]);
+		
+		message('This version combines the three user-defined power cycle (UDPC) tables into one. The values from the three '
+				'original tables have been moved to this new single table. This change will not affect your results.', 'warning');
+	}
+};
+
+version_upgrade{'2018.8.29'} = define() {
+	const cfg = config();
+	
+	// solar resource
+	solar_resource_techs = 'Flat Plate PV,PVWatts,High-X Concentrating PV,Biopower,'
+	                     + 'Geothermal Power,Solar Water Heating,Physical Trough,'
+	                     + 'Empirical Trough,MSPT,DSPT,MSLF,DSLF,Dish Stirling,'
+	                     + 'Generic CSP System,Physical Trough IPH,DSGL IPH,ISCC'
+	                     + 'PV Battery,PVWatts Battery'; // in case config was changed from Flat Plate PV or PVWatts by 2020.2.29 function
+	if ( strpos( solar_resource_techs , cfg.tech ) > -1 )
+	{
+		message("The new Solar Resource input page makes it easy to download weather files from "
+		"the latest version of the National Solar Radiation Database (NSRDB) as TMY, single-year, "
+		"or multiple files for P50/P90 simulations. As part of these improvements, we removed "
+		"the old default weather file library because it contained out-of-date data. "
+		"<br><br>Use the tools on the Solar Resource input page to download weather files "
+		"and build a library with the files you need for your work.");
+
+		library = csvread( userlocaldatadir() + '/SolarResourceData.csv', { 'table' = true } );
+		wf_in_lib = ( library{'Name'} ?@ value( 'solar_resource' ) ) > -1;
+		
+		if ( value('use_specific_weather_file') == 1 ) // file was user specified file
+		{
+			user_wf = value('user_specified_weather_file');
+			message('The weather file ' +  file_only(user_wf) + ' is not in the solar resource library. '
+					+ 'We have removed the \"Choose a Weather File from Your Computer\" option from the Solar Resource page ' 
+					+ 'to make it easier to keep track of your SAM weather files. To use a weather file, you must add its '
+					+ 'folder to the list of SAM library folders on the Solar Resource page.','warning');
+		}
+		elseif ( !wf_in_lib )
+		{
+			message( 'The weather file ' +  file_only(value('solar_resource')) + ' is not in your solar resource library. Use the tools on the Solar Resource page to download or choose a different file.','warning' );
+		}
+	}
+	
+	if (cfg.tech == "Wind Power")
+		if (value('wind_farm_wake_model') == 2)
+			message('This version fixes a bug in the calculation of the length of the near wake region, resulting in changes to output values.', 'warning');	
+};
+
+version_upgrade{'2017.8.28'} = define() {
+	const cfg = config();
+	
+	// Battery
+	if (varinfo('en_batt'))
+	{
+		if (value('en_batt') == true)
+			message("Changes were made in battery auto-sizing and dispatch, potentially resulting in different battery sizes and operation.  Please check your battery to ensure it matches your desired configuration", 'warning');
+	}
+	
+	if( cfg.tech == "Physical Trough IPH")
+	{
+		message("Version Notes:\nThis version of SAM adds direct thermal energy storage (TES) to the Physical Trough IPH model. "
+		"The default values for the following inputs have changed or are new in this version:<ul><li>We have changed default solar "
+		"multiple from 1 to 2.5 to account for the addition of TES.</li>"
+		"<li>The new hours of storage input has a default value of 6 hours</li>\n"
+		"<li>The new wind stow speed input has a default value of 25 m/s</li></ul>"
+		"You will see these default values when you create a new Physical Trough IPH case in this version of SAM. "
+		"The values in your file may differ from the default values.");
+		value( 'tshours', 0, "This file was created in a version of SAM that does not include TES for the Physical Trough "
+		"IPH model. We have set the storage capacity to zero so your results in this version are consistent with the "
+		"older version. You can add storage to your system by changing the storage capacity on the Thermal Storage input page." );
+		value( 'wind_stow_speed', 100, "This file was created with a version of SAM that does not have a wind stow speed "
+		"variable. We have set its value to 100 m/s so that the stow speed is never achieved to ensure the results in this version "
+		"are consistent with the older version. You can change the value on the Solar Field input page" );
+	}
+	
+};
+
+version_upgrade{'2017.5.11'} = define() {
+	const cfg = config();
+			
+	//updated the naming of flux_max
+	if( cfg.tech == "MSPT" )
+	{
+		value('flux_max', oldvalue("flux_max_mspt"), "Variable renamed" );
+	}
+	if( cfg.tech == "DSG" )
+	{
+		value('flux_max', oldvalue("flux_max_dsg"), "Variable renamed" );
+	}
+};
+
+version_upgrade{'2017.4.11'} = define() {
+	const cfg = config();
+	
+	if (cfg.tech == 'Wind Power')
+		if (value('wind_resource_model_choice') == 0)
+			message('This version significantly updates how wind turbine power curves are corrected for air density when using a wind resource file. This will increase your annual energy estimate compared to previous versions.', 'warning');	
+	
+	if ( cfg.fin == 'Single Owner' || cfg.fin == 'Leveraged Partnership Flip' || cfg.fin == 'All Equity Partnership Flip' || cfg.fin == 'Sale Leaseback')
+	{
+		message('The Apply Values from Library checkbox on the Time of Delivery Factors is now a button to resolve an issue with saving and loading TOD factor inputs to and from CSV files.');
+	} 		
+};
+
+
+version_upgrade{'2017.1.17'} = define() {
+	message('Upgraded project to version 2017.1.17');
+};
+
+version_upgrade{'2016.12.29'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{	
+		//transformer loss changed
+			xfmr_ll = oldvalue('transformer_loss');
+			value('transformer_load_loss',xfmr_ll,'transformer loss model updated');
+		
+		// warning about battery losses
+		if (varinfo('en_batt'))
+		{
+			if (value('en_batt') == true)
+				message('This version significantly reworks the power electronic conversion efficiencies of the battery, resulting in changes to battery losses', 'warning');
+		}
+	}
+	if (cfg.tech == 'Wind Power')
+	{
+		if (value('wind_resource_model_choice') == 0 && value('wind.turbine.radio_list_or_design') == 0)
+			message('This version fixes a bug with how wind speeds near the cut-in wind speed are treated for library turbines. This may increase your annual energy estimate slightly. Please see the release notes for more detail.', 'warning');
+	}
+	if (cfg.tech == "MSPT" || cfg.tech == "DSPT")
+	{
+		value( 'opt_algorithm', 1 ); // always set to 1 BOBYQA
+		value( 'opt_flux_penalty', 0 ); // flux penalty not used		
+		
+		message("This version eliminates the option to select the solar field optimization algorithm and uses BOBYQA in all cases. This algorithm does not require a flux over-design penalty. This may change your results when running the solar field optimization routine.", 'warning');	
+		
+		if( value('is_dispatch') == true )
+		{
+			message("The dispatch optimization algorithm was modified in this version to include additional parasitics, weighting functions for dispatch profile variability, and other enhancements. This may change your results when simulating with dispatch optimization enabled.", 'warning');
+		}
+	}
+	if (cfg.tech == "Generic CSP System")
+	{
+		message("The Generic CSP System model was restructured and now uses different regression equations for thermal losses, power block conversion efficiency, and parasitic consumption. This change invalidates previous model configurations and requires revised input values. For more information on generating regression coefficients, view help or visit the SAM website.",'error');
+	}
+};
+
+
+version_upgrade{'2016.10.25'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{	
+		//degradation bug
+		if (value('subarray2_enable') == 1 || value('subarray3_enable') == 1 || value('subarray4_enable') == 1)
+		{
+			degradation = value('dc_degradation');
+			if (typeof(degradation) == 'array' || degradation == 0)
+				message('This version fixes a bug with module degradation when using multiple subarrays. This will change your results. Please see the release notes for more detail.', 'warning');
+		}
+	}
+	if (cfg.tech == 'Wind Power')
+	{
+		//added new variable for Weibull distribution
+		value('weibull_k_factor', oldvalue('wind_characteristics_weibullK'), "Variable renamed");
+		value('weibull_wind_speed', oldvalue('wind_characteristics_class'), "Variable renamed");
+		//Weibull distribution bug
+		if (value('wind_resource_model_choice') == 1) //Weibull distribution
+		{
+			adj = value('adjust');
+			if (adj.constant != 0 || adj.en_hourly || adj.en_periods)
+				message('This version fixes a bug with availability and curtailment losses in conjunction with the Weibull resource model. This will change your results. Please see the release notes for more detail.', 'warning');
+		}
+	}
+	if (cfg.tech == 'Solar Water Heating')
+	{
+		// changed output units to kW, removed output
+		message('Changed outputs for Q_transmitted, Q_useful, Q_deliv, Q_loss, Q_aux, Q_auxonly, P_pump, energy (Q_saved) from W to kW.  Removed duplicated Q_saved variable, which is "System power generated"', 'notice');
+	}		
+	return;
+};
+
+version_upgrade{'2016.7.21'} = define() {
+	const cfg = config();
+	if ((cfg.fin == 'Residential' || cfg.fin == 'Commercial'))
+		if (oldvalue('ur_metering_option') == 3) //two meters with all generation sold and all load purchased
+			value( 'ur_metering_option', 4, 'utility rate metering options have changed order' );
+	return;
+};
+
+
+//****************************************************************************************************************************************************************
+
+// PUBLIC VERSION
+version_upgrade{'2016.3.14'} = define() {
+	message('Upgraded project to version 2016.3.14');
+};
+
+//****************************************************************************************************************************************************************
+
+version_upgrade{'2016.3.2'} = define() {
+
+	//TELL USERS IF THE ANSWERS ARE GOING TO CHANGE
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{	
+		message('This version fixes a bug in how AC wiring and transformer losses are applied. This may change your results slightly. Please see the release notes for more detail.', 'warning');
+		if (value('subarray1_shade_mode') == 1 || value('subarray2_shade_mode') == 1 || value('subarray3_shade_mode') == 1 || value('subarray4_shade_mode') == 1)
+			message('This version fixes a bug in the self-shading algorithm. This may change your results slightly. Please see the release notes for more detail.','warning');
+	}
+	if (cfg.tech == 'Physical Trough')
+		message('This version fixes a bug that resulted in unreasonable freeze protection parasitics. This may change your results slightly. Please see the release notes for more detail.','warning');
+	if (cfg.tech == 'Empirical Trough')
+		message('This version fixes a bug with cooling tower temperature corrections. This may change your results. Please see the release notes for more detail.','warning');
+	if (cfg.tech == 'DSPT')
+		message('This version fixes a bug with the calculation of heliostat tracking parasitics. This may change your results slightly. Please see the release notes for more detail.','warning');
+
+};
+
+//****************************************************************************************************************************************************************
+
+version_upgrade{'2016.2.26'} = define() {
+	const cfg = config();
+	if ((cfg.fin == 'Residential' || cfg.fin == 'Commercial'))
+	{
+		a = oldvalue('ur_metering_option');
+		if (a==2) // switch old hourly and monthly non net metering options.
+			a=3;
+		else if (a==3)
+			a=2;
+		value( 'ur_metering_option', a, 'utility rate metering options have changed' );
+		// update old flat rates to TOU periods- replace energy charges if energy TOU rates not enabled
+		buy = oldvalue('ur_flat_buy_rate');
+		sell = oldvalue('ur_flat_sell_rate');
+		ec_enable = oldvalue('ur_ec_enable');
+		if (buy > 0 || sell > 0)
+		{
+			if (ec_enable > 0)
+			{
+				message('Your project file had both flat and TOU energy rates. The TOU energy rates have been updated and the flat rates ignored. Please review the "Electricity Rates" page.', 'warning');
+			}
+			else // replace weekend and weekday schedules and ec_tou_mat
+			{
+				nm = oldvalue('ur_enable_net_metering');
+				if (nm>0)
+					sell=buy;
+				ec_tou_mat[0][0] = 1; // period
+				ec_tou_mat[0][1] = 1; // tier
+				ec_tou_mat[0][2] = 1e+38; // max
+				ec_tou_mat[0][3] = 0; // units (kWh)
+				ec_tou_mat[0][4] = buy; // buy
+				ec_tou_mat[0][5] = sell; // sell
+				value("ur_ec_tou_mat", ec_tou_mat, 'Utility rate input for energy charge updated');
+				for (m=0;m<12;m++)
+				{
+					for (h=0;h<24;h++)
+					{
+						sched[m][h] = 1;
+					}
+				}
+				value("ur_ec_sched_weekday", sched, 'Utility rate weekday schedule for energy charge updated');
+				value("ur_ec_sched_weekend", sched, 'Utility rate weekend schedule for energy charge updated');
+			}
+		}
+		
+	}
+};
+
+//**********************************************************************************************************************************************************
+
+version_upgrade{'2016.2.22'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{
+		for (i=1; i<5; i++)
+		{
+			pre = sprintf('subarray%d_', i);
+			x = value (pre +'shade_mode');
+			new = 1 - x; //old SAM: 0 was self-shaded, 1 was none, now: 0 is none, 1 is self-shaded (non-linear), 2 is self-shaded (linear)
+			value(pre + 'shade_mode', new, 'Self-shading options have changed order');
+		}
+	}
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2016.1.21'} = define() {
+	const cfg = config();
+	if (cfg.tech == 'Wind Power')
+	{
+		if (value('wind.turbine.radio_list_or_design') == 1)
+			if (value('wind.turbine.blade_design') == 0 || value('wind.turbine.tower_design') == 0)
+				message('The default recommendation for user-entered turbines has been updated to "Advanced" blade and tower design. Please check your Wind Turbine design page if you would like to update your inputs.', 'notice');
+	}
+	if (cfg.tech == 'Flat Plate PV' || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{		
+		if ((cfg.fin == 'Residential' || cfg.fin == 'Commercial') && value('en_batt') == 1)
+		{
+			// battery updates
+			old_dispatch = value("batt_dispatch_choice");
+			// Added new dispatch mode, if they had manual, it's now index 3, others are the same
+			if (old_dispatch == 2)
+				value("batt_dispatch_choice",3,"Keep as manual dispatch");	
+		}	
+	}
+	
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.11.16'} = define() {
+	
+	const cfg = config();
+	if ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' )
+	{	
+		ec_tou_row=0;
+		dc_tou_row=0;
+		dc_flat_row=0;
+		months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" ];
+		// energy charge matrix inputs
+		nm = oldvalue('ur_enable_net_metering');
+		for (per=1;per<13;per++)
+		{
+			for (tier=1;tier<7;tier++)
+			{	
+				// ec tou
+				per_tier = sprintf("ur_ec_p%d_t%d_", per, tier);
+				br = oldvalue(per_tier + 'br');
+				sr = oldvalue(per_tier + 'sr');
+				ub = oldvalue(per_tier + 'ub');
+				if (nm>0)
+					sr=br;
+				
+				if (sr > 0 || br > 0 || ec_tou_row == 0) // must have one row
+				{
+					ec_tou_mat[ec_tou_row][0]=per;
+					ec_tou_mat[ec_tou_row][1]=tier;
+					ec_tou_mat[ec_tou_row][2]=ub;
+					ec_tou_mat[ec_tou_row][3]=0; // units 
+					ec_tou_mat[ec_tou_row][4]=br;
+					ec_tou_mat[ec_tou_row][5]=sr;
+					ec_tou_row++;
+				}
+				// demand tou
+				per_tier = sprintf("ur_dc_p%d_t%d_", per, tier);
+				dc = oldvalue(per_tier + 'dc');
+				ub = oldvalue(per_tier + 'ub');
+				if (dc > 0 || dc_tou_row == 0) // must have one row
+				{
+					dc_tou_mat[dc_tou_row][0]=per;
+					dc_tou_mat[dc_tou_row][1]=tier;
+					dc_tou_mat[dc_tou_row][2]=ub;
+					dc_tou_mat[dc_tou_row][3]=dc;
+					dc_tou_row++;
+				}
+				// flat demand
+				per_tier = sprintf("ur_dc_%s_t%d_", months[per-1], tier);
+				dc = oldvalue(per_tier + 'dc');
+				ub = oldvalue(per_tier + 'ub');
+				if (dc > 0 || dc_flat_row < 12) // must have one value for each month
+				{
+					dc_flat_mat[dc_flat_row][0]=per-1; // month index
+					dc_flat_mat[dc_flat_row][1]=tier;
+					dc_flat_mat[dc_flat_row][2]=ub;
+					dc_flat_mat[dc_flat_row][3]=dc;
+					dc_flat_row++;
+				}
+			}
+		}
+		value("ur_ec_tou_mat", ec_tou_mat, 'Utility rate input for electricity charge TOU rates has changed');
+		value("ur_dc_tou_mat", dc_tou_mat, 'Utility rate input for demand charge TOU rates has changed');
+		value("ur_dc_flat_mat", dc_flat_mat, 'Utility rate input for demand charge flat rates has changed');
+		message( 'Utility rate inputs have been updated to tabular values rather than individual values.  See help for more information.', 'notice' );
+	}
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.10.29'} = define() {
+	const cfg = config();
+	if( ( cfg.tech == 'Flat Plate PV' && value('en_batt') == 1 ) || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{
+		if ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' ) 
+		{
+			x = oldvalue('batt_replacement_cost');
+			value( 'batt_replacement_cost', x[0] ); // batt_replacement_cost is now single value
+		}	
+	}
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.9.9'} = define() {
+	
+	const cfg = config();
+	if ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' )
+	{		
+		// net metering check box removed
+		nm = oldvalue('ur_enable_net_metering');
+		if (nm==1)
+			value('ur_metering_option',oldvalue('ur_excess_monthly_energy_or_dollars'), 'Utility rate metering options have changed');
+		else // non-net metering with monthly reconciliation
+			value('ur_metering_option',2, 'Utility rate metering options have changed');
+	}
+	
+	if( cfg.tech == 'MSPT' )
+	{	
+		value('piping_loss', oldvalue('Piping_loss'),"Variable Renamed");
+		value('piping_length_const', oldvalue('csp.pt.par.piping_length_const'),"Variable Renamed");
+		value('piping_length_mult', oldvalue('csp.pt.par.piping_length_mult'),"Variable Renamed");
+		value('gross_net_conversion_factor', oldvalue('csp.pt.pwrb.gross_net_conversion_factor'),"Variable Renamed");
+		value('hybrid_tou1', oldvalue('csp.pt.pwrb.hc_ctl1'),"Variable Renamed");
+		value('hybrid_tou2', oldvalue('csp.pt.pwrb.hc_ctl2'),"Variable Renamed");
+		value('hybrid_tou3', oldvalue('csp.pt.pwrb.hc_ctl3'),"Variable Renamed");
+		value('hybrid_tou4', oldvalue('csp.pt.pwrb.hc_ctl4'),"Variable Renamed");
+		value('hybrid_tou5', oldvalue('csp.pt.pwrb.hc_ctl5'),"Variable Renamed");
+		value('hybrid_tou6', oldvalue('csp.pt.pwrb.hc_ctl6'),"Variable Renamed");
+		value('hybrid_tou7', oldvalue('csp.pt.pwrb.hc_ctl7'),"Variable Renamed");
+		value('hybrid_tou8', oldvalue('csp.pt.pwrb.hc_ctl8'),"Variable Renamed");
+		value('hybrid_tou9', oldvalue('csp.pt.pwrb.hc_ctl9'),"Variable Renamed");
+	}
+	
+	//changes to the Physical Trough model
+	if( cfg.tech == 'Physical Trough' )
+	{
+		value('eta_lhv', oldvalue('csp.dtr.pwrb.boiler_lhv_eff'),"Variable Renamed");
+		value('eta_tes_htr', oldvalue('csp.dtr.tes.tank_heater_eff'),"Variable Renamed");
+		value('n_pl_inc', oldvalue('csp.dtr.pwrb.hr_pl_nlev'),"Variable Renamed");
+		value('P_ref', oldvalue('pb_rated_cap'),"Variable Renamed");
+		value('hybrid_tou1', oldvalue('csp.dtr.pwrb.hc_ctl1'),"Variable Renamed");
+		value('hybrid_tou2', oldvalue('csp.dtr.pwrb.hc_ctl2'),"Variable Renamed");
+		value('hybrid_tou3', oldvalue('csp.dtr.pwrb.hc_ctl3'),"Variable Renamed");
+		value('hybrid_tou4', oldvalue('csp.dtr.pwrb.hc_ctl4'),"Variable Renamed");
+		value('hybrid_tou5', oldvalue('csp.dtr.pwrb.hc_ctl5'),"Variable Renamed");
+		value('hybrid_tou6', oldvalue('csp.dtr.pwrb.hc_ctl6'),"Variable Renamed");
+		value('hybrid_tou7', oldvalue('csp.dtr.pwrb.hc_ctl7'),"Variable Renamed");
+		value('hybrid_tou8', oldvalue('csp.dtr.pwrb.hc_ctl8'),"Variable Renamed");
+		value('hybrid_tou9', oldvalue('csp.dtr.pwrb.hc_ctl9'),"Variable Renamed");
+		value('pressure_mode', oldvalue('csp.dtr.pwrb.pressure_mode'),"Variable Renamed");
+	}
+	
+	//changes to the molten salt linear fresnel model
+	if( cfg.tech == 'MSLF' )
+	{
+		value('hybrid_tou1', oldvalue('csp.mslf.cycle.F_wc1'),"Variable Renamed");
+		value('hybrid_tou2', oldvalue('csp.mslf.cycle.F_wc2'),"Variable Renamed");
+		value('hybrid_tou3', oldvalue('csp.mslf.cycle.F_wc3'),"Variable Renamed");
+		value('hybrid_tou4', oldvalue('csp.mslf.cycle.F_wc4'),"Variable Renamed");
+		value('hybrid_tou5', oldvalue('csp.mslf.cycle.F_wc5'),"Variable Renamed");
+		value('hybrid_tou6', oldvalue('csp.mslf.cycle.F_wc6'),"Variable Renamed");
+		value('hybrid_tou7', oldvalue('csp.mslf.cycle.F_wc7'),"Variable Renamed");
+		value('hybrid_tou8', oldvalue('csp.mslf.cycle.F_wc8'),"Variable Renamed");
+		value('hybrid_tou9', oldvalue('csp.mslf.cycle.F_wc9'),"Variable Renamed");
+		value('pressure_mode', oldvalue('csp.mslf.cycle.sliding_pres'),"Variable Renamed");
+		value('combo_condenser_type', oldvalue('csp.mslf.cycle.CT'),"Variable Renamed");
+	}	
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.8.17'} = define() {
+	
+	const cfg = config();
+
+	if( cfg.tech == 'DSPT' )
+	{	
+		// Tower piping length multiplier and constant addition need to be remapped
+		value('piping_length_mult',oldvalue('csp.pt.par.piping_length_const'),"Variable names for piping length constant and piping length multiplier were switched");
+		value('piping_length_add',oldvalue('csp.pt.par.piping_length_mult'),"Variable names for piping length constant and piping length multiplier were switched");
+		
+		// Emissivity used for all three receivers, not just boiler...
+		value('rec_emis',oldvalue('emis_boiler'),"The same coating emissivity is applied to the boiler, superheater, and reheater"); 
+	}
+	
+	// Add two new dispatch modes, pushed manual to index 2002
+	if( ( cfg.tech == 'Flat Plate PV' && value('en_batt') == 1 )  || cfg.tech == 'PV Battery') // in case config was changed from flat plate pv to pv battery in 2020.2.29 function
+	{
+		if ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' ) 
+		{
+			value("batt_dispatch_choice",2, "Keep as manual dispatch"); 
+		}
+	}	
+
+};
+
+//***********************************************************************************************************************************************************
+
+//PUBLIC VERSION
+version_upgrade{'2015.6.30'} = define() {
+	
+	// have to update adjust:factor to adjust:constant
+	adj = value('adjust');
+	adj.constant = adj.factor;
+	value('adjust', adj, 'Variable name changed from adjust:factor to adjust:constant');
+	
+	// other updates since 2015.5.27 - everyone please check.	
+	const cfg = config();
+	if ( cfg.fin == 'Residential' || cfg.fin == 'Commercial' )
+		message( 'Utility bill calculations have been updated to use monthly reconciliation for energy and demand charges.  See help for more information.', 'warning' );
+		
+	message('Upgraded project to version 2015.6.30');
+		
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.5.27'} = define() {
+		
+	//get the configuration
+	const cfg = config();
+	
+	// changes to the Molten Salt Power Tower model
+	if( cfg.tech == 'MSPT' )
+	{		
+		// Changed names of hot and cold tank max heat variables
+		value('hot_tank_max_heat',oldvalue('tank_max_heat'));
+		value('cold_tank_max_heat',oldvalue('csp.pt.tes.cold_heater_max_load'));
+	}
+};
+
+//***********************************************************************************************************************************************************
+
+version_upgrade{'2015.4.10'} = define() {	
+	//get the configuration
+	const cfg = config();
+		
+	//changes to the Physical Trough model
+	if( cfg.tech == 'Physical Trough' )
+	{
+		// 2015.1.30 version stored IAM coefficients as single values. 2015.4.10 version stores IAM coefficients as arrays (for each collector)
+		IAMs_1[0] = oldvalue('csp_dtr_sca_iam0_1');
+		IAMs_1[1] = oldvalue('csp_dtr_sca_iam1_1');
+		IAMs_1[2] = oldvalue('csp_dtr_sca_iam2_1');
+		
+		IAMs_2[0] = oldvalue('csp_dtr_sca_iam0_2');
+		IAMs_2[1] = oldvalue('csp_dtr_sca_iam1_2');
+		IAMs_2[2] = oldvalue('csp_dtr_sca_iam2_2');
+		
+		IAMs_3[0] = oldvalue('csp_dtr_sca_iam0_3');
+		IAMs_3[1] = oldvalue('csp_dtr_sca_iam1_3');
+		IAMs_3[2] = oldvalue('csp_dtr_sca_iam2_3');
+		
+		IAMs_4[0] = oldvalue('csp_dtr_sca_iam0_4');
+		IAMs_4[1] = oldvalue('csp_dtr_sca_iam1_4');
+		IAMs_4[2] = oldvalue('csp_dtr_sca_iam2_4');
+		
+		value('IAMs_1', IAMs_1, 'Represent IAM coefficients for Collector 1 in variable size array.');
+		value('IAMs_2', IAMs_2, 'Represent IAM coefficients for Collector 2 in variable size array.');
+		value('IAMs_3', IAMs_3, 'Represent IAM coefficients for Collector 3 in variable size array.');
+		value('IAMs_4', IAMs_4, 'Represent IAM coefficients for Collector 4 in variable size array.');
+		
+		// User defined field and storage HTF properties variable (matrix) name changed between versions
+		value('field_fl_props',oldvalue('user_defined_htf_array'));
+		value('store_fl_props',oldvalue('csp.dtr.tes.user_htf'));
+	}
+	
+	// changes to the Molten Salt Linear Fresnel model
+	if( cfg.tech == 'MSLF' )
+	{
+		value('store_fl_props',oldvalue('user_fluid'));
+	}
+
+};
+
+//***********************************************************************************************************************************************************
+
+//PUBLIC VERSION (last version with no battery model)
+version_upgrade{'2015.1.30'} = define() {
+	
+	//get the configuration
+	const cfg = config();
+		
+	//Availability and Curtailment (all three components) changed from factor to loss for ALL configurations	
+	adj = value('adjust');
+	adj.factor = (1 - adj.factor) * 100.0;
+	if (adj.en_hourly)
+		for(i=0; i<8760; i++)
+			adj.hourly[i] = (1 - adj.hourly[i]) * 100;
+	if(adj.en_periods)
+		for (i=0; i<#adj.periods; i++)
+			adj.periods[i][2] = (1 - adj.periods[i][2]) * 100;
+	value('adjust', adj, 'Availability and curtailment numbers were changed from factors to losses.');
+	
+	//Address fixed bug in the CEC User Entered Module page
+	if (cfg.tech == 'Flat Plate PV')
+	{
+		if (value('module_model') == 2)
+		{
+			if (value('6par_aisc_units') == 1)
+				message('Version 2014.11.24 of SAM had a bug with the units of the ISC Temperature Coefficient. Please double check this input.', 'warning');
+			if (value('6par_bvoc_units') == 1)
+				message('Version 2104.11.24 of SAM had a bug with the units of the VOC Temperature Coefficient. Please double check this input.', 'warning');
+		}
+	}
+	
+	message('Upgraded project to version 2015.1.30');
+};
+
+//***********************************************************************************************************************************************************
