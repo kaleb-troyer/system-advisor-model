@@ -17,6 +17,7 @@ set(TCS_SRC
 		csp_solver_core.cpp
 		csp_solver_cr_electric_resistance.cpp
 		csp_solver_cr_heat_pump.cpp
+        csp_solver_falling_particle_receiver.cpp
         csp_solver_fresnel_collector_receiver.cpp
 		csp_solver_gen_collector_receiver.cpp
 		csp_solver_lf_dsg_collector_receiver.cpp
@@ -37,6 +38,7 @@ set(TCS_SRC
 		csp_solver_two_tank_tes.cpp
 		csp_solver_util.cpp
 		csp_solver_weatherreader.cpp
+        csp_system_costs_gen3.cpp
 		csp_system_costs.cpp
 		direct_steam_receivers.cpp
 		dispatch_builder.cpp
@@ -110,6 +112,7 @@ set(TCS_SRC
 		csp_solver_core.h
 		csp_solver_cr_electric_resistance.h
 		csp_solver_cr_heat_pump.h
+        csp_solver_falling_particle_receiver.h
         csp_solver_fresnel_collector_receiver.h
 		csp_solver_gen_collector_receiver.h
 		csp_solver_lf_dsg_collector_receiver.h
@@ -128,6 +131,7 @@ set(TCS_SRC
 		csp_solver_trough_collector_receiver.h
 		csp_solver_two_tank_tes.h
 		csp_solver_util.h
+        csp_system_costs_gen3.h
 		csp_system_costs.h
 		direct_steam_receivers.h
 		dispatch_builder.h

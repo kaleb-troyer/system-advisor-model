@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_shared_inverter.h"
 
 #include <math.h>
+#include <cstdint>
 #include <algorithm>
 
 /*
@@ -659,7 +660,7 @@ dispatch_automatic_t::dispatch_automatic_t(
     bool chargeOnlySystemExceedLoad,
     bool dischargeOnlyLoadExceedSystem,
     bool behindTheMeterDischargeToGrid,
-    double SOC_min_outage    
+    double SOC_min_outage
 	) : dispatch_t(Battery, dt_hour, SOC_min, SOC_max, current_choice, Ic_max, Id_max, Pc_max_kwdc, Pd_max_kwdc, Pc_max_kwac, Pd_max_kwac,
 
     t_min, dispatch_mode, pv_dispatch, interconnection_limit, chargeOnlySystemExceedLoad, dischargeOnlyLoadExceedSystem, SOC_min_outage)
@@ -1064,12 +1065,12 @@ void outage_manager::update(bool isAutomated, double min_outage_soc) {
 
 
 void outage_manager::startOutage(double min_outage_soc) {
-    canSystemChargeWhenGrid = m_batteryPower->canSystemCharge;	
+    canSystemChargeWhenGrid = m_batteryPower->canSystemCharge;
     canClipChargeWhenGrid = m_batteryPower->canClipCharge;
     canGridChargeWhenGrid = m_batteryPower->canGridCharge;
     canDischargeWhenGrid = m_batteryPower->canDischarge;
 
-    stateOfChargeMaxWhenGrid = m_batteryPower->stateOfChargeMax; 
+    stateOfChargeMaxWhenGrid = m_batteryPower->stateOfChargeMax;
     stateOfChargeMinWhenGrid = m_batteryPower->stateOfChargeMin;
 
     if (m_batteryPower->connectionMode == m_batteryPower->DC_CONNECTED) {
