@@ -5,17 +5,18 @@
 #include <cmath>
 
 #include "csp_solver_falling_particle_receiver.h"
+#include "htf_props.h"
 
 using namespace std;
 
 class cspGen3CostModel {
 public:
 
-    cspGen3CostModel();             // Class initializer. Memory is shared and modified between optimizations. 
-    ~cspGen3CostModel() = default;  // Default destructor. Memory is out-of-scope after the optimization is completed. 
-    void designRoutine();           // Accepts a power block to design a CSP plant and calculate LCOE. 
-    
-    // derived parameters    
+    cspGen3CostModel();             // Class initializer. Memory is shared and modified between optimizations.
+    ~cspGen3CostModel() = default;  // Default destructor. Memory is out-of-scope after the optimization is completed.
+    void designRoutine();           // Accepts a power block to design a CSP plant and calculate LCOE.
+
+    // derived parameters
     double W_dot_therm;     // [MWt]    power cycle thermal input
     double W_dot_field;     // [MWt]    power delivered to the receiver from the solar field
     double W_dot_rec;       // [MWt]    power required at and absorbed by the receiver
@@ -42,7 +43,7 @@ public:
         double P_min;       // [MPa] power cycle low pressure
 
         cycle() {
-            T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = T_HTR_i = T_HTR_o = 
+            T_phx_i = T_phx_o = eta_gen = efficiency = W_dot_net = T_HTR_i = T_HTR_o =
                 T_LTR_i = T_LTR_o = W_dot_gen = phx_height = T_trb_i = P_max = P_min = 0.0;
         };
     } s_cycle;
@@ -67,7 +68,7 @@ public:
         double compressor_capital;     // [$] primary compressor capital cost
         double recompressor_capital;   // [$] recompressor capital cost
         double turbine_capital;        // [$] turbine capital cost
-        double piping_inventory_etc;   // [$] piping, inventory control, etc. 
+        double piping_inventory_etc;   // [$] piping, inventory control, etc.
         double balance_of_plant;       // [$] transformers, inverters, controls, etc.
 
         // Total capital, maintenance, and LCOE
@@ -75,17 +76,17 @@ public:
         double plant_capital;               // [$]       CSP equipment capital costs
         double total_capital;               // [$]       total expected capital cost of plant
         double annual_maintenance;          // [$/year]  expected O&M annual costs
-        double total_adjusted_cost;         // [$]       total cost of capital, construction, and contingencies 
+        double total_adjusted_cost;         // [$]       total cost of capital, construction, and contingencies
         double levelized_cost_of_energy;    // [$/MWe-h] CSP Gen3 levelized cost of energy
 
         costs() {
-            solar_tower = solar_field = falling_particle_receiver = land = balance_of_plant = 
+            solar_tower = solar_field = falling_particle_receiver = land = balance_of_plant =
                 particles = particle_storage = particle_lifts = particle_losses = 0;
 
             HTR_capital = LTR_capital = PHX_capital = air_cooler_capital =
                 compressor_capital = recompressor_capital = turbine_capital = 0;
 
-            annual_maintenance = total_adjusted_cost = cycle_capital = piping_inventory_etc = 
+            annual_maintenance = total_adjusted_cost = cycle_capital = piping_inventory_etc =
                 plant_capital = total_capital = levelized_cost_of_energy = 0;
         };
     } s_costs;
@@ -100,7 +101,7 @@ public:
         double inflation = 0.025;        // [-] average rate of inflation (DOE, SunShot Vision Study)
         double lifetime = 30.00;         // [years] total design lifetime (DOE, SunShot Vision Study)
         double maintenance = 40000;      // [$/MWe-year] O&M costs        (Albrecht, 2019)
-        double balance_of_plant = 167E3; // [$/MWe] balance of plant rate (NREL, SAM) 
+        double balance_of_plant = 167E3; // [$/MWe] balance of plant rate (NREL, SAM)
 
         // financing derived parameters
         double real_discount_rate;       // [-] calculated using discount rate and inflation
@@ -110,7 +111,7 @@ public:
             real_discount_rate = ((1 + discount_rate) / (1 + inflation)) - 1; // [-]
             capital_recovery_factor =
                 real_discount_rate * pow(1 + real_discount_rate, lifetime)
-                / (pow(1 + real_discount_rate, lifetime) - 1); 
+                / (pow(1 + real_discount_rate, lifetime) - 1);
         };
     } s_financing;
 
@@ -146,7 +147,7 @@ public:
 
             warm() {
                 height = radius = volume = efficiency = 0;
-                Tm = Ti = To = 0; 
+                Tm = Ti = To = 0;
             }
         } s_warm;
 
@@ -174,6 +175,8 @@ public:
 
     struct particles { // thermal carrier data structure
 
+        int fluid_code;      // [-]      particle fluid code
+
         // parameters derived from particle
         double cost_per_kg;     // [$/kg]   particle bulk cost
         double angle_of_repose; // [rad]    particle repose angle
@@ -193,8 +196,9 @@ public:
             cost_per_kg = angle_of_repose = bulk_density
                 = m_particles = m_dot_phx = m_dot_rec = 0;
 
+            fluid_code = 0;
             mean_diameter = 250e-6;
-            absorptivity = 0.34; 
+            absorptivity = 0.34;
             non_storage = 0.05;
         };
     } s_particles;
@@ -237,7 +241,7 @@ public:
     struct receiver { // falling particle receiver data structure
 
         // falling particle receiver dimensions and performance
-        double height;               // [m]   flat plate receiver height 
+        double height;               // [m]   flat plate receiver height
         double width;                // [m]   flat plate receiver width
         double wind_direction;       // [deg] wind direction (North=0, North-facing receiver)
         double area_aperature;       // [m2]  aperature area = receiver area
@@ -245,9 +249,9 @@ public:
         double particle_loss_factor; // [-]   particle loss from open air receiver
         double efficiency_modifier;  // [-]   receiver efficiency modifier
         double efficiency;           // [-]   receiver efficiency
-        double Tm;                   // [K]   particle mean temperature in receiver 
+        double Tm;                   // [K]   particle mean temperature in receiver
         double Ti;                   // [K]   particle temperature at receiver inlet
-        double To;                   // [K]   particle temperature at receiver outlet 
+        double To;                   // [K]   particle temperature at receiver outlet
 
         receiver() {
             height = width = area_aperature = aspect_ratio = wind_direction =
@@ -265,7 +269,7 @@ public:
 
         lifts() {
             height = dT = 0;
-            efficiency = 0.8; // [-] (Ho, 2016) 
+            efficiency = 0.8; // [-] (Ho, 2016)
         };
     } s_lifts;
 
@@ -297,15 +301,15 @@ public:
 
             alloy() {
                 specific_cost = density = 0.0;
-                name = "NA"; 
+                name = "NA";
             }
         } s_alloy;
-        
+
         piping() {
-            lifetime = dP = stress_creep_rupture = thickness_ratio = baseline = T_max = 
+            lifetime = dP = stress_creep_rupture = thickness_ratio = baseline = T_max =
                 cost_per_length = normalized_cost = ri = ro = th = Ac = cost_factor = 0.0;
-            f_fix = 0.05; // [-] selected to fit data from White, et al. 2017. 
-            f_var = 0.07; // [-] selected to fit data from White, et al. 2017.  
+            f_fix = 0.05; // [-] selected to fit data from White, et al. 2017.
+            f_var = 0.07; // [-] selected to fit data from White, et al. 2017.
         }
     } s_piping;
 
@@ -321,24 +325,24 @@ private:
         LIFT,       // Lifts / Hoists / Process Machinery
     };
 
-    void temperatureCostScaling();  // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature 
+    void temperatureCostScaling();  // Scales the cost of the LTR, HTR, and turbine based on the respective operating temperature
     void particleTemperatures();    // Calculates particle temperatures at the inlet / outlet of the receiver and warm / cold storage
     void receiverLosses();          // Calculates estimated receiver thermal losses
-    void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc). 
+    void sizeEquipment();           // Sizes CSP Gen3 equipment (solar tower, etc).
     void pipingFactor();            // Calculates piping % share of power block costs.
     double costLand();              // Calculates cost of the total land required.
-    double costTower();             // Calculates cost of the solar tower. 
-    double costField();             // Calculates cost of the solar field / heliostats. 
-    double costLifts();             // Calculates cost of the particle lifts. 
-    double costStorage();           // Calculates cost of the thermal energy storage. 
-    double costReceiver();          // Calculates cost of the falling particle receiver. 
-    double costParticles();         // Calculates cost of bulk particles required. 
-    double costPiping(double T);    // Calculates the piping cost per length for a given temperature 
-    double costParticleLosses();    // Calculates incurred cost of particle loss / attrition. 
+    double costTower();             // Calculates cost of the solar tower.
+    double costField();             // Calculates cost of the solar field / heliostats.
+    double costLifts();             // Calculates cost of the particle lifts.
+    double costStorage();           // Calculates cost of the thermal energy storage.
+    double costReceiver();          // Calculates cost of the falling particle receiver.
+    double costParticles();         // Calculates cost of bulk particles required.
+    double costPiping(double T);    // Calculates the piping cost per length for a given temperature
+    double costParticleLosses();    // Calculates incurred cost of particle loss / attrition.
 
     double CEPCI(                   // Using the US BLS CPI, returns a correction factor for inflation to Jan 2025.
         int year, int type
-    );   
+    );
 
 };
 

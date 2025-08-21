@@ -30,7 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include <stdio.h>
 #include <cstring>
 #include <iostream>
@@ -70,8 +69,8 @@ SSCEXPORT output ssc_testing(
         0.0,            // + double rec_qf_delay            [-]         required startup energy as fraction of design thermal output
         2.0,            // + double m_dot_htf_max_frac      [-]         maximum receiver HTF mass flow as fraction of design mass flow
         1.0,            // * double eta_pump                [-]         HTF pump efficiency
-        36,             // + int    field_fl                [-]         Receiver heat transfer fluid
-        fluid_props,    // - util::matrix_t<double> field_fl_props      Receiver htf fluid properties 
+        37,             // + int    field_fl                [-]         Receiver heat transfer fluid
+        fluid_props,    // - util::matrix_t<double> field_fl_props      Receiver htf fluid properties
 
         //---Receiver Model Parameters
         3,              // + int    model_type              [-]         0 = Fixed efficiency, 1 = Sandia efficiency correlation for free-falling receiver, 2 = Sandia efficiency correlation for multi-stage receiver, 3 = Detailed quasi-2D physics-based receiver model
@@ -89,8 +88,8 @@ SSCEXPORT output ssc_testing(
         180.0,          // + double rec_orientation         [-]         Receiver orientation (0 = north, 90 = east, 180 = south, 270 = west
 
         //---Particle Parameters
-        250.e-6,        // * double particle_dp             [m]         Particle diameter
-        0.34,           // * double particle_abs            [-]         Particle absorptivity
+        404.e-6,        // * double particle_dp             [m]         Particle diameter
+        0.91,           // * double particle_abs            [-]         Particle absorptivity
 
         //---Curtain / Cavity Parameters
         0.60,           // + double curtain_emis            [-]         Curtain emissivity for q_net approximations
@@ -102,8 +101,8 @@ SSCEXPORT output ssc_testing(
         20.,            // + double cav_hext                [W/m2/K]    External heat transfer coefficient
 
         //---Transport / Radiation Loss Parameters
-        0.0,            // + double deltaT_transport_cold   [K]         Constant tempearture loss from cold particle transport 
-        0.0,            // + double deltaT_transport_hot    [K]         Constant tempearture loss from hot particle transport 
+        0.0,            // + double deltaT_transport_cold   [K]         Constant tempearture loss from cold particle transport
+        0.0,            // + double deltaT_transport_hot    [K]         Constant tempearture loss from hot particle transport
         1.0,            // + double tauc_mult               [-]         User-provided multiplier to adjust curtain transmissivity relative to values calculated from simple model
         1.0,            // + double hadv_mult               [-]         User-provided multipler to adjust advective loss coefficient. Only used if m_hdav_model_type == 1
 
@@ -119,7 +118,7 @@ SSCEXPORT output ssc_testing(
     );
 
     fpr_model.init();
-    const auto& soln = fpr_model.get_steady_state_soln(); 
+    const auto& soln = fpr_model.get_steady_state_soln();
 
     output reval;
     reval.eta = soln.eta;
@@ -943,7 +942,7 @@ void json_to_ssc_var(const rapidjson::Value& json_val, ssc_var_t ssc_val) {
     std::vector<ssc_number_t> vec;
     std::vector<var_data>* vd_arr;
     var_table* vd_tab;
-    
+
     auto is_numerical = [](const rapidjson::Value& json_val) {
         bool is_num = true;
         for (rapidjson::SizeType i = 0; i < json_val.Size(); i++) {
@@ -954,7 +953,7 @@ void json_to_ssc_var(const rapidjson::Value& json_val, ssc_var_t ssc_val) {
         }
         return is_num;
     };
-    
+
     switch (json_val.GetType()) {
     default:
     case rapidjson::Type::kNullType:
@@ -1119,7 +1118,7 @@ SSCEXPORT const char* ssc_data_to_json(ssc_data_t p_data) {
 
     return strdup(buffer.GetString());
 }
- 
+
 
 
 
@@ -1478,7 +1477,7 @@ SSCEXPORT ssc_bool_t ssc_module_hybridize(ssc_module_t p_mod)
                 }
             }
         }
-    }    
+    }
 
     cmod->add_var_info(vtab_oandm_hybrid_tech);
     cmod->add_var_info(vtab_hybrid_tech_inputs);

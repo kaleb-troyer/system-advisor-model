@@ -338,7 +338,7 @@ using namespace std;
 //			// Knowing the specific work of the recompressor, the required mass flow rate can be calculated
 //			//m_dot_t = ms_des_par.m_W_dot_net / (w_mc*(1.0 - ms_des_par.m_recomp_frac) + w_rc*ms_des_par.m_recomp_frac + w_t);	// Required mass flow rate through turbine
 //			m_dot_t = ms_des_par.m_W_dot_net / (w_mc + w_t);	// Required mass flow rate through turbine
-//			
+//
 //			if( m_dot_t < 0.0 )		// positive power output is not possible with these inputs
 //			{
 //				error_code = 29;
@@ -354,14 +354,14 @@ using namespace std;
 //				Q_dot_LT = m_dot_t * (m_enth_last[8 - cpp_offset] - m_enth_last[9 - cpp_offset]);
 //
 //			min_DT_LT = std::numeric_limits<double>::quiet_NaN();
-//			
+//
 //			// Define variables that method outputs that we don't use
 //			double eff_LT_hx, NTU_LT_hx, T_h_out_LT_hx, T_c_out_LT_hx, q_dot_LT_hx;
 //			eff_LT_hx = NTU_LT_hx = T_h_out_LT_hx = T_c_out_LT_hx = q_dot_LT_hx = std::numeric_limits<double>::quiet_NaN();
 //
-//			try 
+//			try
 //			{
-//			mc_LT_recup.calc_req_UA(Q_dot_LT, m_dot_mc, m_dot_t, m_temp_last[MC_OUT], m_temp_last[HTR_LP_OUT], 
+//			mc_LT_recup.calc_req_UA(Q_dot_LT, m_dot_mc, m_dot_t, m_temp_last[MC_OUT], m_temp_last[HTR_LP_OUT],
 //				m_pres_last[MC_OUT], m_pres_last[LTR_HP_OUT], m_pres_last[HTR_LP_OUT], m_pres_last[LTR_LP_OUT],
 //				UA_LT_calc, min_DT_LT, eff_LT_hx, NTU_LT_hx, T_h_out_LT_hx, T_c_out_LT_hx, q_dot_LT_hx);
 //			}
@@ -378,7 +378,7 @@ using namespace std;
 //					error_code = csp_except.m_error_code;
 //					return;
 //				}
-//			
+//
 //			}
 //
 //			//calculate_hxr_UA_1(ms_des_par.m_N_sub_hxrs, Q_dot_LT, m_dot_mc, m_dot_t, m_temp_last[2 - cpp_offset], m_temp_last[8 - cpp_offset],
@@ -621,9 +621,9 @@ using namespace std;
 //	// Calculate/set cycle performance metrics
 //	// m_W_dot_net_last = w_mc*m_dot_mc + w_rc*m_dot_rc + w_t*m_dot_t;
 //	m_W_dot_net_last = (w_mc + w_t)*m_dot_t;
-//	
+//
 //	double Q_dot_heat_shield = m_dot_rc * (m_enth_last[10 - cpp_offset] - m_enth_last[2-cpp_offset]);
-//	
+//
 //	m_eta_thermal_last = m_W_dot_net_last / (PHX_des_par.m_Q_dot_design + Q_dot_heat_shield);
 //
 //	//double eta_thermal = ms_od_solved.m_eta_thermal;
@@ -638,10 +638,10 @@ using namespace std;
 //	double Q_hs_frac_target = 10.0 / 65.0;
 //	double Q_hs_frac = Q_dot_heat_shield / (PHX_des_par.m_Q_dot_design+Q_dot_heat_shield);
 //
-//	double diff_Q_hs = max(0.0, fabs(Q_hs_frac - Q_hs_frac_target) - ms_des_par.m_tol);		
+//	double diff_Q_hs = max(0.0, fabs(Q_hs_frac - Q_hs_frac_target) - ms_des_par.m_tol);
 //
 //	double E_bal = (PHX_des_par.m_Q_dot_design + Q_dot_heat_shield) - (m_W_dot_net_last + PC_des_par.m_Q_dot_design/m_dot_mc*(m_dot_mc + m_dot_rc));
-//	
+//
 //	m_eta_thermal_last = m_eta_thermal_last*exp(-diff_deltaT_hs)*exp(-100.0*diff_Q_hs);
 //
 //	m_m_dot_mc = m_dot_mc;
@@ -1233,7 +1233,7 @@ using namespace std;
 //	int iter_f_bypass = 0;
 //
 //	do
-//	{		
+//	{
 //		iter_f_bypass++;
 //
 //		int max_iter = 500;
@@ -1829,7 +1829,7 @@ using namespace std;
 //
 //	} while( true );
 //
-//	
+//
 //}
 
 void C_RecompCycle::design_core_standard(int & error_code)
@@ -2032,7 +2032,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	// ****************************************************
     C_mono_eq_HTR_des HTR_des_eq(this, w_mc, w_t);
     C_monotonic_eq_solver HTR_des_solver(HTR_des_eq);
-    
+
     if (ms_des_par.m_recomp_frac == 0.0)
     {
         double y_T_diff = std::numeric_limits<double>::quiet_NaN();
@@ -2066,7 +2066,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
             error_code = 35;
             return;
         }
-    }    
+    }
 
 	// Get information calculated in C_mono_eq_HTR_des
 	w_rc = HTR_des_eq.m_w_rc;
@@ -2124,9 +2124,9 @@ void C_RecompCycle::design_core_standard(int & error_code)
 	}
     else if (ms_des_par.m_des_objective_type == 3)
     {
-        //***********************************************//
-        // INTEGRATED COST FUNCTIONS WITHIN OPTIMIZATION //
-        //***********************************************//
+        //************************************//
+        // COST FUNCTIONS WITHIN OPTIMIZATION //
+        //************************************//
         int cpp_offset = 1;
 
         int mc_design_err = m_mc_ms.design_given_outlet_state(m_mc_comp_model_code, m_temp_last[MC_IN],
@@ -2160,7 +2160,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         }
         else
             ms_des_solved.m_is_rc = false;
-            //m_rc_ms.reset(); 
+            //m_rc_ms.reset();
 
         // Size turbine
         C_turbine::S_design_parameters  t_des_par;
@@ -2256,7 +2256,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         // Design the PHX
         double q_dot_des_phx = ms_des_solved.m_W_dot_net / ms_des_solved.m_eta_thermal;
         // ms_phx_des_par.m_Q_dot_design = ms_des_solved.ms_rc_cycle_solved.m_W_dot_net / ms_des_solved.ms_rc_cycle_solved.m_eta_thermal;		//[kWt]
-        ms_phx_des_par.m_T_h_in = ms_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature 
+        ms_phx_des_par.m_T_h_in = ms_des_par.m_T_htf_hot_in;	//[K] HTF hot inlet temperature
         // Okay, but CO2-HTF HX is assumed here. How does "structure inheritance" work?
         ms_phx_des_par.m_P_h_in = 1.0;						    // Assuming HTF is incompressible...
         ms_phx_des_par.m_P_h_out = 1.0;						    // Assuming HTF is incompressible...
@@ -2272,10 +2272,10 @@ void C_RecompCycle::design_core_standard(int & error_code)
 
         mc_phx.design_and_calc_m_dot_htf(ms_phx_des_par, q_dot_des_phx, ms_auto_opt_des_par.m_phx_dt_cold_approach, ms_des_solved.ms_phx_des_solved);
 
-        // ********************************
-        // Collecting CSP equipment costs  
-        // ********************************
-        
+        //********************************//
+        // Collecting CSP equipment costs //
+        //********************************//
+
         /*
         This penalty function steers the optimizer away from designing massive recuperators
         with very aggressive approach temperatures.
@@ -2288,7 +2288,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
         const double C1 = 5.00; // buffer determines when the penalty is triggered
         const double C2 = 3.60; // base value in exponential penalty function determines aggressiveness
         const double C3 = 2.80; // fine-tuning parameter
-        const double E1 = 1.30; // if dT < E1, use quadratic penalty 
+        const double E1 = 1.30; // if dT < E1, use quadratic penalty
         const double E2 = 5.80; // maximum penalty per rule
         const double E3 = 1.56; // quadratic penalty factor
         if (ms_opt_des_par.m_opt_penalty) { // optimizer gets stuck here if total UA is not a decision variable
@@ -2296,7 +2296,7 @@ void C_RecompCycle::design_core_standard(int & error_code)
             if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_LTR_min_dT) && ms_des_solved.ms_LTR_des_solved.m_min_DT_design > E1) {
                 penalty += pow(C2, ms_des_par.m_LTR_min_dT - (C3 + ms_des_solved.ms_LTR_des_solved.m_min_DT_design));
             } else if (ms_des_solved.ms_LTR_des_solved.m_min_DT_design <= E1) {
-                penalty += E2 - E3 * pow(ms_des_solved.ms_LTR_des_solved.m_min_DT_design, 2.0); 
+                penalty += E2 - E3 * pow(ms_des_solved.ms_LTR_des_solved.m_min_DT_design, 2.0);
             } else { penalty += 0.0; }
             // calculating penalty for HTR approach
             if (ms_des_solved.ms_HTR_des_solved.m_min_DT_design < (C1 + ms_des_par.m_HTR_min_dT) && ms_des_solved.ms_HTR_des_solved.m_min_DT_design > E1) {
@@ -2323,11 +2323,11 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.efficiency = ms_des_solved.m_eta_thermal; // [-]
         csp_cost_model.s_cycle.eta_gen = m_eta_generator;                // [-]
         csp_cost_model.s_cycle.T_phx_i = ms_phx_des_par.m_T_h_in;        // [K]
-        csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;  // [K] 
-        csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K] 
-        csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_HTR_des_solved.m_T_c_out;  // [K] 
-        csp_cost_model.s_cycle.T_LTR_i = ms_des_solved.ms_mc_ms_des_solved.m_T_out;  // [K] 
-        csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K] 
+        csp_cost_model.s_cycle.T_phx_o = ms_des_solved.ms_phx_des_solved.m_T_h_out;  // [K]
+        csp_cost_model.s_cycle.T_HTR_i = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K]
+        csp_cost_model.s_cycle.T_HTR_o = ms_des_solved.ms_HTR_des_solved.m_T_c_out;  // [K]
+        csp_cost_model.s_cycle.T_LTR_i = ms_des_solved.ms_mc_ms_des_solved.m_T_out;  // [K]
+        csp_cost_model.s_cycle.T_LTR_o = ms_des_solved.ms_LTR_des_solved.m_T_c_out;  // [K]
 
         csp_cost_model.s_particles.m_dot_phx = ms_phx_des_par.m_m_dot_hot_des;       // [kg/s]
         csp_cost_model.s_cycle.T_trb_i = ms_des_solved.ms_phx_des_solved.m_T_c_out; // [K] turbine inlet temperature
@@ -2335,12 +2335,14 @@ void C_RecompCycle::design_core_standard(int & error_code)
         csp_cost_model.s_cycle.P_min = ms_des_solved.ms_mc_ms_des_solved.m_P_in / 1000.0;  // [MPa] power cycle low pressure
 
         csp_cost_model.s_field.heliostat_cost_per_area = ms_opt_des_par.m_heliostat_cost;
-        csp_cost_model.s_receiver.efficiency_modifier = ms_opt_des_par.m_receiver_eta_mod; 
+        csp_cost_model.s_receiver.efficiency_modifier = ms_opt_des_par.m_receiver_eta_mod;
+        csp_cost_model.s_particles.fluid_code = ms_auto_opt_des_par.m_hot_fl_code;
 
         csp_cost_model.designRoutine();
-        const double objective_scalar = 100.0; 
+
+        const double objective_scalar = 100.0;
         m_objective_metric_last = objective_scalar / (csp_cost_model.s_costs.levelized_cost_of_energy + penalty);
-        
+
     }
     else
     {
@@ -2366,12 +2368,12 @@ void C_RecompCycle::design_core_standard(int & error_code)
             std::cerr << "Failed to open file." << std::endl;
         }
     }
-} 
+}
 
 int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, double *diff_T_LTR_LP_out /*K*/)
 {
 	m_w_rc = m_m_dot_t = m_m_dot_rc = m_m_dot_mc = m_Q_dot_LT = std::numeric_limits<double>::quiet_NaN();
-	
+
 	mpc_rc_cycle->m_temp_last[LTR_LP_OUT] = T_LTR_LP_out;
 
 	// First, solve the recompressor model as necessary
@@ -2390,13 +2392,13 @@ int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, doub
 			{
 				*diff_T_LTR_LP_out = std::numeric_limits<double>::quiet_NaN();
 				return rc_error_code;
-			}		
+			}
 		}
 		else
 		{
 			eta_rc_isen = mpc_rc_cycle->m_eta_rc;
 		}
-	
+
 		int rc_error_code = 0;
 
 		calculate_turbomachinery_outlet_1(mpc_rc_cycle->m_temp_last[LTR_LP_OUT], mpc_rc_cycle->m_pres_last[LTR_LP_OUT], mpc_rc_cycle->m_pres_last[RC_OUT], eta_rc_isen, true, rc_error_code,
@@ -2482,9 +2484,9 @@ int C_RecompCycle::C_mono_eq_LTR_des::operator()(double T_LTR_LP_out /*K*/, doub
 
 int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, double *diff_T_HTR_LP_out /*K*/)
 {
-	m_w_rc = m_m_dot_t = m_m_dot_rc = m_m_dot_mc = m_Q_dot_LT = m_Q_dot_HT = std::numeric_limits<double>::quiet_NaN();	
+	m_w_rc = m_m_dot_t = m_m_dot_rc = m_m_dot_mc = m_Q_dot_LT = m_Q_dot_HT = std::numeric_limits<double>::quiet_NaN();
 
-	mpc_rc_cycle->m_temp_last[HTR_LP_OUT] = T_HTR_LP_out;		//[K]	
+	mpc_rc_cycle->m_temp_last[HTR_LP_OUT] = T_HTR_LP_out;		//[K]
 
 	int prop_error_code = CO2_TP(mpc_rc_cycle->m_temp_last[HTR_LP_OUT], mpc_rc_cycle->m_pres_last[HTR_LP_OUT], &mpc_rc_cycle->mc_co2_props);
 	if( prop_error_code != 0 )
@@ -2522,7 +2524,7 @@ int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, doub
 	{
 		return 31;
 	}
-	  
+
 	// Get information set in the Monotonic Equation class
 	m_w_rc = LTR_des_eq.m_w_rc;
 	m_m_dot_t = LTR_des_eq.m_m_dot_t;
@@ -2541,7 +2543,7 @@ int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, doub
 	}
 	mpc_rc_cycle->m_temp_last[LTR_HP_OUT] = mpc_rc_cycle->mc_co2_props.temp;	//[K]
 	mpc_rc_cycle->m_entr_last[LTR_HP_OUT] = mpc_rc_cycle->mc_co2_props.entr;	//[kJ/kg-K]
-	mpc_rc_cycle->m_dens_last[LTR_HP_OUT] = mpc_rc_cycle->mc_co2_props.dens;	//[kg/m^3]	
+	mpc_rc_cycle->m_dens_last[LTR_HP_OUT] = mpc_rc_cycle->mc_co2_props.dens;	//[kg/m^3]
 
 	// Simulate the Mixer
 	if( mpc_rc_cycle->ms_des_par.m_recomp_frac >= 1.E-12 )
@@ -2583,8 +2585,8 @@ int C_RecompCycle::C_mono_eq_HTR_des::operator()(double T_HTR_LP_out /*K*/, doub
 		*diff_T_HTR_LP_out = std::numeric_limits<double>::quiet_NaN();
 		return -1;
 	}
-	
-	*diff_T_HTR_LP_out = T_HTR_LP_out_calc - mpc_rc_cycle->m_temp_last[HTR_LP_OUT];		//[K]	
+
+	*diff_T_HTR_LP_out = T_HTR_LP_out_calc - mpc_rc_cycle->m_temp_last[HTR_LP_OUT];		//[K]
 
 	return 0;
 }
@@ -2605,7 +2607,7 @@ void C_RecompCycle::design(S_design_parameters & des_par_in, int & error_code)
 	ms_des_par = des_par_in;
 
 	int design_error_code = 0;
-	
+
 	design_core(design_error_code);
 
 	if(design_error_code != 0)
@@ -2639,12 +2641,12 @@ void C_RecompCycle::opt_design_core(int & error_code)
 {
 	// Map ms_opt_des_par to ms_des_par
         // LTR thermal design
-    ms_des_par.m_fixed_UA_frac = ms_opt_des_par.m_fixed_UA_frac; 
+    ms_des_par.m_fixed_UA_frac = ms_opt_des_par.m_fixed_UA_frac;
     ms_des_par.m_LTR_target_code = ms_opt_des_par.m_LTR_target_code;    //[-]
     ms_des_par.m_LTR_min_dT = ms_opt_des_par.m_LTR_min_dT;      //[K]
     ms_des_par.m_LTR_eff_target = ms_opt_des_par.m_LTR_eff_target;  //[-]
 	ms_des_par.m_LTR_eff_max = ms_opt_des_par.m_LTR_eff_max;    //[-]
-    ms_des_par.m_LTR_od_UA_target_type = ms_opt_des_par.m_LTR_od_UA_target_type;    
+    ms_des_par.m_LTR_od_UA_target_type = ms_opt_des_par.m_LTR_od_UA_target_type;
         // HTR thermal design
     ms_des_par.m_HTR_target_code = ms_opt_des_par.m_HTR_target_code;    //[-]
     ms_des_par.m_HTR_min_dT = ms_opt_des_par.m_HTR_min_dT;      //[K]
@@ -2723,7 +2725,7 @@ void C_RecompCycle::opt_design_core(int & error_code)
 
         index++;
     }
-    
+
     if (!ms_opt_des_par.m_fixed_T_hot_i)
     {
         x.push_back(ms_opt_des_par.m_T_hot_i_guess);
@@ -2752,7 +2754,7 @@ void C_RecompCycle::opt_design_core(int & error_code)
 		opt_des_cycle.set_max_objective(nlopt_cb_opt_des, this);		// Calls wrapper/callback that calls 'design_point_eta', which optimizes objective through repeated calls to 'design'
 		double max_f = std::numeric_limits<double>::quiet_NaN();
 		nlopt::result   result_des_cycle = opt_des_cycle.optimize(x, max_f);
-		
+
 		ms_des_par = ms_des_par_optimal;
 
 		design_core(error_code);
@@ -2841,7 +2843,7 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
 			P_mc_in = std::abs(ms_opt_des_par.m_PR_HP_to_LP_guess);		//[kPa]
 		}
 	}
-	
+
 	if( P_mc_in >= ms_des_par.m_P_mc_out )
 		return 0.0;
 	if( P_mc_in <= 100.0 )
@@ -2860,7 +2862,7 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
         ms_des_par.m_recomp_frac = ms_opt_des_par.m_recomp_frac_guess;
 
     // Recuperator conductance
-    double UA_frac_local = -999.9; 
+    double UA_frac_local = -999.9;
     if (!ms_opt_des_par.m_fixed_UA_frac)
     {
         UA_frac_local = x[index];
@@ -2895,7 +2897,7 @@ double C_RecompCycle::design_cycle_return_objective_metric(const std::vector<dou
 	}
 	else
 		LT_frac_local = ms_opt_des_par.m_LT_frac_guess;
-	
+
     if (ms_opt_des_par.m_LTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA || ms_opt_des_par.m_HTR_target_code == NS_HX_counterflow_eqs::OPTIMIZE_UA)
     {
         ms_des_par.m_LTR_UA = UA_frac_local*ms_opt_des_par.m_UA_rec_total*LT_frac_local;
@@ -2950,13 +2952,13 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 
 	// map 'auto_opt_des_par_in' to 'ms_auto_opt_des_par'
         // meta
-    ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging; 
+    ms_opt_des_par.m_opt_logging = ms_auto_opt_des_par.m_opt_logging;
     ms_opt_des_par.m_opt_penalty = ms_auto_opt_des_par.m_opt_penalty;
 
-    ms_opt_des_par.m_heliostat_cost = ms_auto_opt_des_par.m_heliostat_cost; 
-    ms_opt_des_par.m_receiver_eta_mod = ms_auto_opt_des_par.m_receiver_eta_mod; 
-    
-    ms_opt_des_par.m_opt_iters = 0; 
+    ms_opt_des_par.m_heliostat_cost = ms_auto_opt_des_par.m_heliostat_cost;
+    ms_opt_des_par.m_receiver_eta_mod = ms_auto_opt_des_par.m_receiver_eta_mod;
+
+    ms_opt_des_par.m_opt_iters = 0;
         // LTR thermal design
     ms_opt_des_par.m_LTR_target_code = ms_auto_opt_des_par.m_LTR_target_code;   //[-]
     ms_opt_des_par.m_LTR_UA = ms_auto_opt_des_par.m_LTR_UA;                     //[kW/K]
@@ -3011,7 +3013,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 		// Complete 'ms_opt_des_par' for recompression cycle
 		ms_opt_des_par.m_P_mc_out_guess = best_P_high;      //[kPa]
 		ms_opt_des_par.m_fixed_P_mc_out = true;
-		
+
 		if (ms_opt_des_par.m_fixed_PR_HP_to_LP)
 		{
 			ms_opt_des_par.m_PR_HP_to_LP_guess = ms_auto_opt_des_par.m_PR_HP_to_LP_guess;	//[-]
@@ -3062,7 +3064,7 @@ void C_RecompCycle::auto_opt_design_core(int & error_code)
 
             ms_opt_des_par.m_T_hot_i_max = ms_auto_opt_des_par.m_T_htf_hot_in;
             if (ms_auto_opt_des_par.m_T_htf_hot_in > 673.15) {
-                ms_opt_des_par.m_T_hot_i_min = 673.15; //[K] 
+                ms_opt_des_par.m_T_hot_i_min = 673.15; //[K]
             } else { ms_opt_des_par.m_T_hot_i_min = 0.5 * ms_auto_opt_des_par.m_T_htf_hot_in; } //[K]
         }
 
@@ -3167,7 +3169,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 	ms_auto_opt_des_par.m_fixed_P_mc_out = auto_opt_des_hit_eta_in.m_fixed_P_mc_out;	//[-]
 
 	ms_auto_opt_des_par.m_PR_HP_to_LP_guess = auto_opt_des_hit_eta_in.m_PR_HP_to_LP_guess;			//[-] Initial guess for ratio of P_mc_out to P_mc_in
-	ms_auto_opt_des_par.m_fixed_PR_HP_to_LP = auto_opt_des_hit_eta_in.m_fixed_PR_HP_to_LP;			//[-] if true, ratio of P_mc_out to P_mc_in is fixed at PR_mc_guess		
+	ms_auto_opt_des_par.m_fixed_PR_HP_to_LP = auto_opt_des_hit_eta_in.m_fixed_PR_HP_to_LP;			//[-] if true, ratio of P_mc_out to P_mc_in is fixed at PR_mc_guess
 
 	// At this point, 'auto_opt_des_hit_eta_in' should only be used to access the targer thermal efficiency: 'm_eta_thermal'
 
@@ -3185,7 +3187,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 		// Can't operate compressore in 2-phase region
 	if( m_T_mc_in <= N_co2_props::T_crit )
 	{
-		error_msg.append( util::format("Only single phase cycle operation is allowed in this model." 
+		error_msg.append( util::format("Only single phase cycle operation is allowed in this model."
 			"The compressor inlet temperature (%lg [C]) must be great than the critical temperature: %lg [C]",
 			m_T_mc_in - 273.15, ((N_co2_props::T_crit) - 273.15)));
 
@@ -3233,7 +3235,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 		// Check for realistic isentropic efficiencies
 	if( m_eta_mc > 1.0 )
 	{
-		error_msg.append( util::format("The main compressor isentropic efficiency, %lg, was reset to theoretical maximum 1.0\n", 
+		error_msg.append( util::format("The main compressor isentropic efficiency, %lg, was reset to theoretical maximum 1.0\n",
 			m_eta_mc));
 
 		m_eta_mc = 1.0;
@@ -3254,7 +3256,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 	}
 	if( m_eta_mc < 0.1 )
 	{
-		error_msg.append( util::format("The main compressor isentropic efficiency, %lg, was increased to the internal limit of 0.1 to improve solution stability\n", 
+		error_msg.append( util::format("The main compressor isentropic efficiency, %lg, was increased to the internal limit of 0.1 to improve solution stability\n",
 			m_eta_mc));
 
 		m_eta_mc = 0.1;
@@ -3268,7 +3270,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 	}
 	if( m_eta_t < 0.1 )
 	{
-		error_msg.append(util::format("The turbine isentropic efficiency, %lg, was increased to the internal limit of 0.1 to improve solution stability\n", 
+		error_msg.append(util::format("The turbine isentropic efficiency, %lg, was increased to the internal limit of 0.1 to improve solution stability\n",
 			m_eta_t));
 
 		m_eta_t = 0.1;
@@ -3307,7 +3309,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 	{
 		error_msg.append( util::format("The upper pressure limit, %lg [MPa], was set to the internal limit in the CO2 properties code %lg [MPa]\n",
 			m_P_high_limit, N_co2_props::P_upper_limit ));
-	
+
 		m_P_high_limit = N_co2_props::P_upper_limit;
 	}
 	double P_high_limit_min = 10.0*1.E3;	//[kPa]
@@ -3322,7 +3324,7 @@ int C_RecompCycle::auto_opt_design_hit_eta(S_auto_opt_design_hit_eta_parameters 
 		// Finally, check thermal efficiency
 	if( auto_opt_des_hit_eta_in.m_eta_thermal <= 0.0 )
 	{
-		error_msg.append(util::format("The design cycle thermal efficiency, %lg, must be at least greater than 0 ", 
+		error_msg.append(util::format("The design cycle thermal efficiency, %lg, must be at least greater than 0 ",
 			auto_opt_des_hit_eta_in.m_eta_thermal));
 
 		return -1;
@@ -3448,15 +3450,15 @@ double C_RecompCycle::opt_eta_fixed_P_high(double P_high_opt /*kPa*/)
 	double PR_mc_guess = 1.1;
 	if(P_high_opt > P_pseudocritical_1(m_T_mc_in))
 		PR_mc_guess = P_high_opt / P_pseudocritical_1(m_T_mc_in);
-		
+
 	double local_eta_rc = 0.0;
     double local_eta_s = 0.0;
 	if( ms_auto_opt_des_par.m_is_recomp_ok != 0 )
-	{		 
+	{
 		// Complete 'ms_opt_des_par' for recompression cycle
 		ms_opt_des_par.m_P_mc_out_guess = P_high_opt;
 		ms_opt_des_par.m_fixed_P_mc_out = true;
-		
+
 		//ms_opt_des_par.m_PR_HP_to_LP_guess = PR_mc_guess;
 		//ms_opt_des_par.m_fixed_PR_HP_to_LP = false;
 		ms_opt_des_par.m_fixed_PR_HP_to_LP = ms_auto_opt_des_par.m_fixed_PR_HP_to_LP;	//[-]
@@ -3502,10 +3504,10 @@ double C_RecompCycle::opt_eta_fixed_P_high(double P_high_opt /*kPa*/)
 
 		int rc_error_code = 0;
 		opt_design_core(rc_error_code);
-	
+
 		if( rc_error_code == 0 )
 			local_eta_rc = m_objective_metric_opt;
-	
+
 		if(rc_error_code == 0 && m_objective_metric_opt > m_objective_metric_auto_opt)
 		{
 			ms_des_par_auto_opt = ms_des_par_optimal;
@@ -3554,7 +3556,7 @@ double C_RecompCycle::opt_eta_fixed_P_high(double P_high_opt /*kPa*/)
 	return -max(local_eta_rc, local_eta_s);
 
 }
-void C_RecompCycle::check_od_solution(double & diff_m_dot, double & diff_E_cycle, 
+void C_RecompCycle::check_od_solution(double & diff_m_dot, double & diff_E_cycle,
     double & diff_Q_LTR, double & diff_Q_HTR)
 {
     CO2_state c_co2_props;
@@ -3668,7 +3670,7 @@ void C_RecompCycle::finalize_design(int & error_code)
 										m_m_dot_rc,
 										m_temp_last[RC_OUT],
 										m_pres_last[RC_OUT], ms_des_par.m_des_tol);
-		
+
 		if (rc_des_err != 0)
 		{
 			error_code = rc_des_err;
@@ -3679,7 +3681,7 @@ void C_RecompCycle::finalize_design(int & error_code)
 	}
 	else
 		ms_des_solved.m_is_rc = false;
-	
+
 	// Size turbine
 	C_turbine::S_design_parameters  t_des_par;
 		// Set turbine shaft speed
@@ -3712,15 +3714,15 @@ void C_RecompCycle::finalize_design(int & error_code)
 	s_air_cooler_des_par_dep.m_T_hot_in_des = m_temp_last[C_sco2_cycle_core::LTR_LP_OUT];		//[K]
 	s_air_cooler_des_par_dep.m_P_hot_in_des = m_pres_last[C_sco2_cycle_core::LTR_LP_OUT];		//[kPa]
 	s_air_cooler_des_par_dep.m_m_dot_total = m_m_dot_mc;		//[kg/s]
-		
+
 		// This pressure drop is currently uncoupled from the cycle design
 	double cooler_deltaP = m_pres_last[C_sco2_cycle_core::LTR_LP_OUT] - m_pres_last[C_sco2_cycle_core::MC_IN];	//[kPa]
 	if (cooler_deltaP == 0.0)
 		s_air_cooler_des_par_dep.m_delta_P_des = m_deltaP_cooler_frac*m_pres_last[C_sco2_cycle_core::LTR_LP_OUT];	//[kPa]
 	else
 		s_air_cooler_des_par_dep.m_delta_P_des = cooler_deltaP;	//[kPa]
-	
-	
+
+
 	s_air_cooler_des_par_dep.m_T_hot_out_des = m_temp_last[C_sco2_cycle_core::MC_IN];			//[K]
 	s_air_cooler_des_par_dep.m_W_dot_fan_des = m_frac_fan_power*m_W_dot_net / 1000.0;		    //[MWe]
 		// Structure for design parameters that are independent of cycle design solution
@@ -3839,7 +3841,7 @@ void C_RecompCycle::off_design_recompressor(double T_in, double P_in, double m_d
 //	T_mc_out = P_mc_out = std::numeric_limits<double>::quiet_NaN();
 //
 //	mpc_rc_cycle->m_mc.od_comp_phi(m_phi_mc, m_T_mc_in, m_P_mc_in, m_dot_mc, mc_err_code, T_mc_out, P_mc_out);
-//	
+//
 //		// Check that main compressor performance solved
 //	if(mc_err_code != 0)
 //	{
@@ -3934,7 +3936,7 @@ void C_RecompCycle::off_design_recompressor(double T_in, double P_in, double m_d
 //void C_RecompCycle::optimize_od_turbo_balance_csp(S_od_turbo_bal_csp_par in_params, std::vector<double> &opt_params)
 //{
 //	ms_od_turbo_bal_csp_par = in_params;
-//	
+//
 //	int n_vars = 1;
 //	if(ms_des_solved.m_is_rc)
 //		n_vars = 2;
@@ -4006,7 +4008,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 
 //double C_RecompCycle::od_turbo_bal_csp_Wnet(const std::vector<double> &x)
 //{
-//	// Get cycle operation arguments from vector input	
+//	// Get cycle operation arguments from vector input
 //	ms_od_turbo_bal_csp_par.m_P_mc_in = x[0];		//[kPa]
 //	if( ms_des_solved.m_is_rc )
 //		ms_od_turbo_bal_csp_par.m_f_recomp = x[1];		//[-]
@@ -4042,7 +4044,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 //	m_dot_t_solved = tol_solved = std::numeric_limits<double>::quiet_NaN();
 //	int iter_solved = -1;
 //
-//	int m_dot_t_code = c_rc_cycle_solver.solve(m_dot_guess_lower, m_dot_guess_upper, 0.0, 
+//	int m_dot_t_code = c_rc_cycle_solver.solve(m_dot_guess_lower, m_dot_guess_upper, 0.0,
 //							m_dot_t_solved, tol_solved, iter_solved);
 //
 //	if( m_dot_t_code != C_monotonic_eq_solver::CONVERGED )
@@ -4056,7 +4058,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 //
 //	// Other useful outputs
 //	double P_out = m_mc.get_od_solved()->m_P_out;	//[kPa]
-//	
+//
 //	// Solve recompressor
 //	double W_dot_rc = 0.0;
 //
@@ -4088,7 +4090,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 //	//     But we aren't running the entire cycle model here, so instead limit C_dot_co2 >= C_dot_MS
 //	double co2_to_htf_m_dot_ratio = m_dot_t_solved / ms_od_turbo_bal_csp_par.m_m_dot_htf;	//[-]
 //	double over_T_t_in = max(0.0, 10.0*(1.1*ms_od_turbo_bal_csp_par.m_co2_to_htf_m_dot_ratio_des - co2_to_htf_m_dot_ratio));
-//	
+//
 //	// 2) Don't let the upper pressure in the cycle exceed the specified max (typically also = design point)
 //	double over_P_high = max(0.0, (P_out - ms_des_par.m_P_high_limit));
 //
@@ -4126,7 +4128,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 //		ms_od_turbo_bal_csp_solved.m_W_dot_net_adj = W_dot_net_adjusted;	//[kWe]
 //		ms_od_turbo_bal_csp_solved.m_P_high = P_out;						//[kPa]
 //		ms_od_turbo_bal_csp_solved.m_m_dot_total = m_dot_t_solved;			//[kg/s]
-//	
+//
 //		ms_od_turbo_bal_csp_solved.m_N_mc = m_mc.get_od_solved()->m_N;		//[rpm]
 //		ms_od_turbo_bal_csp_solved.m_w_tip_ratio_mc = mc_w_tip_ratio;		//[-]
 //		ms_od_turbo_bal_csp_solved.m_eta_mc = m_mc.get_od_solved()->m_eta;	//[-]
@@ -4151,7 +4153,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 //double nlopt_callback_tub_bal_opt(const std::vector<double> &x, std::vector<double> &grad, void *data)
 //{
 //	C_RecompCycle *frame = static_cast<C_RecompCycle*>(data);
-//	if( frame != NULL ) 
+//	if( frame != NULL )
 //		return frame->od_turbo_bal_csp_Wnet(x);
 //	else
 //		return std::numeric_limits<double>::quiet_NaN();
@@ -4159,7 +4161,7 @@ void C_RecompCycle::reset_ms_od_turbo_bal_csp_solved()
 
 int C_RecompCycle::C_mono_eq_LTR_od::operator()(double T_LTR_LP_out_guess /*K*/, double *diff_T_LTR_LP_out /*K*/)
 {
-	m_Q_dot_LTR = std::numeric_limits<double>::quiet_NaN(); 
+	m_Q_dot_LTR = std::numeric_limits<double>::quiet_NaN();
 
 	mpc_rc_cycle->m_temp_od[LTR_LP_OUT] = T_LTR_LP_out_guess;		//[K]
 
@@ -4212,7 +4214,7 @@ int C_RecompCycle::C_mono_eq_LTR_od::operator()(double T_LTR_LP_out_guess /*K*/,
 	mpc_rc_cycle->mc_LT_recup.off_design_solution_fixed_dP(mpc_rc_cycle->m_temp_od[MC_OUT], mpc_rc_cycle->m_pres_od[MC_OUT], m_m_dot_LTR_HP, mpc_rc_cycle->m_pres_od[LTR_HP_OUT],
 					mpc_rc_cycle->m_temp_od[HTR_LP_OUT], mpc_rc_cycle->m_pres_od[HTR_LP_OUT], m_m_dot_t, mpc_rc_cycle->m_pres_od[LTR_LP_OUT],
                     m_od_tol,
-                    m_Q_dot_LTR, mpc_rc_cycle->m_temp_od[LTR_HP_OUT], T_LTR_LP_out_calc);     
+                    m_Q_dot_LTR, mpc_rc_cycle->m_temp_od[LTR_HP_OUT], T_LTR_LP_out_calc);
 	}
 	catch( C_csp_exception &  )
 	{
@@ -4349,7 +4351,7 @@ int C_RecompCycle::C_mono_eq_HTR_od::operator()(double T_HTR_LP_out_guess /*K*/,
 //	m_pres_od[C_RecompCycle::MC_IN] = P_mc_in;	//[kPa]
 //	m_temp_od[C_RecompCycle::TURB_IN] = T_t_in;	//[K]
 //
-//	C_RecompCycle::C_mono_eq_turbo_m_dot c_turbo_bal(this, T_mc_in, P_mc_in, 
+//	C_RecompCycle::C_mono_eq_turbo_m_dot c_turbo_bal(this, T_mc_in, P_mc_in,
 //													f_recomp, T_t_in, phi_mc, is_update_ms_od_solved);
 //
 //	C_monotonic_eq_solver c_turbo_m_dot_solver(c_turbo_bal);
@@ -4380,7 +4382,7 @@ int C_RecompCycle::C_mono_eq_HTR_od::operator()(double T_HTR_LP_out_guess /*K*/,
 //		P_mc_out = 0.0;
 //		rc_error_code = 0;
 //		rc_w_tip_ratio = 0.0;
-//		return;	
+//		return;
 //	}
 //	else
 //	{
@@ -4398,13 +4400,13 @@ int C_RecompCycle::C_mono_eq_HTR_od::operator()(double T_HTR_LP_out_guess /*K*/,
 //									m_dot_rc,
 //									P_mc_out,
 //									rc_error_code,
-//									T_rc_out);		
+//									T_rc_out);
 //		}
 //
 //		if( rc_error_code == 0 )
 //		{
 //			rc_w_tip_ratio = m_rc.get_od_solved()->m_w_tip_ratio;
-//			
+//
 //			double rc_phi_s1 = m_rc.get_od_solved()->m_phi;
 //			double rc_phi_s2 = m_rc.get_od_solved()->m_phi_2;
 //			rc_phi = min(rc_phi_s1, rc_phi_s2);
@@ -4473,7 +4475,7 @@ int C_RecompCycle::C_mono_eq_turbo_N_fixed_m_dot::operator()(double m_dot_t_in /
 	std::vector<double> m_dot_PHX;
 	m_dot_PHX.push_back(m_dot_t_in);
 	m_dot_PHX.push_back(0.0);
-    
+
 		// Pre-Cooler
 	std::vector<double> DP_PC;
 	std::vector<double> m_dot_PC;
@@ -4487,14 +4489,14 @@ int C_RecompCycle::C_mono_eq_turbo_N_fixed_m_dot::operator()(double m_dot_t_in /
     // Calculating HX *outlet* from dP, so adding 'calc less guess' here because a + value means a smaller pressure drop
     double P_LTR_hp_out_est = mpc_rc_cycle->m_pres_od[MC_OUT] - DP_LT[1 - cpp_offset];		// LT recuperator (cold stream)
     mpc_rc_cycle->m_pres_od[LTR_HP_OUT] = P_LTR_hp_out_est + 0.75*mpc_rc_cycle->ms_od_deltaP.m_od_diff_P_LTR_HP_out_calc_less_guess;
-	
+
     mpc_rc_cycle->m_pres_od[MIXER_OUT] = mpc_rc_cycle->m_pres_od[LTR_HP_OUT];	// Assume no pressure drop in mixing valve
 	mpc_rc_cycle->m_pres_od[RC_OUT] = mpc_rc_cycle->m_pres_od[LTR_HP_OUT];		// Assume no pressure drop in mixing valve
-	
+
     // Calculating HX *outlet* from dP, so adding 'calc less guess' here because a + value means a smaller pressure drop
     double P_HTR_HP_out_est = mpc_rc_cycle->m_pres_od[MIXER_OUT] - DP_HT[1 - cpp_offset];		// HT recuperator (cold stream)
     mpc_rc_cycle->m_pres_od[HTR_HP_OUT] = P_HTR_HP_out_est + 0.75*mpc_rc_cycle->ms_od_deltaP.m_od_diff_P_HTR_HP_out_calc_less_guess;
-	
+
     if (mpc_rc_cycle->ms_od_par.m_is_PHX_dP_input)
     {
         DP_PHX.push_back(mpc_rc_cycle->m_pres_od[HTR_HP_OUT] * mpc_rc_cycle->ms_od_par.m_PHX_f_dP);     //[kPa]
@@ -4515,7 +4517,7 @@ int C_RecompCycle::C_mono_eq_turbo_N_fixed_m_dot::operator()(double m_dot_t_in /
     // Calculating HX *inlet* from dP, so subtracting 'calc less guess' here because a + value means a smaller pressure drop
     double P_HTR_LP_out_est = mpc_rc_cycle->m_pres_od[LTR_LP_OUT] + DP_LT[2 - cpp_offset];		// LT recuperator (hot stream)
     mpc_rc_cycle->m_pres_od[HTR_LP_OUT] = P_HTR_LP_out_est - 0.75*mpc_rc_cycle->ms_od_deltaP.m_od_diff_P_LTR_LP_out_calc_less_guess;
-	
+
     // Calculating HX *inlet* from dP, so subtracting 'calc less guess' here because a + value means a smaller pressure drop
     double P_t_out_est = mpc_rc_cycle->m_pres_od[HTR_LP_OUT] + DP_HT[2 - cpp_offset];		// HT recuperator (hot stream)
     double P_t_out = mpc_rc_cycle->m_pres_od[TURB_OUT] = P_t_out_est - 0.75*mpc_rc_cycle->ms_od_deltaP.m_od_diff_P_HTR_LP_out_calc_less_guess;
@@ -4669,7 +4671,7 @@ int C_RecompCycle::C_mono_eq_x_f_recomp_y_N_rc::operator()(double f_recomp /*-*/
 	// Solve recuperators here...
     C_mono_eq_HTR_od HTR_od_eq(mpc_rc_cycle, m_m_dot_rc, m_m_dot_LTR_HP, m_m_dot_t, m_od_tol);
     C_monotonic_eq_solver HTR_od_solver(HTR_od_eq);
-    
+
     if (mpc_rc_cycle->ms_des_solved.ms_HTR_des_solved.m_UA_design <= 0.0 || !std::isfinite(mpc_rc_cycle->ms_des_solved.ms_HTR_des_solved.m_UA_design))
     {
         double y_T_diff = std::numeric_limits<double>::quiet_NaN();
@@ -4786,9 +4788,9 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 		// Define bounds on the recompression fraction
 		double f_recomp_lower = 0.0;
 		double f_recomp_upper = 1.0;
-		
+
 		c_turbo_bal_f_recomp_solver.settings(od_tol, 50, f_recomp_lower, f_recomp_upper, true);
-		
+
 		C_monotonic_eq_solver::S_xy_pair f_recomp_pair_1st;
 		C_monotonic_eq_solver::S_xy_pair f_recomp_pair_2nd;
 
@@ -4799,7 +4801,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 
 		// If guessed recompression fraction fails, then try to find a recompression fraction that works
 		if( turb_bal_err_code != 0 )
-		{			
+		{
 			double delta = 0.02;
 			bool is_iter = true;
 			for(int i = 1; is_iter; i++)
@@ -4818,7 +4820,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 						// Have tried a fairly fine grid of recompression fraction values; have not found one that works
 						error_code = -40;
 						return;
-					}	
+					}
 				}
 			}
 		}
@@ -4851,7 +4853,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 				return;
 			}
 		}
-		
+
 		// Now, using the two solved guess values, solve for the recompression fraction that results in:
 		// ... balanced turbomachinery at their design shaft speed
 		double f_recomp_solved, tol_solved;
@@ -4872,7 +4874,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 		int f_recomp_code = 0;
 		try
 		{
-			f_recomp_code = c_turbo_bal_f_recomp_solver.solve(f_recomp_pair_1st, f_recomp_pair_2nd, N_rc_od, 
+			f_recomp_code = c_turbo_bal_f_recomp_solver.solve(f_recomp_pair_1st, f_recomp_pair_2nd, N_rc_od,
 																f_recomp_solved, tol_solved, iter_solved);
 		}
 		catch( C_csp_exception )
@@ -4943,7 +4945,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 	ms_od_solved.m_m_dot_rc = m_dot_rc;
 	ms_od_solved.m_m_dot_t = m_dot_t;
 	ms_od_solved.m_recomp_frac = m_dot_rc / m_dot_t;
-    ms_od_solved.m_mc_f_bypass = 1.0 - m_dot_LTR_HP / m_dot_mc; //[-]    
+    ms_od_solved.m_mc_f_bypass = 1.0 - m_dot_LTR_HP / m_dot_mc; //[-]
 
 	ms_od_solved.m_temp = m_temp_od;
 	ms_od_solved.m_pres = m_pres_od;
@@ -5078,7 +5080,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			error_code = (*(HTR_od_solver.get_solver_call_history()))[n_call_history - 1].err_code;
 //		if(error_code == 0)
 //		{
-//			error_code = T_HTR_LP_out_code;		
+//			error_code = T_HTR_LP_out_code;
 //		}
 //		return;
 //	}
@@ -5138,7 +5140,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //}
 
 //void C_RecompCycle::off_design_core(int & error_code)
-//{	
+//{
 //	// Need to reset 'ms_od_solved' here
 //	clear_ms_od_solved();
 //	// Check if recompression fraction is > 0 and whether cycle is simple or recompression
@@ -5194,7 +5196,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //
 //		// Calculate the pressure rise through the main compressor
 //		int comp_error_code = 0;
-//		m_mc.off_design_compressor(m_temp_od[1-cpp_offset], m_pres_od[1-cpp_offset], m_dot_mc, ms_od_par.m_N_mc, 
+//		m_mc.off_design_compressor(m_temp_od[1-cpp_offset], m_pres_od[1-cpp_offset], m_dot_mc, ms_od_par.m_N_mc,
 //			comp_error_code, m_temp_od[2-cpp_offset], m_pres_od[2-cpp_offset]);
 //
 //		if(comp_error_code == 1)			// m_dot is too high because the given shaft speed is not possible
@@ -5237,7 +5239,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		m_dot_PHX.push_back( m_dot_t );
 //		m_dot_PHX.push_back( 0.0 );
 //		m_PHX.hxr_pressure_drops(m_dot_PHX, DP_PHX);
-//		
+//
 //		std::vector<double> m_dot_PC;
 //		m_dot_PC.push_back( 0.0 );
 //		m_dot_PC.push_back( m_dot_mc);
@@ -5258,7 +5260,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		double m_dot_t_allowed = std::numeric_limits<double>::quiet_NaN();
 //		m_t.off_design_turbine(m_temp_od[6-cpp_offset], m_pres_od[6-cpp_offset], m_pres_od[7-cpp_offset], ms_od_par.m_N_t,
 //			turbine_error_code, m_dot_t_allowed, m_temp_od[7-cpp_offset]);
-//		
+//
 //		if(turbine_error_code != 0)		// unexpected error
 //		{
 //			error_code = turbine_error_code;
@@ -5267,10 +5269,10 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //
 //		// Determine the mass flow rate residual and prepare the next iteration
 //		double m_dot_residual = m_dot_t - m_dot_t_allowed;
-//		
+//
 //		// twn: during the first iteration 'last_m_dot_guess' won't be initialized
 //		double secant_guess = m_dot_t - m_dot_residual*(last_m_dot_guess-m_dot_t)/(last_m_dot_residual-m_dot_residual);		// next guess predicted using secant method
-//		
+//
 //		if(m_dot_residual > 0.0)	// pressure rise is too small, so m_dot_t is too big
 //		{
 //			if( m_dot_residual / m_dot_t < ms_od_par.m_tol )		// residual is positive; check for convergence
@@ -5299,7 +5301,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			m_dot_t = 0.5*(m_dot_upper_bound + m_dot_lower_bound);
 //		else
 //			m_dot_t = secant_guess;
-//	
+//
 //	}	// End m_dot loop
 //
 //	// Check for convergence
@@ -5406,7 +5408,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		m_enth_od[8-cpp_offset] = co2_props.enth;
 //		m_entr_od[8-cpp_offset] = co2_props.entr;
 //		m_dens_od[8-cpp_offset] = co2_props.dens;
-//	
+//
 //		// Inner iteration loop: temp(9), checking against UA_LT
 //		double T9_lower_bound = std::numeric_limits<double>::quiet_NaN();
 //		double T9_upper_bound = std::numeric_limits<double>::quiet_NaN();
@@ -5417,7 +5419,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		{
 //			T9_lower_bound = m_temp_od[8-cpp_offset];	// no iteration necessary
 //			T9_upper_bound = m_temp_od[8-cpp_offset];	// no iteration necessary
-//			m_temp_od[9-cpp_offset] = m_temp_od[8-cpp_offset];	
+//			m_temp_od[9-cpp_offset] = m_temp_od[8-cpp_offset];
 //			UA_LT_calc = 0.0;
 //			last_LT_residual = 0.0;
 //			last_T9_guess = m_temp_od[8-cpp_offset];
@@ -5445,12 +5447,12 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			m_enth_od[9-cpp_offset] = co2_props.enth;
 //			m_entr_od[9-cpp_offset] = co2_props.entr;
 //			m_dens_od[9-cpp_offset] = co2_props.dens;
-//		
+//
 //			if(ms_od_par.m_recomp_frac >= 1.E-12)		// determine the required shaft speed for the recompressing compressor
 //			{
 //				int rc_error_code = 0;
 //				m_rc.off_design_recompressor(m_temp_od[9-cpp_offset], m_pres_od[9-cpp_offset], m_dot_rc, m_pres_od[10-cpp_offset], rc_error_code, m_temp_od[10-cpp_offset]);
-//			
+//
 //				if(rc_error_code != 0)
 //				{
 //					error_code = rc_error_code;
@@ -5466,7 +5468,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //				}
 //				m_enth_od[10-cpp_offset] = co2_props.enth;
 //				m_entr_od[10-cpp_offset] = co2_props.entr;
-//				m_dens_od[10-cpp_offset] = co2_props.dens;			
+//				m_dens_od[10-cpp_offset] = co2_props.dens;
 //			}
 //			else
 //			{
@@ -5507,7 +5509,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //				}
 //			}
 //
-//			//calculate_hxr_UA_1(ms_od_par.m_N_sub_hxrs, Q_dot_LT, m_dot_mc, m_dot_t, m_temp_od[2-cpp_offset], m_temp_od[8-cpp_offset], 
+//			//calculate_hxr_UA_1(ms_od_par.m_N_sub_hxrs, Q_dot_LT, m_dot_mc, m_dot_t, m_temp_od[2-cpp_offset], m_temp_od[8-cpp_offset],
 //			//	m_pres_od[2-cpp_offset], m_pres_od[3-cpp_offset], m_pres_od[8-cpp_offset], m_pres_od[9-cpp_offset], hx_error_code, UA_LT_calc, min_DT_LT);
 //			//
 //			//if(hx_error_code > 0)
@@ -5517,7 +5519,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			//		T9_lower_bound = m_temp_od[9-cpp_offset];
 //			//		m_temp_od[9-cpp_offset] = 0.5*(T9_lower_bound + T9_upper_bound);	// bisect bounds for next guess
 //			//		hx_error_code = 0;
-//			//		continue;				
+//			//		continue;
 //			//	}
 //			//	else
 //			//	{
@@ -5585,7 +5587,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		if( ms_od_par.m_recomp_frac >= 1.E-12 )
 //		{
 //			// Conservation of energy (both sides divided by m_dot_t)
-//			m_enth_od[4-cpp_offset] = (1.0 - ms_od_par.m_recomp_frac)*m_enth_od[3-cpp_offset] + ms_od_par.m_recomp_frac*m_enth_od[10-cpp_offset];	
+//			m_enth_od[4-cpp_offset] = (1.0 - ms_od_par.m_recomp_frac)*m_enth_od[3-cpp_offset] + ms_od_par.m_recomp_frac*m_enth_od[10-cpp_offset];
 //			prop_error_code = CO2_PH(m_pres_od[4-cpp_offset], m_enth_od[4-cpp_offset], &co2_props);
 //			if(prop_error_code != 0)
 //			{
@@ -5594,7 +5596,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			}
 //			m_temp_od[4-cpp_offset] = co2_props.temp;
 //			m_entr_od[4-cpp_offset] = co2_props.entr;
-//			m_dens_od[4-cpp_offset] = co2_props.dens;		
+//			m_dens_od[4-cpp_offset] = co2_props.dens;
 //		}
 //		else	// no mixing valve, therefore state 4 is equal to state 3
 //		{
@@ -5662,7 +5664,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		//	{
 //		//		error_code = HT_hx_error_code;
 //		//		return;
-//		//	}		
+//		//	}
 //		//}
 //
 //		// Check for convergence and adjust T8 appropriately
@@ -5731,7 +5733,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //
 //
 //	m_Q_dot_PHX_od = m_dot_t*(m_enth_od[6-cpp_offset] - m_enth_od[5-cpp_offset]);
-//	m_W_dot_net_od = w_mc*m_dot_mc + w_rc*m_dot_rc + w_t*m_dot_t;			
+//	m_W_dot_net_od = w_mc*m_dot_mc + w_rc*m_dot_rc + w_t*m_dot_t;
 //	m_eta_thermal_od = m_W_dot_net_od / m_Q_dot_PHX_od;
 //
 //	// Get 'od_solved' structures from component classes
@@ -5775,7 +5777,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //	int max_iter = 100;
 //
 //	// 10.6.14 twn: Increase from 20 to 40 to hopefully improve convergence when q_target is close (but less than) q_max
-//	int search_intervals; 
+//	int search_intervals;
 //	if( ms_tar_od_par.m_use_default_res )
 //		search_intervals = 20;
 //	else
@@ -5853,7 +5855,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //					left_residual = residual;
 //					lower_bound_found = true;
 //				}
-//			}		
+//			}
 //		}		// End od_error_code = 0 loop
 //		if( lower_bound_found && upper_bound_found )
 //			break;
@@ -5879,7 +5881,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //
 //		int od_error_code = 0;
 //		off_design_core(od_error_code);
-//		
+//
 //		if( od_error_code != 0 )			// results not valid; choose a random value between P_low and P_high for next guess
 //		{
 //			double P_frac = rand() / (double)(RAND_MAX);
@@ -5893,7 +5895,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			residual = m_Q_dot_PHX_od - ms_tar_od_par.m_target;
 //		else
 //			residual = m_W_dot_net_od - ms_tar_od_par.m_target;
-//	
+//
 //		if( residual >= 0.0 )		// value is above target
 //		{
 //			if( residual / ms_tar_od_par.m_target <= ms_tar_od_par.m_tol )		// converged
@@ -6107,7 +6109,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //	// Hardcode some compressor checks to 'true', per John's code. Could revisit later
 //	bool surge_allowed = true;
 //	bool supersonic_tip_speed_allowed = true;
-//	
+//
 //	// Check validity
 //	if( m_pres_od[2 - 1] > ms_des_par.m_P_high_limit )		// above high-pressure limit; provide optimizer with more information
 //	{
@@ -6121,7 +6123,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //	{
 //		if( m_mc.get_od_solved()->m_surge )
 //			off_design_point_value = 0.0;
-//		
+//
 //		if( ms_od_par.m_recomp_frac > 0.0 && m_rc.get_od_solved()->m_surge )
 //			off_design_point_value = 0.0;
 //	}
@@ -6211,7 +6213,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		{
 //			P_low = 1.1*P_low;
 //		}
-//		
+//
 //
 //		if( P_low > ms_opt_tar_od_par.m_highest_pressure )
 //			break;
@@ -6405,7 +6407,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		optimal_off_design_core(od_error_code);
 //
 //		if(od_error_code == 0)
-//		{									
+//		{
 //
 //			// Update guess parameters
 //			ms_opt_od_par.m_recomp_frac_guess = ms_od_par.m_recomp_frac;
@@ -6416,7 +6418,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //			if( point_found )		// exit only after testing two starting points (prevents optimization near-misses)
 //				break;
 //
-//			point_found = true; 
+//			point_found = true;
 //		}
 //
 //		P_low = 1.1*ms_opt_od_par.m_P_mc_in_guess;
@@ -6712,7 +6714,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		lb[index-1] = ms_des_solved.ms_mc_des_solved.m_N_design*0.5;
 //		ub[index-1] = ms_des_solved.ms_mc_des_solved.m_N_design*1.75;
 //		scale[index-1] = -ms_des_solved.ms_mc_des_solved.m_N_design*0.1;
-//		
+//
 //		opt_od_cycle.set_lower_bounds(lb);
 //		opt_od_cycle.set_upper_bounds(ub);
 //		opt_od_cycle.set_initial_step(scale);
@@ -6748,13 +6750,13 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //		error_code = od_error_code;
 //		return;
 //	}
-//		
+//
 //}
 
 //double C_RecompCycle::opt_od_eta(const std::vector<double> &x)
 //{
 //	CO2_state co2_props;
-//	
+//
 //	int index = 0;
 //
 //	ms_od_par.m_P_mc_in = x[index];
@@ -6778,7 +6780,7 @@ void C_RecompCycle::off_design_fix_shaft_speeds_core(int & error_code, double od
 //
 //	double T_t_in_upper = ms_phx_od_par.m_T_htf_hot - 0.01;
 //	bool know_T_in_upper = false;
-//	
+//
 //	double T_t_in_lower = ms_phx_od_par.m_T_htf_hot - 50.0;
 //	bool know_T_in_lower = false;
 //
@@ -6920,36 +6922,36 @@ double fmin_cb_opt_des_fixed_P_high(double P_high /*kPa*/, void *data)
 double nlopt_cb_opt_des(const std::vector<double> &x, std::vector<double> &grad, void *data)
 {
 	C_RecompCycle *frame = static_cast<C_RecompCycle*>(data);
-	if( frame != NULL ) 
+	if( frame != NULL )
 		return frame->design_cycle_return_objective_metric(x);
-	else 
+	else
 		return 0.0;
 }
 
 //double nlopt_cb_opt_od(const std::vector<double> &x, std::vector<double> &grad, void *data)
 //{
 //	C_RecompCycle *frame = static_cast<C_RecompCycle*>(data);
-//	if( frame != NULL ) 
+//	if( frame != NULL )
 //		return frame->off_design_point_value(x);
-//	else 
+//	else
 //		return 0.0;
 //}
 
 //double nlopt_cb_eta_at_target(const std::vector<double> &x, std::vector<double> &grad, void *data)
 //{
 //	C_RecompCycle *frame = static_cast<C_RecompCycle*>(data);
-//	if( frame != NULL ) 
+//	if( frame != NULL )
 //		return frame->eta_at_target(x);
-//	else 
+//	else
 //		return 0.0;
 //}
 
 //double nlopt_cb_opt_od_eta(const std::vector<double> &x, std::vector<double> &grad, void *data)
 //{
 //	C_RecompCycle *frame = static_cast<C_RecompCycle*>(data);
-//	if( frame != NULL ) 
+//	if( frame != NULL )
 //		return frame->opt_od_eta(x);
-//	else 
+//	else
 //		return 0.0;
 //}
 
@@ -7013,9 +7015,9 @@ double C_poly_curve_r_squared::calc_r_squared(const std::vector<double> coefs)
 double nlopt_callback_poly_coefs(const std::vector<double> &x, std::vector<double> &grad, void *data)
 {
 	C_poly_curve_r_squared *frame = static_cast<C_poly_curve_r_squared*>(data);
-	if( frame != NULL ) 
+	if( frame != NULL )
 		return frame->calc_r_squared(x);
-	else 
+	else
 		return 0.0;
 }
 
