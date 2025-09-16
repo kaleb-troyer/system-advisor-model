@@ -1985,7 +1985,7 @@ void C_falling_particle_receiver::calculate_advection_coeff_sandia(double vel, d
     // Loss coefficient from Gonzalez et al. assumes equal aperture area and curtain area and will overestimate convective losses if the loss coefficient is applied for cases where curtain area > aperture area
     hadv *= m_ap_area / m_curtain_area;
 
-    return;
+    return;False
 }
 
 

@@ -212,7 +212,14 @@ void cspGen3CostModel::receiverLosses() {
     */
 
     if (s_particles.fluid_code == 37) {
-        s_receiver.efficiency = 0.97;
+        const double A1 = -30.7185;
+        const double A2 = 30.19119;
+        const double A3 = 0.973472;
+        const double dT = (s_receiver.To - s_receiver.Ti) / (273.15 + 35);
+        s_receiver.efficiency = ((
+            A1 / (log(dT) + A2 + W_dot_rec)
+        ) + A3
+        ) * s_receiver.efficiency_modifier;
     } else {
         const double A1 = 0.99967897;
         const double A2 = 0.46471970;
@@ -451,7 +458,7 @@ double cspGen3CostModel::costPiping(double T) {
     /*
     Von-Mises stress of a pressurized pipe, rearranged to calculate
     the ratio of the wall thickness to the outter radius, given the
-   stress to creep rupture and an internal pressure.
+    stress to creep rupture and an internal pressure.
     */
     s_piping.dP = s_cycle.P_max - 0.101325; // [MPa] pressure difference across pipe wall
     //s_piping.thickness_ratio = 1 - ((sqrt(3 * pow(s_piping.dP, 2) + 4 * pow(s_piping.stress_creep_rupture, 2)) - sqrt(3) * s_piping.dP)
