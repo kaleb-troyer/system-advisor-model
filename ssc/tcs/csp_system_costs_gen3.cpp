@@ -199,37 +199,55 @@ void cspGen3CostModel::receiverLosses() {
     //---- NREL Physics-Based FPR Model (quasi-2D) ----//
     //-------------------------------------------------//
     /*
-    The following equation is a fit of an optimized receiver modeled
+    The following equation is a set of fits for an optimized receiver modeled
     using the NREL physics-based approach, across a large parameterization
-    of inlet and outlet temperatures, and power delivered to the receiver.
-    Power delivered to the receiver has only a small impact on efficiency,
-    and is therefore not included in the fit.
-
-    Note that in the optimized case, receiver efficiency is not a strong
-    function of temperature or thermal power input. In the case of Carbo
-    HSP 40/70 ceramic particles, the receiver efficiency is predicted to
-    be nearly constant at around 0.97, regardless of temperature.
+    of inlet and outlet temperatures and power delivered to the receiver.
+    The receiver is assumed to be 12m x 12m with a curtain-to-aperture
+    aspect ratio of 1.
     */
 
     if (s_particles.fluid_code == 37) {
-        const double A1 = -30.7185;
-        const double A2 = 30.19119;
-        const double A3 = 0.973472;
-        const double dT = (s_receiver.To - s_receiver.Ti) / (273.15 + 35);
-        s_receiver.efficiency = ((
-            A1 / (log(dT) + A2 + W_dot_rec)
-        ) + A3
+        /*Carbo HSP40/70*/
+
+        /*DEPRECATED*/
+        // const double A1 = -30.7185;
+        // const double A2 = 30.19119;
+        // const double A3 = 0.973472;
+        // const double dT = (s_receiver.To - s_receiver.Ti) / (273.15 + 35);
+        // s_receiver.efficiency = ((
+        //     A1 / (log(dT) + A2 + W_dot_rec)
+        // ) + A3
+        // ) * s_receiver.efficiency_modifier;
+
+        const double A1 = 0.967;
+        const double A2 = 6.800;
+        const double A3 = 1.580;
+        s_receiver.efficiency = (A1 - (
+            A2 + A3 * (s_receiver.To / T_ambient) * (s_receiver.Ti / T_ambient)
+        ) / W_dot_rec
         ) * s_receiver.efficiency_modifier;
     } else {
-        const double A1 = 0.99967897;
-        const double A2 = 0.46471970;
-        const double A3 = 0.25026485;
-        const double Ta = 30.+273.15;
-        s_receiver.efficiency = (cos((sqrt(
-            (s_receiver.To / Ta) - A1
-        ) - (s_receiver.Ti / Ta)
-        ) * A2 / (s_receiver.To / Ta)
-        ) - A3) * s_receiver.efficiency_modifier;
+        /*Silica (SiO2) Sand*/
+
+        /*DEPRECATED*/
+        // const double A1 = 0.99967897;
+        // const double A2 = 0.46471970;
+        // const double A3 = 0.25026485;
+        // const double Ta = 30.+273.15;
+        // s_receiver.efficiency = (cos((sqrt(
+        //     (s_receiver.To / Ta) - A1
+        // ) - (s_receiver.Ti / Ta)
+        // ) * A2 / (s_receiver.To / Ta)
+        // ) - A3) * s_receiver.efficiency_modifier;
+
+        const double A1 = 0.845;
+        const double A2 = 0.122;
+        const double A3 = 6.370;
+        const double A4 = 1.190;
+        s_receiver.efficiency = (A1 - (
+            A2 * (s_receiver.Ti / T_ambient) / (s_receiver.To / T_ambient)
+        ) + A3 * (A4 - (s_receiver.To / T_ambient)) / W_dot_rec
+        ) * s_receiver.efficiency_modifier;
     }
 
     W_dot_losses = W_dot_field * (1.0 - s_receiver.efficiency);
@@ -268,8 +286,10 @@ void cspGen3CostModel::sizeEquipment() {
     // Receiver sizing
     double R1 = 1.227e+01;  // RO model, first coefficient.
     double R2 = 3.261e-02;  // RO model, second coefficient.
-    s_receiver.height = 15; // assumed in SolarPILOT study
-    s_receiver.width = R1 + (R2 * W_dot_field);
+    // s_receiver.height = 15; // assumed in SolarPILOT study
+    // s_receiver.width = R1 + (R2 * W_dot_field);
+    s_receiver.height = 12.0; // assumed in receiver eta calcs
+    s_receiver.width = 12.0; // assumed aspect ratio of 1 in receiver eta calcs
     s_receiver.area_aperature = s_receiver.height * s_receiver.width;
     s_receiver.aspect_ratio = s_receiver.height / s_receiver.width;
     s_receiver.particle_loss_factor = 0.000001;     // assumed

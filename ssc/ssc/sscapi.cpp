@@ -69,7 +69,7 @@ SSCEXPORT output ssc_testing(
         0.0,            // + double rec_qf_delay            [-]         required startup energy as fraction of design thermal output
         2.0,            // + double m_dot_htf_max_frac      [-]         maximum receiver HTF mass flow as fraction of design mass flow
         1.0,            // * double eta_pump                [-]         HTF pump efficiency
-        37,             // + int    field_fl                [-]         Receiver heat transfer fluid
+        36,             // + int    field_fl                [-]         Receiver heat transfer fluid
         fluid_props,    // - util::matrix_t<double> field_fl_props      Receiver htf fluid properties
 
         //---Receiver Model Parameters
@@ -88,8 +88,8 @@ SSCEXPORT output ssc_testing(
         180.0,          // + double rec_orientation         [-]         Receiver orientation (0 = north, 90 = east, 180 = south, 270 = west
 
         //---Particle Parameters
-        404.e-6,        // * double particle_dp             [m]         Particle diameter
-        0.91,           // * double particle_abs            [-]         Particle absorptivity
+        150.e-6,        // * double particle_dp             [m]         Particle diameter
+        0.34,           // * double particle_abs            [-]         Particle absorptivity
 
         //---Curtain / Cavity Parameters
         0.60,           // + double curtain_emis            [-]         Curtain emissivity for q_net approximations
