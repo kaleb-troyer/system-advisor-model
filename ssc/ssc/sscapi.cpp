@@ -53,7 +53,7 @@ SSCEXPORT int ssc_version()
 	return 290;
 }
 
-SSCEXPORT output ssc_testing(
+SSCEXPORT output ssc_fpr(
     double Ti, double To, double H, double W, double h, double w, double d, double q
 ) {
 
@@ -120,23 +120,23 @@ SSCEXPORT output ssc_testing(
     fpr_model.init();
     const auto& soln = fpr_model.get_steady_state_soln();
 
-    output reval;
-    reval.eta = soln.eta;
-    reval.m_dot_tot = soln.m_dot_tot;
-    reval.T_particle_hot_rec = soln.T_particle_hot_rec - 273.15;
-    reval.Q_inc = soln.Q_inc * 1E-6;
-    reval.Q_refl = soln.Q_refl * 1E-6;
-    reval.Q_rad = soln.Q_rad * 1E-6;
-    reval.Q_adv = soln.Q_adv * 1E-6;
-    reval.Q_cond = soln.Q_cond * 1E-6;
-    reval.Q_transport = soln.Q_transport * 1E-6;
-    reval.Q_thermal = soln.Q_thermal * 1E-6;
-    reval.tauc_avg = soln.tauc_avg;
-    reval.rhoc_avg = soln.rhoc_avg;
-    reval.qnetc_sol_avg = soln.qnetc_sol_avg * 1E-6;
-    reval.qnetw_sol_avg = soln.qnetw_sol_avg;
+    output return_vals;
+    return_vals.eta = soln.eta;
+    return_vals.m_dot_tot = soln.m_dot_tot;
+    return_vals.T_particle_hot_rec = soln.T_particle_hot_rec - 273.15;
+    return_vals.Q_inc = soln.Q_inc * 1E-6;
+    return_vals.Q_refl = soln.Q_refl * 1E-6;
+    return_vals.Q_rad = soln.Q_rad * 1E-6;
+    return_vals.Q_adv = soln.Q_adv * 1E-6;
+    return_vals.Q_cond = soln.Q_cond * 1E-6;
+    return_vals.Q_transport = soln.Q_transport * 1E-6;
+    return_vals.Q_thermal = soln.Q_thermal * 1E-6;
+    return_vals.tauc_avg = soln.tauc_avg;
+    return_vals.rhoc_avg = soln.rhoc_avg;
+    return_vals.qnetc_sol_avg = soln.qnetc_sol_avg * 1E-6;
+    return_vals.qnetw_sol_avg = soln.qnetw_sol_avg;
 
-    return reval;
+    return return_vals;
 }
 
 SSCEXPORT const char *ssc_build_info()

@@ -48,25 +48,15 @@ void cspGen3CostModel::designRoutine() {
         s_particles.cost_per_kg = 0.185;
         s_particles.absorptivity = 0.34;
         s_particles.mean_diameter = 250e-6;
-    } else if (s_particles.fluid_code == 37) { // Carbo HSP 40/70
+    } else if (s_particles.fluid_code == 37) {  // Carbo HSP 40/70
         s_particles.angle_of_repose = 0.559;    // assumed
         s_particles.bulk_density = 2164.0;
         s_particles.cost_per_kg = 2.00;
-        s_particles.absorptivity = 0.91;        // currently unused
+        s_particles.absorptivity = 0.91;        // used in receiver RO model
         s_particles.mean_diameter = 404e-6;     // currently unused
     } else {
         std::cout << "Fluid code " << s_particles.fluid_code << " not recognized." << std::endl;
     }
-
-    // solar multiple, thermal energy storage
-    s_field.solar_multiple = 2.5;       // [-] (Albrecht, 2019)
-    s_storage.hours_of_capacity = 14.0; // [h] (Albrecht, 2019)
-    s_storage.capacity_factor = 0.71;   // [-] (Albrecht, 2019)
-
-    // assume efficiencies here
-    s_storage.s_warm.efficiency = 0.98; // [-] assumed (unused)
-    s_storage.s_cold.efficiency = 0.98; // [-] assumed (unused)
-    s_lifts.efficiency = 0.8;           // [-] (Ho, 2016)
 
     // calculating power required at the receiver, according to cycle efficiency
     W_dot_therm = s_cycle.W_dot_net / s_cycle.efficiency; // [MWt] power required at power block
@@ -209,16 +199,6 @@ void cspGen3CostModel::receiverLosses() {
     if (s_particles.fluid_code == 37) {
         /*Carbo HSP40/70*/
 
-        /*DEPRECATED*/
-        // const double A1 = -30.7185;
-        // const double A2 = 30.19119;
-        // const double A3 = 0.973472;
-        // const double dT = (s_receiver.To - s_receiver.Ti) / (273.15 + 35);
-        // s_receiver.efficiency = ((
-        //     A1 / (log(dT) + A2 + W_dot_rec)
-        // ) + A3
-        // ) * s_receiver.efficiency_modifier;
-
         const double A1 = 0.967;
         const double A2 = 6.800;
         const double A3 = 1.580;
@@ -228,17 +208,6 @@ void cspGen3CostModel::receiverLosses() {
         ) * s_receiver.efficiency_modifier;
     } else {
         /*Silica (SiO2) Sand*/
-
-        /*DEPRECATED*/
-        // const double A1 = 0.99967897;
-        // const double A2 = 0.46471970;
-        // const double A3 = 0.25026485;
-        // const double Ta = 30.+273.15;
-        // s_receiver.efficiency = (cos((sqrt(
-        //     (s_receiver.To / Ta) - A1
-        // ) - (s_receiver.Ti / Ta)
-        // ) * A2 / (s_receiver.To / Ta)
-        // ) - A3) * s_receiver.efficiency_modifier;
 
         const double A1 = 0.845;
         const double A2 = 0.122;
@@ -304,8 +273,12 @@ void cspGen3CostModel::sizeEquipment() {
     s_storage.s_cold.radius = s_tower.radius * 0.80; // [m] assumed
     s_storage.s_warm.volume = s_particles.m_particles / s_particles.bulk_density;
     s_storage.s_cold.volume = s_particles.m_particles / s_particles.bulk_density;
-    s_storage.s_warm.height = height_buffer + (s_storage.s_warm.volume - (pi / 3.0) * pow(s_storage.s_warm.radius, 3.0) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_warm.radius, 2.0));   // height from required volume of cylinder + cone, calculated with angle of repose
-    s_storage.s_cold.height = height_buffer + (s_storage.s_cold.volume - (pi / 3.0) * pow(s_storage.s_cold.radius, 3.0) * tan(s_particles.angle_of_repose)) / (pi * pow(s_storage.s_cold.radius, 2.0));   // height from required volume of cylinder + cone, calculated with angle of repose
+    s_storage.s_warm.height = height_buffer + ( // height from required volume of cylinder + cone, calculated with angle of repose
+        s_storage.s_warm.volume / (pi * pow(s_storage.s_warm.radius, 2.))
+    ) + (2. / 3.) * s_storage.s_warm.radius * tan(s_particles.angle_of_repose)
+    s_storage.s_cold.height = height_buffer + ( // height from required volume of cylinder + cone, calculated with angle of repose
+        s_storage.s_cold.volume / (pi * pow(s_storage.s_cold.radius, 2.))
+    ) + (2. / 3.) * s_storage.s_cold.radius * tan(s_particles.angle_of_repose)
 
     // Determining if particle storage can fit inside tower to calculate total lift height
     if (s_cycle.phx_height == 0.0) { s_cycle.phx_height = s_storage.s_warm.height; }
@@ -315,8 +288,7 @@ void cspGen3CostModel::sizeEquipment() {
     //if (height_required < s_tower.height - tower_free_space) {
     if (true) {
         s_lifts.height = height_required;
-    }
-    else {
+    } else {
         s_lifts.height = s_storage.s_warm.height + s_storage.s_cold.height + s_tower.height;
     }
 
@@ -481,8 +453,6 @@ double cspGen3CostModel::costPiping(double T) {
     stress to creep rupture and an internal pressure.
     */
     s_piping.dP = s_cycle.P_max - 0.101325; // [MPa] pressure difference across pipe wall
-    //s_piping.thickness_ratio = 1 - ((sqrt(3 * pow(s_piping.dP, 2) + 4 * pow(s_piping.stress_creep_rupture, 2)) - sqrt(3) * s_piping.dP)
-    //    / (2 * s_piping.stress_creep_rupture));
     s_piping.thickness_ratio = ((sqrt(3.0) * s_piping.dP) + (2.0 * s_piping.stress_creep_rupture)
         - sqrt(3.0 * pow(s_piping.dP, 2.0) + 4.0 * pow(s_piping.stress_creep_rupture, 2.0)))
         / (2.0 * s_piping.stress_creep_rupture);

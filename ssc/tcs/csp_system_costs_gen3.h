@@ -130,9 +130,9 @@ public:
     struct storage { // thermal energy storage data structure
 
         // thermal energy storage capacity
-        double hours_of_capacity;   // [hours]  hours of energy storage
-        double capacity_factor;     // [-]      actual energy delivered / nameplate
-        double dT;                  // [K]      storage losses
+        double hours_of_capacity = 14.0;  // [hours]  hours of energy storage
+        double capacity_factor = 0.71;    // [-]      actual energy delivered / nameplate
+        double dT;                        // [K]      storage losses
 
         struct warm { // warm storage
 
@@ -206,7 +206,7 @@ public:
     struct field { // solar field data structure
 
         // ratio of receiver thermal input to power cycle thermal input
-        double solar_multiple;  // [-] solar multiple determines hours of energy storage
+        double solar_multiple = 2.5;         // [-] solar multiple determines hours of energy storage
 
         // assumed solar field parameters
         double heliostat_cost_per_area = 75; // [$/m2]  cost per unit area of heliostat           (US DOE, 2012)
@@ -221,7 +221,7 @@ public:
         double area_total_land; // [m2] total land required
 
         field() {
-            area_heliostats = area_total_land = solar_multiple = 0;
+            area_heliostats = area_total_land = 0;
         };
     } s_field;
 
